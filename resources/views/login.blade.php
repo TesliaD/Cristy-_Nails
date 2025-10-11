@@ -43,7 +43,7 @@
                 </form>
 
                 <div class="text-center mt-3">
-                    <small>¿No tienes cuenta? <a href="{{ url('/registro') }}">Regístrate aquí</a></small>
+                    <small>¿No tienes cuenta? <a href="{{ url('auth/registro') }}">Regístrate aquí</a></small>
                 </div>
             </div>
 

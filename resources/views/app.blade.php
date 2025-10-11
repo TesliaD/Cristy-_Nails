@@ -32,13 +32,16 @@
             <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ url('dashboard') }}">Inicio</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ route(name: 'dashboard') }}">Inicio</a>
                     </li>
                     <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route('login') }}">Iniciar Sesión</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ route(name:'sobrenosotros') }}">Sobre Nosotros</a>
                     </li>
                     <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route('agendar') }}">Agendar Cita</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ route(name: 'login') }}">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link text-white fw-semibold" href="{{ route(name: 'agendar') }}">Agendar Cita</a>
                     </li>
                 </ul>
             </div>

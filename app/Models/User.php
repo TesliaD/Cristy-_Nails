@@ -11,8 +11,11 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'usuarios'; // tu tabla
-    public $timestamps = false;     // DESACTIVAR timestamps
+    // Nombre de la tabla en la base de datos
+    protected $table = 'usuarios';
+
+    // Si no desactivas los timestamps, Laravel manejará 'created_at' y 'updated_at'
+    // public $timestamps = false; // No es necesario si usas 'created_at' y 'updated_at'
 
     protected $fillable = [
         'nombre',
@@ -27,6 +30,6 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at' => 'datetime', // Esto es para asegurar que se convierta en objeto de fecha.
     ];
 }

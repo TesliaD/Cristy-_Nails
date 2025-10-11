@@ -20,7 +20,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('agendar.store') }}">
+                    <form method="POST" action="{{ route(name: 'agendar') }}">
                         @csrf
 
                         <!-- Servicio -->
