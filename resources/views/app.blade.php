@@ -54,7 +54,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-dark text-white text-center py-3 mt-5">
+    <footer class="bg-dark text-white text-center py-3 mt-6">
         <p class="mb-0">
             Cristy Nails and Beauty - &copy; {{ date('Y') }} Todos los derechos reservados
         </p>

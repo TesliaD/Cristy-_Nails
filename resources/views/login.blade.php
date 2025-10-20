@@ -1,5 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
+@extends('app')
+
+@section('title', 'Dashboard')
+
+@section('content')
 <head>
     <meta charset="UTF-8">
     <title>Login - Cristy Nails and Beauty</title>
@@ -56,3 +59,4 @@
     </div>
 </body>
 </html>
+@endsection
