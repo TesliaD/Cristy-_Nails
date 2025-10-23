@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Clientes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User; // 👈 Importante: asegúrate de tener esta línea
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -22,20 +23,23 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            $user = Auth::user();
 
-            switch (Auth::user()->rol) {
+            // Redirigir según el rol
+            switch ($user->rol) {
                 case 'admin':
                     return redirect()->route('admin.panel');
-                case 'cliente':
-                    return redirect()->route('agendar');
                 case 'empleado':
                     return redirect()->route('empleado.panel');
+                case 'cliente':
+                    return redirect()->route('agendar');
                 default:
                     Auth::logout();
                     return back()->withErrors(['email' => '⚠️ Rol no reconocido']);
             }
         }
 
+        // Si las credenciales son incorrectas
         return back()->withErrors([
             'email' => '⚠️ Credenciales incorrectas',
         ]);
@@ -60,25 +64,31 @@ class AuthController extends Controller
     // 🔹 Registrar nuevos usuarios
     public function registrarUsuario(Request $request)
     {
-        // Validar los datos del formulario
         $request->validate([
             'nombre' => 'required|string|max:255',
             'email' => 'required|email|unique:usuarios,email',
             'password' => 'required|min:6|confirmed',
         ]);
 
-        // Crear usuario con rol por defecto
+        // Crear usuario (tabla: usuarios)
         $user = User::create([
             'nombre' => $request->nombre,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'rol' => 'cliente', // 👈 le damos rol por defecto
+            'rol' => 'cliente',
         ]);
 
-        // Inicia sesión automáticamente después de registrarse (opcional)
+        // Crear registro en tabla clientes relacionado
+        Clientes::create([
+            'usuario_id' => $user->id,
+            'nombre' => $request->input('cliente_nombre', $request->nombre),
+            'telefono' => $request->input('telefono'),
+            'direccion' => $request->input('direccion'),
+        ]);
+
+        // Iniciar sesión automáticamente después de registrarse
         Auth::login($user);
 
-        // Redirige según su rol (cliente por defecto)
         return redirect()->route('agendar')
             ->with('success', '¡Bienvenido! Tu cuenta se creó correctamente.');
     }

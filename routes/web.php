@@ -7,15 +7,18 @@ use App\Http\Controllers\AuthController;
 // 🧩 GRUPO DE AUTENTICACIÓN (Login / Registro)
 // -----------------------------------------------------------
 Route::prefix('auth')->group(function () {
-
     // LOGIN
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post'); // 👈 Añadido el name
+
+    // LOGOUT
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // REGISTRO
     Route::get('/registro', [AuthController::class, 'mostrarRegistro'])->name('registro');
     Route::post('/registro', [AuthController::class, 'registrarUsuario'])->name('registro.guardar');
 });
+
 
 // -----------------------------------------------------------
 // 🏠 GRUPO DE VISTAS GENERALES (Dashboard, Inicio, etc.)

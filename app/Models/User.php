@@ -32,4 +32,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime', // Esto es para asegurar que se convierta en objeto de fecha.
     ];
+
+     public function cliente()
+    {
+        return $this->hasOne(clientes::class, 'usuario_id');
+    }
 }

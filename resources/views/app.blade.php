@@ -8,6 +8,9 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Iconos de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <!-- Tu CSS personalizado -->
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
@@ -15,10 +18,36 @@
 
     <!-- HEADER -->
     <header class="bg-white shadow-sm">
-        <div class="container d-flex justify-content-center py-3">
+        <div class="container d-flex justify-content-between align-items-center py-3">
+            <!-- Logo -->
             <a href="{{ url('/') }}">
                 <img class="img-fluid" src="{{ asset('img/nailslogo.jpg') }}" alt="Cristy Nails and Beauty" style="max-height: 80px;">
             </a>
+
+            <!-- Ícono de usuario -->
+            <div class="dropdown">
+                @auth
+                    <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-4 me-2 text-danger"></i>
+                        <span>{{ Auth::user()->nombre }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ route('dashboard') }}">Mi Panel</a></li>
+                        <li><a class="dropdown-item" href="{{ route('agendar') }}">Agendar Cita</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button class="dropdown-item text-danger" type="submit">Cerrar sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-outline-danger d-flex align-items-center">
+                        <i class="bi bi-person fs-4 me-2"></i> Iniciar Sesión
+                    </a>
+                @endauth
+            </div>
         </div>
     </header>
 
@@ -32,16 +61,13 @@
             <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route(name: 'dashboard') }}">Inicio</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ route('dashboard') }}">Inicio</a>
                     </li>
                     <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route(name:'sobrenosotros') }}">Sobre Nosotros</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ route('sobrenosotros') }}">Sobre Nosotros</a>
                     </li>
                     <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route(name: 'login') }}">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route(name: 'agendar') }}">Agendar Cita</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ route('agendar') }}">Agendar Cita</a>
                     </li>
                 </ul>
             </div>
