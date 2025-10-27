@@ -1,0 +1,37 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fa;
+}
+
+#wrapper {
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+   background-color: #f82061; 
+}
+
+#page-content {
+  margin-left: 250px;
+  background-color: #fff;
+  border-radius: 10px;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.btn {
+  border-radius: 10px;
+}
+
+.boton_datos{
+   background-color: green; 
+}

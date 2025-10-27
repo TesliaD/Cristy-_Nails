@@ -13,7 +13,7 @@ class AuthController extends Controller
     // 🔹 Mostrar formulario de login
     public function showLogin()
     {
-        return view('login'); 
+        return view('layouts.login'); 
     }
 
     // 🔹 Iniciar sesión
@@ -58,7 +58,7 @@ class AuthController extends Controller
     // 🔹 Mostrar formulario de registro
     public function mostrarRegistro()
     {
-        return view('registro');
+        return view('layouts.registro');
     }
 
     // 🔹 Registrar nuevos usuarios
@@ -91,5 +91,9 @@ class AuthController extends Controller
 
         return redirect()->route('agendar')
             ->with('success', '¡Bienvenido! Tu cuenta se creó correctamente.');
+    }
+
+    public function mostrarpanelclientes(){
+        return view('clientes.panelclientes');
     }
 }
