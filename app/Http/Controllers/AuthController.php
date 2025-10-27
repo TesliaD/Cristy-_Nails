@@ -65,14 +65,14 @@ class AuthController extends Controller
     public function registrarUsuario(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'usuario' => 'required|string|max:255',
             'email' => 'required|email|unique:usuarios,email',
             'password' => 'required|min:6|confirmed',
         ]);
 
         // Crear usuario (tabla: usuarios)
         $user = User::create([
-            'nombre' => $request->nombre,
+            'usuario' => $request->usuario,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'rol' => 'cliente',

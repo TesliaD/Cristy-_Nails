@@ -31,33 +31,53 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route(name: 'registro.guardar') }}">
-                    @csrf
-                    
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Usuario</label>
-                        <input type="text" class="form-control" name="nombre" id="nombre" value="{{ old('name') }}" required>
-                    </div>
+        <form method="POST" action="{{ route('registro.guardar') }}">
+            @csrf
+    
+            <div class="mb-3">
+                <label for="usuario" class="form-label">Usuario</label>
+                <input type="text" class="form-control" name="usuario" id="usuario" value="{{ old('usuario') }}" required>
+            </div>
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-control" name="email" id="email" value="{{ old('email') }}" required>
-                    </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" name="email" id="email" value="{{ old('email') }}" required>
+            </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" name="password" id="password" required>
-                    </div>
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre Completo</label>
+                <input type="text" class="form-control" name="nombre" id="nombre" value="{{ old('nombre') }}">
+            </div>
 
-                    <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
-                        <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" required>
-                    </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" name="telefono" id="telefono" value="{{ old('telefono') }}">
+            </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Registrarse</button>
-                    </div>
-                </form>
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" name="direccion" id="direccion" value="{{ old('direccion') }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
+                <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" name="password" id="password" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
+                <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" required>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+            </div>
+        </form>
 
                 <div class="text-center mt-3">
                     <small>¿Ya tienes cuenta? <a href="{{ route(name: 'login') }}">Inicia sesión</a></small>

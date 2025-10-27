@@ -84,7 +84,7 @@
     <!-- Contenido principal -->
     <div id="page-content" class="p-4 flex-grow-1">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1><i class="bi bi-person-fill-check"></i> Bienvenido, {{ Auth::user()->nombre ?? 'Cliente' }}</h1>
+        <h1><i class="bi bi-person-fill-check"></i> Bienvenido, {{ Auth::user()->usuario ?? 'Cliente' }}</h1>
       </div>
 
       @if(session('success'))
@@ -95,7 +95,7 @@
       <section id="perfil" class="mb-5">
         <h4 class="mb-3">Mi Perfil</h4>
         <div class="card p-4 shadow-sm">
-          <p><strong>Nombre:</strong> {{ $user->nombre ?? 'No registrado' }}</p>
+          <p><strong>Nombre:</strong> {{ $cliente->nombre ?? 'No registrado' }}</p>
           <p><strong>Email:</strong> {{ $user->email ?? 'No registrado' }}</p>
           <p><strong>Teléfono:</strong> {{ $cliente->telefono ?? 'No registrado' }}</p>
           <p><strong>Dirección:</strong> {{ $cliente->direccion ?? 'No registrada' }}</p>
@@ -113,7 +113,7 @@
 
           <div class="mb-3">
             <label class="form-label">Nombre</label>
-            <input type="text" name="nombre" class="form-control" value="{{ old('nombre', $user->nombre ?? '') }}">
+            <input type="text" name="nombre" class="form-control" value="{{ old('nombre', $cliente->nombre ?? '') }}">
           </div>
 
           <div class="mb-3">

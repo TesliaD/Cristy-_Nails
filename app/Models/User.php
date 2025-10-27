@@ -18,7 +18,7 @@ class User extends Authenticatable
     // public $timestamps = false; // No es necesario si usas 'created_at' y 'updated_at'
 
     protected $fillable = [
-        'nombre',
+        'usuario',
         'email',
         'password',
         'rol',

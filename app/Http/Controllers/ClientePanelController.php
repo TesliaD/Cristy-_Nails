@@ -36,7 +36,7 @@ class ClientePanelController extends Controller
         ]);
 
         // Actualizar usuario
-        if ($request->filled('nombre')) {
+        if ($request->filled('usuario')) {
             $user->nombre = $request->nombre;
         }
 
