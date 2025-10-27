@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use resources\views\clientes;
 use App\Http\Controllers\ClientePanelController;
 
 // -----------------------------------------------------------
@@ -23,11 +22,11 @@ Route::prefix('auth')->group(function () {
 
 //Panel para clientes
 
-Route::prefix('auth','cliente')->group(function(){
-
-    Route::get('/panelclientes',[AuthController::class, 'mostrarpanelclientes'])->name('panelclientes');
-    Route::post('/panelcliente', [ClientePanelController::class, 'update'])->name('panelcliente.update');
+Route::middleware('auth')->prefix('cliente')->group(function () {
+    Route::get('/panel', [AuthController::class, 'mostrarpanelclientes'])->name('panelclientes');
+    Route::post('/panel/update', [ClientePanelController::class, 'update'])->name('panelcliente.update');
 });
+
 
 
 // -----------------------------------------------------------

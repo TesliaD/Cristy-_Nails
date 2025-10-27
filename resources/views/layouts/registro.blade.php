@@ -1,4 +1,4 @@
-@extends('app')
+@extends('layouts.app')
 
 @section('title', 'Agendar Cita')
 
@@ -33,9 +33,9 @@
 
                 <form method="POST" action="{{ route(name: 'registro.guardar') }}">
                     @csrf
-
+                    
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre completo</label>
+                        <label for="nombre" class="form-label">Usuario</label>
                         <input type="text" class="form-control" name="nombre" id="nombre" value="{{ old('name') }}" required>
                     </div>
 
