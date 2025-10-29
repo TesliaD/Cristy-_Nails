@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientePanelController;
+use function PHPUnit\Framework\callback;
 
 // -----------------------------------------------------------
 // 🧩 GRUPO DE AUTENTICACIÓN (Login / Registro)
@@ -27,6 +29,10 @@ Route::middleware('auth')->prefix('cliente')->group(function () {
     Route::post('/panel/update', [ClientePanelController::class, 'update'])->name('panelcliente.update');
 });
 
+//Panel para Administrador
+Route::middleware('auth')->prefix('admin')->group(function () {
+    Route::get('/paneladmin', [AuthController::class, 'mostrarpaneladmin'])->name('paneladmin');
+});
 
 
 // -----------------------------------------------------------

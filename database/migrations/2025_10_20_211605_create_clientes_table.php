@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('clientes', function (Blueprint $table) {
-            $table->id(); // Esto crea el campo 'id' como clave primaria.
-            $table->foreignId('usuario_id') // Cambié 'id' por 'usuario_id'
+            $table->id(); 
+            $table->foreignId('usuario_id') 
                 ->constrained('usuarios') // Esto crea una clave foránea que apunta a la tabla 'usuarios'
                 ->onDelete('cascade'); // Si el usuario es eliminado, el cliente se elimina también
             $table->string('nombre')->nullable();

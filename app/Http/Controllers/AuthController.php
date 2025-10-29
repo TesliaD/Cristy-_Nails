@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use PHPUnit\Framework\Constraint\Operator;
 
 class AuthController extends Controller
 {
@@ -28,11 +29,11 @@ class AuthController extends Controller
             // Redirigir según el rol
             switch ($user->rol) {
                 case 'admin':
-                    return redirect()->route('admin.panel');
+                    return redirect()->route('paneladmin');
                 case 'empleado':
                     return redirect()->route('empleado.panel');
                 case 'cliente':
-                    return redirect()->route('panelclientes'); // 👈 antes decía 'agendar'
+                    return redirect()->route('panelclientes'); 
                 default:
                     Auth::logout();
                     return back()->withErrors(['email' => '⚠️ Rol no reconocido']);
@@ -93,7 +94,7 @@ class AuthController extends Controller
             ->with('success', '¡Bienvenido! Tu cuenta se creó correctamente.');
     }
 
-    // 🔹 Mostrar panel del cliente con sus datos
+    //Mostrar panel del cliente con sus datos
     public function mostrarpanelclientes()
     {
         $user = Auth::user();
@@ -103,5 +104,15 @@ class AuthController extends Controller
 
         // Enviar datos a la vista
         return view('clientes.panelclientes', compact('user', 'cliente'));
+    }
+
+    //Mostrar panel de Administrador con sus datos
+    public function mostrarpaneladmin()
+    {
+        $user = Auth::user();
+        
+        $admin = User::where(column:'usuario', operator:$user->id)->first();
+        //Enviar datos de la vista de administrador
+         return view('admin.paneladmin', compact('user', 'admin'));
     }
 }

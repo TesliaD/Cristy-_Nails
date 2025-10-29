@@ -8,5 +8,8 @@
 </head>
 <body>
     <div>Panel Empleados</div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1><i class="bi bi-person-fill-check"></i> Bienvenido, {{ Auth::user()->usuario ?? 'admin' }}</h1>
+        </div>
 </body>
 </html>

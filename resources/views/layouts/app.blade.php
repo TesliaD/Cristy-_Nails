@@ -28,16 +28,16 @@
             @auth
                 <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-person-circle fs-4 me-2 text-danger"></i>
-                    <span>{{ Auth::user()->nombre }}</span>
+                    <span>{{ Auth::user()->usuario }}</span>
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-end">
                     @if(Auth::user()->rol === 'admin')
                         <!-- Opciones del administrador -->
-                        <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Panel de Administración</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.usuarios') }}">Gestión de Usuarios</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.citas') }}">Gestión de Citas</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.reportes') }}">Reportes</a></li>
+                        <li><a class="dropdown-item" href="{{ route('paneladmin') }}">Panel de Administración</a></li>
+                        <li><a class="dropdown-item" href="{{ route('login') }}">Gestión de Usuarios</a></li> <!--Se van a modificar-->
+                        <li><a class="dropdown-item" href="{{ route('agendar') }}">Gestión de Citas</a></li> <!--Se van a modificar-->
+                        <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Reportes</a></li> <!--Se van a modificar-->
                     @else
                         <!-- Opciones del cliente -->
                         <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Mi Panel</a></li>
