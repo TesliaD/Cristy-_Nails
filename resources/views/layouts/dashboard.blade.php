@@ -1,53 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Nuestros Servicios')
 
 @section('content')
-<h1>Nuestros Servicios</h1>
+<h1 class="text-center mb-4">Nuestros Servicios</h1>
 
 <div class="grid">
-    <!-- Servicio 1 -->
-    <div class="producto">
-        <a href="{{ route('agendar', ['servicio' => 'manicura']) }}">
-            <img class="producto__imagen" src="{{ asset('img/manicure.jpg') }}" alt="Manicura">
-            <div class="producto__informacion">
-                <p class="producto__nombre">💅 Manicura</p>
-                <p class="producto__precio">$200 MXN</p>
-            </div>
-        </a>
-    </div>
+    @forelse($servicios as $servicio)
+        <div class="producto">
+            <a href="{{ route('agendar', ['servicio' => $servicio->Nom_Servicio]) }}">
+                <img class="producto__imagen"
+                     src="{{ $servicio->imagen ? asset('storage/' . $servicio->imagen) : asset('img/default-servicio.jpg') }}"
+                     alt="{{ $servicio->Nom_Servicio }}">
 
-    <!-- Servicio 2 -->
-    <div class="producto">
-        <a href="{{ route('agendar', ['servicio' => 'pedicura']) }}">
-            <img class="producto__imagen" src="{{ asset('img/pedicure.jpeg') }}" alt="Pedicura">
-            <div class="producto__informacion">
-                <p class="producto__nombre">🦶 Pedicura</p>
-                <p class="producto__precio">$250 MXN</p>
-            </div>
-        </a>
-    </div>
+                <div class="producto__informacion">
+                    <p class="producto__nombre">💅 {{ $servicio->Nom_Servicio }}</p>
+                    <p class="producto__precio">${{ number_format($servicio->Precio, 2) }} MXN</p>
 
-    <!-- Servicio 3 -->
-    <div class="producto">
-        <a href="{{ route('agendar', ['servicio' => 'diseno']) }}">
-            <img class="producto__imagen" src="{{ asset('img/nailsdesign.jpg') }}" alt="Diseño de Uñas">
-            <div class="producto__informacion">
-                <p class="producto__nombre">🎨 Diseño de Uñas</p>
-                <p class="producto__precio">$300 MXN</p>
-            </div>
-        </a>
-    </div>
-
-    <!-- Servicio 4 -->
-    <div class="producto">
-        <a href="{{ route('agendar', ['servicio' => 'otros']) }}">
-            <img class="producto__imagen" src="{{ asset('img/otrosservicios.jpg') }}" alt="Otros Servicios">
-            <div class="producto__informacion">
-                <p class="producto__nombre">✨ Otros Servicios</p>
-                <p class="producto__precio">Desde $150 MXN</p>
-            </div>
-        </a>
-    </div>
+                    @if($servicio->Descripcion)
+                        <p class="producto__descripcion">{{ $servicio->Descripcion }}</p>
+                    @endif
+                </div>
+            </a>
+        </div>
+    @empty
+        <p class="text-center">No hay servicios disponibles por el momento.</p>
+    @endforelse
 </div>
 @endsection

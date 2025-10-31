@@ -83,7 +83,8 @@
         </li>
 
       </ul>
-    </div>
+    </div> <!--Fin del sidebar-->
+
 
     <!-- Contenido principal -->
     <div id="page-content" class="p-4 flex-grow-1">
@@ -172,11 +173,83 @@
         <p>Aquí se pueden ver, crear o cancelar todas las citas de los clientes.</p>
       </section>
 
-      <!-- SERVICIOS -->
-      <section id="servicios" class="mb-5" style="display:none;">
+
+    <!-- SERVICIOS -->
+    <section id="servicios" class="mb-5" style="display:none;">
         <h4 class="mb-3">Gestión de Servicios</h4>
         <p>Agregar, editar o eliminar los servicios disponibles.</p>
-      </section>
+
+      <!-- Formulario para agregar servicio -->
+        <form action="{{ route('servicios.store') }}" method="POST" class="mb-4">
+          @csrf
+        <div class="row g-3">
+          <div class="col-md-4">
+            <input type="text" name="Nom_Servicio" class="form-control" placeholder="Nombre del servicio" required>
+        </div>
+        <div class="col-md-3">
+          <input type="number" step="0.01" name="Precio" class="form-control" placeholder="Precio" required>
+        </div>
+        <div class="col-md-3">
+          <input type="number" name="Duracion" class="form-control" placeholder="Duración (min)" required>
+        </div>
+        <div class="col-md-8 mt-2">
+          <textarea name="Descripcion" class="form-control" placeholder="Descripción" rows="2"></textarea>
+        </div>
+        <div class="col-md-8 mt-2">
+          <input type="file" name="imagen" class="form-control">
+        </div>
+        <div class="col-md-4 mt-2">
+          <button type="submit" class="btn btn-success w-100">Agregar Servicio</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Tabla de servicios -->
+    <table class="table table-striped table-bordered align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Imagen</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Duración</th>
+          <th>Activo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach ($servicios as $servicio)
+          <tr>
+            <form action="{{ route('servicios.update', $servicio->id) }}" method="POST">
+              @csrf
+              @method('PUT')
+              <td><input type="file" name="imagen" class="form-control" accept="image/*"></td>
+              <td><input type="text" name="Nom_Servicio" value="{{ $servicio->Nom_Servicio }}" class="form-control"></td>
+              <td><textarea name="Descripcion" class="form-control">{{ $servicio->Descripcion }}</textarea></td>
+              <td><input type="number" step="0.01" name="precio" value="{{ $servicio->Precio }}" class="form-control"></td>
+              <td><input type="number" name="Duracion" value="{{ $servicio->Duracion }}" class="form-control"></td>
+              <td class="text-center">
+                <input type="checkbox" name="activo" value="1" {{ $servicio->Activo ? 'checked' : '' }}>
+              </td>
+              <td class="text-center">
+                <button type="submit" class="btn btn-primary btn-sm">💾</button>
+            </form>
+            <form action="{{ route('servicios.destroy', $servicio->id) }}" method="POST" style="display:inline;">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+            </form>
+              </td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+
+    @if (session('success'))
+      <div class="alert alert-success mt-3">{{ session('success') }}</div>
+    @endif
+  </section>
+
 
       <!-- REPORTES -->
       <section id="reportes" class="mb-5" style="display:none;">

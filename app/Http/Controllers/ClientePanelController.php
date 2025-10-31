@@ -48,7 +48,7 @@ class ClientePanelController extends Controller
             $user->password = Hash::make($request->password);
         }
 
-        $user->save();
+      
 
         // Actualizar o crear el registro del cliente
         $cliente = Clientes::updateOrCreate(

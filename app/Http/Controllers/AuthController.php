@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Servicios;
 use PHPUnit\Framework\Constraint\Operator;
 
 class AuthController extends Controller
@@ -31,7 +32,7 @@ class AuthController extends Controller
                 case 'admin':
                     return redirect()->route('paneladmin');
                 case 'empleado':
-                    return redirect()->route('empleado.panel');
+                    return redirect()->route('panelempleado');
                 case 'cliente':
                     return redirect()->route('panelclientes'); 
                 default:
@@ -107,12 +108,24 @@ class AuthController extends Controller
     }
 
     //Mostrar panel de Administrador con sus datos
+    
     public function mostrarpaneladmin()
     {
         $user = Auth::user();
-        
-        $admin = User::where(column:'usuario', operator:$user->id)->first();
-        //Enviar datos de la vista de administrador
-         return view('admin.paneladmin', compact('user', 'admin'));
+
+        // Este where está mal: 'usuario' no es una columna que compare con el id del usuario.
+        // Si solo quieres obtener los datos del usuario autenticado:
+        $admin = $user;
+
+        // 🔹 Cargar todos los servicios
+        $servicios = Servicios::all();
+
+        // Enviar las variables a la vista
+        return view('admin.paneladmin', compact('user', 'admin', 'servicios'));
+    }
+
+    public function mostrarpanelempleado(){
+        $user = Auth::user();
+        return view('empleados.panelempleados', compact('user', 'empleado'));
     }
 }

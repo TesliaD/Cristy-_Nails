@@ -25,42 +25,47 @@
 
         <!-- Ícono de usuario -->
         <div class="dropdown">
-            @auth
-                <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle fs-4 me-2 text-danger"></i>
-                    <span>{{ Auth::user()->usuario }}</span>
-                </button>
+    @auth
+        <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle fs-4 me-2 text-danger"></i>
+            <span>{{ Auth::user()->usuario }}</span>
+        </button>
 
-                <ul class="dropdown-menu dropdown-menu-end">
-                    @if(Auth::user()->rol === 'admin')
-                        <!-- Opciones del administrador -->
-                        <li><a class="dropdown-item" href="{{ route('paneladmin') }}">Panel de Administración</a></li>
-                        <li><a class="dropdown-item" href="{{ route('login') }}">Gestión de Usuarios</a></li> <!--Se van a modificar-->
-                        <li><a class="dropdown-item" href="{{ route('agendar') }}">Gestión de Citas</a></li> <!--Se van a modificar-->
-                        <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Reportes</a></li> <!--Se van a modificar-->
-                    @else
-                        <!-- Opciones del cliente -->
-                        <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Mi Panel</a></li>
-                        <li><a class="dropdown-item" href="{{ route('agendar') }}">Agendar Cita</a></li>
-                        <li><a class="dropdown-item" href="{{ route('login') }}">Mis Citas</a></li>      
-                    
-                    @endif
+        <ul class="dropdown-menu dropdown-menu-end">
+            @if(Auth::user()->rol === 'admin')
+                <!-- 🔹 Opciones del administrador -->
+                <li><a class="dropdown-item" href="{{ route('paneladmin') }}">Panel de Administración</a></li>
+                <li><a class="dropdown-item" href="{{ route('login') }}">Gestión de Usuarios</a></li>
+                <li><a class="dropdown-item" href="{{ route('login') }}">Gestión de Citas</a></li>
+                <li><a class="dropdown-item" href="{{ route('login') }}">Reportes</a></li>
 
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button class="dropdown-item text-danger" type="submit">Cerrar sesión</button>
-                        </form>
-                    </li>
-                </ul>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-outline-danger d-flex align-items-center">
-                    <i class="bi bi-person fs-4 me-2"></i> Iniciar Sesión
-                </a>
-            @endauth
-        </div>
-    </div>
+            @elseif(Auth::user()->rol === 'empleado')
+                <!-- 🔹 Opciones del empleado -->
+                <li><a class="dropdown-item" href="{{ route('panelempleado') }}">Panel del Empleado</a></li>
+                <li><a class="dropdown-item" href="{{ route('login') }}">Citas Asignadas</a></li>
+
+            @elseif(Auth::user()->rol === 'cliente')
+                <!-- 🔹 Opciones del cliente -->
+                <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Mi Panel</a></li>
+                <li><a class="dropdown-item" href="{{ route('agendar') }}">Agendar Cita</a></li>
+                <li><a class="dropdown-item" href="{{ route('login') }}">Mis Citas</a></li>
+            @endif
+
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button class="dropdown-item text-danger" type="submit">Cerrar sesión</button>
+                </form>
+            </li>
+        </ul>
+
+    @else
+        <a href="{{ route('login') }}" class="btn btn-outline-danger d-flex align-items-center">
+            <i class="bi bi-person fs-4 me-2"></i> Iniciar Sesión
+        </a>
+    @endauth
+</div>
 </header>
 
 
