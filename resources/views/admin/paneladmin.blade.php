@@ -127,45 +127,133 @@
           </div>
         </div>
       </section>
-
+      
       <!-- CLIENTES -->
-      <section id="clientes" class="mb-5" style="display:none;">
-        <h4 class="mb-3">Gestión de Clientes</h4>
-        <a href="" class="btn btn-success mb-3">
-          <i class="bi bi-plus-circle"></i> Nuevo Cliente
-        </a>
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-             
-              <tr>
-             
-                <td>
-                  <a href="" class="btn btn-sm btn-primary">
-                    <i class="bi bi-pencil-square"></i>
-                  </a>
-                  <form action="" method="POST" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-danger">
-                      <i class="bi bi-trash-fill"></i>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <section id="clientes" class="mb-5" style="display:none;">
+          <h4 class="mb-3">Gestión de Clientes</h4>
+
+          <!-- Barra de búsqueda -->
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" id="buscarCliente" class="form-control" placeholder="Buscar cliente por nombre, email o teléfono...">
+          </div>
+
+          <!-- Botón para agregar cliente -->
+          <a href="#" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#nuevoClienteModal">
+            <i class="bi bi-plus-circle"></i> Nuevo Cliente
+          </a>
+
+          <!-- Modal para nuevo cliente -->
+          <div class="modal fade" id="nuevoClienteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form action="{{ route('clientes.store') }}" method="POST">
+                  @csrf
+                  <div class="modal-header">
+                    <h5 class="modal-title">Agregar Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <label class="form-label">Nombre</label>
+                      <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Email</label>
+                      <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Teléfono</label>
+                      <input type="text" name="telefono" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Dirección</label>
+                      <input type="text" name="direccion" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Fecha de nacimiento</label>
+                      <input type="date" name="fecha_nacimiento" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Rol</label>
+                      <select name="rol" class="form-select">
+                        <option value="cliente" selected>Cliente</option>
+                        <option value="admin">Administrador</option>
+                        <option value="empleado">Empleado</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Contraseña</label>
+                      <input type="password" name="password" class="form-control" required>
+                    </div>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de clientes -->
+          <div class="table-responsive">
+            <table class="table table-striped align-middle" id="tablaClientes">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th>Dirección</th>
+                  <th>Rol</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach ($clientes as $cliente)
+                <tr>
+                  <td>{{ $cliente->id }}</td>
+                  <td>{{ $cliente->usuario->usuario ?? '-' }}</td>
+                  <td>{{ $cliente->nombre }}</td>
+                  <td>{{ $cliente->usuario->email ?? '-' }}</td>
+                  <td>{{ $cliente->telefono }}</td>
+                  <td>{{ $cliente->direccion }}</td>
+                  <td>{{ $cliente->usuario->rol ?? 'cliente' }}</td>
+                  <td>
+                    <a href="{{ route('clientes.edit', $cliente->id) }}" class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" class="d-inline">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar cliente?')">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Script de búsqueda -->
+        <script>
+          document.getElementById("buscarCliente").addEventListener("keyup", function() {
+            const texto = this.value.toLowerCase();
+            const filas = document.querySelectorAll("#tablaClientes tbody tr");
+
+            filas.forEach(fila => {
+              const coincide = fila.innerText.toLowerCase().includes(texto);
+              fila.style.display = coincide ? "" : "none";
+            });
+          });
+        </script>
 
       <!-- CITAS -->
       <section id="citas" class="mb-5" style="display:none;">

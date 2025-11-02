@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientePanelController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\AdminPanelController;
 use function PHPUnit\Framework\callback;
 
 
@@ -35,16 +36,27 @@ Route::middleware('auth')->prefix('cliente')->group(function () {
 //Panel para Administrador
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/paneladmin', [AuthController::class, 'mostrarpaneladmin'])->name('paneladmin');
+
+    //Rutas para servicios en el Panel de administrador
     Route::get('/paneladmin/servicios', [ServicioController::class, 'index'])->name('servicios.index');
     Route::post('/paneladmin/servicios', [ServicioController::class, 'store'])->name('servicios.store');
     Route::put('/paneladmin/servicios/{id}', [ServicioController::class, 'update'])->name('servicios.update');
     Route::delete('/paneladmin/servicios/{id}', [ServicioController::class, 'destroy'])->name('servicios.destroy');
+
+    //Rutas para Clientes en el panel de Administrador
+    Route::post('/paneladmin/clientes', [AdminPanelController::class,'clientes_store'])->name('clientes.store');
+    Route::post('/paneladmin/clientes', [AdminPanelController::class, 'clientes_store'])->name('clientes.store');
+    Route::delete('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_destroy'])->name('clientes.destroy');
+    Route::get('/paneladmin/clientes/{id}/edit', [AdminPanelController::class, 'clientes_edit'])->name('clientes.edit');
+    Route::put('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_update'])->name('clientes.update');
+
 });
 
 //Panel para Empleados
 
 Route::middleware('auth')->prefix('empleado')->group(function () {
     Route::get('/panelempleado', [EmpleadoController::class, 'index'])->name('panelempleado');
+
 });
 
 

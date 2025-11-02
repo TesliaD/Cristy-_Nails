@@ -107,22 +107,22 @@ class AuthController extends Controller
         return view('clientes.panelclientes', compact('user', 'cliente'));
     }
 
-    //Mostrar panel de Administrador con sus datos
-    
+        //Mostrar panel de Administrador con sus datos
+        
     public function mostrarpaneladmin()
-    {
-        $user = Auth::user();
+        {
+            $user = Auth::user();
+            $admin = $user;
 
-        // Este where está mal: 'usuario' no es una columna que compare con el id del usuario.
-        // Si solo quieres obtener los datos del usuario autenticado:
-        $admin = $user;
+            // 🔹 Cargar todos los servicios
+            $servicios = Servicios::all();
 
-        // 🔹 Cargar todos los servicios
-        $servicios = Servicios::all();
+            // 🔹 Cargar todos los clientes junto con su usuario
+            $clientes = Clientes::with('usuario')->get();
 
-        // Enviar las variables a la vista
-        return view('admin.paneladmin', compact('user', 'admin', 'servicios'));
-    }
+            // ✅ Pasamos $clientes también a la vista
+            return view('admin.paneladmin', compact('user', 'admin', 'servicios', 'clientes'));
+        }
 
     public function mostrarpanelempleado(){
         $user = Auth::user();
