@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Servicios;
 use Illuminate\Http\Request;
-
-use function PHPUnit\Framework\returnCallback;
 
 class ServicioController extends Controller
 {
@@ -14,53 +13,67 @@ class ServicioController extends Controller
         $servicios = Servicios::all();
         return view('admin.paneladmin', compact('servicios'));
     }
+
     // Mostrar servicios en la página pública del cliente
     public function mostrarServicios()
     {
-         // obtiene los servicios activos
+        // obtiene los servicios activos
         $servicios = Servicios::where('Activo', 1)->get();
 
         // devuelve la vista dashboard y le pasa los servicios
         return view('layouts.dashboard', ['servicios' => $servicios]);
     }
 
-    //Metodo para guardar un nuevo servicio
+    //Guardar un nuevo servicio
     public function store(Request $request)
     {
         $request->validate([
-            'Nom_Servicio'=>'required|string|max:100',
-            'Descripcion'=>'nullable|string',
-            'Precio'=>'required|numeric|min:0',
-            'Duracion'=>'nullable|integer|min:0'
+            'Nom_Servicio' => 'required|string|max:100',
+            'Descripcion'  => 'nullable|string',
+            'Precio'       => 'required|numeric|min:0',
+            'Duracion'     => 'nullable|integer|min:0',
+            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        //Guarda los datos
-        $data=$request->all();
+        $data = $request->all();
 
-        //Si el usuario subió una imagen
-        if($request->hasFile('imagen'))
-        {
-            $path=$request->file('imagen')->store('servicios','public');
-            $data['imagen']=$path;
+        // ✅ Guarda la imagen si existe
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('servicios', 'public');
+            $data['imagen'] = $path;
         }
 
         Servicios::create($data);
-        return redirect()->back()->with('success','Servicio agregado');
+
+        return redirect()->back()->with('success', 'Servicio agregado correctamente.');
     }
 
-    //Editar Servicio
+    //Actualizar Servicio
     public function update(Request $request, $id)
     {
-        $servicio =Servicios::findOrFail($id);
+        $servicio = Servicios::findOrFail($id);
 
         $request->validate([
-            'Nom_Servicio'=>'required|string|max:100',
-            'Descripcion' => 'nullable|string',
-            'Precio' => 'required|numeric|min:0',
-            'Duracion' => 'nullable|integer|min:0',
+            'Nom_Servicio' => 'required|string|max:100',
+            'Descripcion'  => 'nullable|string',
+            'precio'       => 'required|numeric|min:0',
+            'Duracion'     => 'nullable|integer|min:0',
+            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $servicio->update($request->all());
+        $servicio->Nom_Servicio = $request->Nom_Servicio;
+        $servicio->Descripcion  = $request->Descripcion;
+        $servicio->Precio       = $request->precio;
+        $servicio->Duracion     = $request->Duracion;
+        $servicio->Activo       = $request->has('activo');
+
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('servicios', 'public');
+            $servicio->imagen = $path;
+        }
+
+        $servicio->save();
+
         return redirect()->back()->with('success', 'Servicio actualizado correctamente.');
     }
 
@@ -70,7 +83,6 @@ class ServicioController extends Controller
         $servicio = Servicios::findOrFail($id);
         $servicio->delete();
 
-        return redirect()->back()->with('success','Servicio eliminado correctamente');
+        return redirect()->back()->with('success', 'Servicio eliminado correctamente.');
     }
-    
 }

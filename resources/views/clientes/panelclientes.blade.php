@@ -110,7 +110,6 @@
         <h4 class="mb-3">Actualizar mi perfil</h4>
         <form method="POST" action="{{ route('panelcliente.update') }}">
           @csrf
-
           <div class="mb-3">
             <label class="form-label">Nombre</label>
             <input type="text" name="nombre" class="form-control" value="{{ old('nombre', $cliente->nombre ?? '') }}">

@@ -34,7 +34,7 @@ class AdminPanelController extends Controller
 
         // ✅ Crear usuario (tabla usuarios)
         $usuario = User::create([
-            'usuario' => $request->nombre,
+            'usuario' => $request->usuario,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'rol' => $request->rol,
@@ -57,31 +57,24 @@ class AdminPanelController extends Controller
     public function clientes_update(Request $request, $id)
     {
         $cliente = Clientes::findOrFail($id);
-        $usuario = $cliente->usuario;
+        $user = $cliente->usuario;
 
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email' => 'required|email|unique:usuarios,email,' . $usuario->id,
-            'telefono' => 'nullable|string|max:20',
-            'direccion' => 'nullable|string|max:255',
-            'fecha_nacimiento' => 'nullable|date',
-            'rol' => 'required|in:cliente,admin,empleado',
-        ]);
+        // Actualizar datos
+        $user->usuario = $request->usuario;
+        $user->email = $request->email;
+        $user->rol = $request->rol;
+        $user->save();
 
-        // Actualiza usuario
-        $usuario->update([
-            'usuario' => $request->nombre,
-            'email' => $request->email,
-            'rol' => $request->rol,
-        ]);
+        $cliente->nombre = $request->nombre;
+        $cliente->telefono = $request->telefono;
+        $cliente->direccion = $request->direccion;
+        $cliente->save();
 
-        // Actualiza cliente
-        $cliente->update([
-            'nombre' => $request->nombre,
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-        ]);
+        // Contraseña opcional
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+            $user->save();
+        }
 
         return redirect()->back()->with('success', 'Cliente actualizado correctamente.');
     }
@@ -90,7 +83,14 @@ class AdminPanelController extends Controller
     public function clientes_destroy($id)
     {
         $cliente = Clientes::findOrFail($id);
-        $cliente->delete(); // Gracias a onDelete('cascade') también borra el usuario
-        return redirect()->back()->with('success', 'Cliente eliminado correctamente.');
+
+        // Eliminar también el usuario asociado
+        if ($cliente->usuario_id) {
+            $cliente->usuario()->delete(); // elimina el usuario y por cascada el cliente
+        } else {
+            $cliente->delete();
+        }
+
+        return redirect()->back()->with('success', 'Cliente y usuario eliminados correctamente.');
     }
 }

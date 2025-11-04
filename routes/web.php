@@ -45,7 +45,6 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     //Rutas para Clientes en el panel de Administrador
     Route::post('/paneladmin/clientes', [AdminPanelController::class,'clientes_store'])->name('clientes.store');
-    Route::post('/paneladmin/clientes', [AdminPanelController::class, 'clientes_store'])->name('clientes.store');
     Route::delete('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_destroy'])->name('clientes.destroy');
     Route::get('/paneladmin/clientes/{id}/edit', [AdminPanelController::class, 'clientes_edit'])->name('clientes.edit');
     Route::put('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_update'])->name('clientes.update');

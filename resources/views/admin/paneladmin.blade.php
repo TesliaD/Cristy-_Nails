@@ -14,6 +14,28 @@
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="{{ asset('css/panelclientes.css') }}">
 </head>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('editarClienteModal');
+  const form = document.getElementById('editarClienteForm');
+
+  modal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    const id = button.getAttribute('data-id');
+
+    // 🔹 Cambiar la ruta del formulario dinámicamente
+    form.action = "{{ url('admin/paneladmin/clientes') }}/" + id;
+    // 🔹 Llenar los campos del modal
+    document.getElementById('editUsuario').value = button.getAttribute('data-usuario');
+    document.getElementById('editNombre').value = button.getAttribute('data-nombre');
+    document.getElementById('editEmail').value = button.getAttribute('data-email');
+    document.getElementById('editTelefono').value = button.getAttribute('data-telefono');
+    document.getElementById('editDireccion').value = button.getAttribute('data-direccion');
+    document.getElementById('editRol').value = button.getAttribute('data-rol');
+  });
+});
+</script>
+
 
 <body>
   <div class="d-flex" id="wrapper">
@@ -156,6 +178,10 @@
 
                   <div class="modal-body">
                     <div class="mb-3">
+                      <label for="form-label">Usuario</label>
+                      <input type="text" name="usuario" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
                       <label class="form-label">Nombre</label>
                       <input type="text" name="nombre" class="form-control" required>
                     </div>
@@ -224,9 +250,20 @@
                   <td>{{ $cliente->direccion }}</td>
                   <td>{{ $cliente->usuario->rol ?? 'cliente' }}</td>
                   <td>
-                    <a href="{{ route('clientes.edit', $cliente->id) }}" class="btn btn-sm btn-primary">
+                    <!-- 🟦 Botón para abrir el modal de edición -->
+                    <button type="button" class="btn btn-sm btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editarClienteModal"
+                            data-id="{{ $cliente->id }}"
+                            data-nombre="{{ $cliente->nombre }}"
+                            data-usuario="{{ $cliente->usuario->usuario }}"
+                            data-email="{{ $cliente->usuario->email }}"
+                            data-telefono="{{ $cliente->telefono }}"
+                            data-direccion="{{ $cliente->direccion }}"
+                            data-fecha="{{ $cliente->fecha_nacimiento }}"
+                            data-rol="{{ $cliente->usuario->rol }}">
                       <i class="bi bi-pencil-square"></i>
-                    </a>
+                    </button>
                     <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" class="d-inline">
                       @csrf
                       @method('DELETE')
@@ -240,20 +277,75 @@
               </tbody>
             </table>
           </div>
-        </section>
+            <!-- ======================================= -->
+            <!-- MODAL EDITAR CLIENTE -->
+            <!-- ======================================= -->
+            <div class="modal fade" id="editarClienteModal" tabindex="-1" aria-labelledby="editarClienteLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <form id="editarClienteForm" method="POST">
+                    @csrf
+                    @method('PUT')
 
-        <!-- Script de búsqueda -->
-        <script>
-          document.getElementById("buscarCliente").addEventListener("keyup", function() {
-            const texto = this.value.toLowerCase();
-            const filas = document.querySelectorAll("#tablaClientes tbody tr");
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="editarClienteLabel">Editar Cliente</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
 
-            filas.forEach(fila => {
-              const coincide = fila.innerText.toLowerCase().includes(texto);
-              fila.style.display = coincide ? "" : "none";
-            });
-          });
-        </script>
+                    <div class="modal-body">
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Usuario</label>
+                          <input type="text" name="usuario" class="form-control" id="edit_usuario" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Nombre</label>
+                          <input type="text" name="nombre" class="form-control" id="edit_nombre" required>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Email</label>
+                          <input type="email" name="email" class="form-control" id="edit_email" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Teléfono</label>
+                          <input type="text" name="telefono" class="form-control" id="edit_telefono">
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Dirección</label>
+                          <input type="text" name="direccion" class="form-control" id="edit_direccion">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Fecha de nacimiento</label>
+                          <input type="date" name="fecha_nacimiento" class="form-control" id="edit_fecha">
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select name="rol" class="form-select" id="edit_rol">
+                          <option value="cliente">Cliente</option>
+                          <option value="admin">Administrador</option>
+                          <option value="empleado">Empleado</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-success">Guardar cambios</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            
+        </Section>
 
       <!-- CITAS -->
       <section id="citas" class="mb-5" style="display:none;">
@@ -268,7 +360,7 @@
         <p>Agregar, editar o eliminar los servicios disponibles.</p>
 
       <!-- Formulario para agregar servicio -->
-        <form action="{{ route('servicios.store') }}" method="POST" class="mb-4">
+        <form action="{{ route('servicios.store') }}" method="POST" enctype="multipart/form-data" class="mb-4">
           @csrf
         <div class="row g-3">
           <div class="col-md-4">
@@ -308,7 +400,7 @@
       <tbody>
         @foreach ($servicios as $servicio)
           <tr>
-            <form action="{{ route('servicios.update', $servicio->id) }}" method="POST">
+            <form action="{{ route('servicios.update', $servicio->id) }}" method="POST" enctype="multipart/form-data">
               @csrf
               @method('PUT')
               <td><input type="file" name="imagen" class="form-control" accept="image/*"></td>
