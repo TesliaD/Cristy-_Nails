@@ -32,21 +32,23 @@ class ServicioController extends Controller
             'Descripcion'  => 'nullable|string',
             'Precio'       => 'required|numeric|min:0',
             'Duracion'     => 'nullable|integer|min:0',
-            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120', // Aumenté a 5MB
         ]);
 
         $data = $request->all();
 
-        // ✅ Guarda la imagen si existe
         if ($request->hasFile('imagen')) {
-            $path = $request->file('imagen')->store('servicios', 'public');
-            $data['imagen'] = $path;
+            $imagen = $request->file('imagen');
+            $nombreArchivo = time() . '_' . $imagen->getClientOriginalName();
+            $ruta = $imagen->storeAs('servicios', $nombreArchivo, 'public');
+            $data['imagen'] = $ruta;
         }
 
         Servicios::create($data);
 
         return redirect()->back()->with('success', 'Servicio agregado correctamente.');
     }
+
 
     //Actualizar Servicio
     public function update(Request $request, $id)

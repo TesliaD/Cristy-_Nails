@@ -343,9 +343,161 @@ document.addEventListener('DOMContentLoaded', () => {
                   </form>
                 </div>
               </div>
+            </div>  
+      </Section>
+      
+      
+            <!-- 🧩 SECCIÓN GESTIÓN DE SERVICIOS -->
+      <section id="servicios" class="d-flex flex-column min-vh-100 py-4 px-4" style="background-color: #f8f9fa; display:none;">
+        <div class="container-fluid flex-grow-1">
+
+          <!-- 🌟 Encabezado -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="fw-bold text-primary mb-1">Gestión de Servicios</h2>
+              <p class="text-muted">Administra los servicios ofrecidos por tu negocio.</p>
             </div>
-            
-        </Section>
+            <button class="btn btn-success px-4 py-2 shadow-sm" onclick="document.getElementById('form-servicio').scrollIntoView({ behavior: 'smooth' })">
+              ➕ Agregar Servicio
+            </button>
+          </div>
+
+          <!-- 💅 FORMULARIO DE REGISTRO -->
+          <div class="card shadow-sm border-0 mb-5" id="form-servicio">
+            <div class="card-body">
+              <form action="{{ route('servicios.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="row g-4 align-items-end">
+                  <div class="col-lg-3 col-md-6">
+                    <label class="form-label fw-semibold">Nombre del servicio</label>
+                    <input type="text" name="Nom_Servicio" class="form-control" placeholder="Ej. Uñas acrílicas" required>
+                  </div>
+                  <div class="col-lg-2 col-md-4">
+                    <label class="form-label fw-semibold">Precio ($)</label>
+                    <input type="number" step="0.01" name="Precio" class="form-control" required>
+                  </div>
+                  <div class="col-lg-2 col-md-4">
+                    <label class="form-label fw-semibold">Duración (min)</label>
+                    <input type="number" name="Duracion" class="form-control" required>
+                  </div>
+                  <div class="col-lg-5 col-md-8">
+                    <label class="form-label fw-semibold">Descripción</label>
+                    <textarea name="Descripcion" class="form-control" rows="2" placeholder="Describe el servicio..."></textarea>
+                  </div>
+                  <div class="col-lg-5 col-md-6">
+                    <label class="form-label fw-semibold">Imagen del servicio</label>
+                    <input type="file" name="imagen" class="form-control" accept="image/*">
+                  </div>
+                  <div class="col-lg-3 col-md-6 mt-3">
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm">
+                      💅 Guardar Servicio
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- 🧾 TABLA DE SERVICIOS -->
+          <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white fw-semibold">
+              Lista de Servicios
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light text-center">
+                    <tr>
+                      <th>Imagen</th>
+                      <th>Nombre</th>
+                      <th>Descripción</th>
+                      <th>Precio</th>
+                      <th>Duración</th>
+                      <th>Activo</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @forelse ($servicios as $servicio)
+                      <tr>
+                        <form action="{{ route('servicios.update', $servicio->id) }}" method="POST" enctype="multipart/form-data">
+                          @csrf
+                          @method('PUT')
+
+                          <!-- Imagen -->
+                          <td class="text-center" style="width: 120px;">
+                            @if ($servicio->imagen)
+                              <img src="{{ asset('storage/' . $servicio->imagen) }}" 
+                                  alt="Imagen del servicio" 
+                                  class="rounded shadow-sm mb-2" 
+                                  width="80" height="80" style="object-fit:cover;">
+                            @else
+                              <span class="text-muted small">Sin imagen</span>
+                            @endif
+                            <input type="file" name="imagen" class="form-control form-control-sm mt-1" accept="image/*">
+                          </td>
+
+                          <!-- Nombre -->
+                          <td style="width: 160px;">
+                            <input type="text" name="Nom_Servicio" value="{{ $servicio->Nom_Servicio }}" class="form-control form-control-sm text-center">
+                          </td>
+
+                          <!-- Descripción -->
+                          <td style="width: 250px;">
+                            <textarea name="Descripcion" class="form-control form-control-sm" rows="2">{{ $servicio->Descripcion }}</textarea>
+                          </td>
+
+                          <!-- Precio -->
+                          <td style="width: 100px;">
+                            <input type="number" step="0.01" name="Precio" value="{{ $servicio->Precio }}" class="form-control form-control-sm text-center">
+                          </td>
+
+                          <!-- Duración -->
+                          <td style="width: 90px;">
+                            <input type="number" name="Duracion" value="{{ $servicio->Duracion }}" class="form-control form-control-sm text-center">
+                          </td>
+
+                          <!-- Activo -->
+                          <td class="text-center" style="width: 60px;">
+                            <input type="checkbox" name="Activo" value="1" {{ $servicio->Activo ? 'checked' : '' }}>
+                          </td>
+
+                          <!-- Acciones -->
+                          <td class="text-center" style="width: 140px;">
+                            <button type="submit" class="btn btn-sm btn-primary me-1" title="Guardar cambios">
+                              💾
+                            </button>
+                        </form>
+                        <form action="{{ route('servicios.destroy', $servicio->id) }}" method="POST" style="display:inline;">
+                          @csrf
+                          @method('DELETE')
+                          <button type="submit" class="btn btn-sm btn-danger" title="Eliminar servicio" onclick="return confirm('¿Seguro que deseas eliminar este servicio?')">
+                            🗑️
+                          </button>
+                        </form>
+                          </td>
+                      </tr>
+                    @empty
+                      <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No hay servicios registrados aún.</td>
+                      </tr>
+                    @endforelse
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje de éxito -->
+          @if (session('success'))
+            <div class="alert alert-success mt-4 shadow-sm">
+              {{ session('success') }}
+            </div>
+          @endif
+
+        </div>
+      </section>
+
 
       <!-- CITAS -->
       <section id="citas" class="mb-5" style="display:none;">
@@ -353,84 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <p>Aquí se pueden ver, crear o cancelar todas las citas de los clientes.</p>
       </section>
 
-
-    <!-- SERVICIOS -->
-    <section id="servicios" class="mb-5" style="display:none;">
-        <h4 class="mb-3">Gestión de Servicios</h4>
-        <p>Agregar, editar o eliminar los servicios disponibles.</p>
-
-      <!-- Formulario para agregar servicio -->
-        <form action="{{ route('servicios.store') }}" method="POST" enctype="multipart/form-data" class="mb-4">
-          @csrf
-        <div class="row g-3">
-          <div class="col-md-4">
-            <input type="text" name="Nom_Servicio" class="form-control" placeholder="Nombre del servicio" required>
-        </div>
-        <div class="col-md-3">
-          <input type="number" step="0.01" name="Precio" class="form-control" placeholder="Precio" required>
-        </div>
-        <div class="col-md-3">
-          <input type="number" name="Duracion" class="form-control" placeholder="Duración (min)" required>
-        </div>
-        <div class="col-md-8 mt-2">
-          <textarea name="Descripcion" class="form-control" placeholder="Descripción" rows="2"></textarea>
-        </div>
-        <div class="col-md-8 mt-2">
-          <input type="file" name="imagen" class="form-control">
-        </div>
-        <div class="col-md-4 mt-2">
-          <button type="submit" class="btn btn-success w-100">Agregar Servicio</button>
-        </div>
-      </div>
-    </form>
-
-    <!-- Tabla de servicios -->
-    <table class="table table-striped table-bordered align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>Imagen</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Precio</th>
-          <th>Duración</th>
-          <th>Activo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach ($servicios as $servicio)
-          <tr>
-            <form action="{{ route('servicios.update', $servicio->id) }}" method="POST" enctype="multipart/form-data">
-              @csrf
-              @method('PUT')
-              <td><input type="file" name="imagen" class="form-control" accept="image/*"></td>
-              <td><input type="text" name="Nom_Servicio" value="{{ $servicio->Nom_Servicio }}" class="form-control"></td>
-              <td><textarea name="Descripcion" class="form-control">{{ $servicio->Descripcion }}</textarea></td>
-              <td><input type="number" step="0.01" name="precio" value="{{ $servicio->Precio }}" class="form-control"></td>
-              <td><input type="number" name="Duracion" value="{{ $servicio->Duracion }}" class="form-control"></td>
-              <td class="text-center">
-                <input type="checkbox" name="activo" value="1" {{ $servicio->Activo ? 'checked' : '' }}>
-              </td>
-              <td class="text-center">
-                <button type="submit" class="btn btn-primary btn-sm">💾</button>
-            </form>
-            <form action="{{ route('servicios.destroy', $servicio->id) }}" method="POST" style="display:inline;">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
-            </form>
-              </td>
-          </tr>
-        @endforeach
-      </tbody>
-    </table>
-
-    @if (session('success'))
-      <div class="alert alert-success mt-3">{{ session('success') }}</div>
-    @endif
-  </section>
-
-
+      
       <!-- REPORTES -->
       <section id="reportes" class="mb-5" style="display:none;">
         <h4 class="mb-3">Reportes y Estadísticas</h4>
