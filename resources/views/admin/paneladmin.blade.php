@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </section>
       
       <!-- CLIENTES -->
-        <section id="clientes" class="mb-5" style="display:none;">
+      <section id="clientes" class="mb-5" style="display:none;">
           <h4 class="mb-3">Gestión de Clientes</h4>
 
           <!-- Barra de búsqueda -->
@@ -344,14 +344,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
               </div>
             </div>  
-      </Section>
-      
-      
-            <!-- 🧩 SECCIÓN GESTIÓN DE SERVICIOS -->
-      <section id="servicios" class="d-flex flex-column min-vh-100 py-4 px-4" style="background-color: #f8f9fa; display:none;">
-        <div class="container-fluid flex-grow-1">
-
-          <!-- 🌟 Encabezado -->
+      </section>
+       <!-- SERVICIOS -->
+      <section id="servicios" class="mb-5" style="display:none; min-height:100vh;">
+        <div class="container-fluid">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
               <h2 class="fw-bold text-primary mb-1">Gestión de Servicios</h2>
@@ -362,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
           </div>
 
-          <!-- 💅 FORMULARIO DE REGISTRO -->
+          <!-- FORMULARIO -->
           <div class="card shadow-sm border-0 mb-5" id="form-servicio">
             <div class="card-body">
               <form action="{{ route('servicios.store') }}" method="POST" enctype="multipart/form-data">
@@ -398,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
 
-          <!-- 🧾 TABLA DE SERVICIOS -->
+          <!-- TABLA -->
           <div class="card shadow border-0">
             <div class="card-header bg-primary text-white fw-semibold">
               Lista de Servicios
@@ -423,81 +419,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         <form action="{{ route('servicios.update', $servicio->id) }}" method="POST" enctype="multipart/form-data">
                           @csrf
                           @method('PUT')
-
-                          <!-- Imagen -->
-                          <td class="text-center" style="width: 120px;">
+                          <td class="text-center">
                             @if ($servicio->imagen)
-                              <img src="{{ asset('storage/' . $servicio->imagen) }}" 
-                                  alt="Imagen del servicio" 
-                                  class="rounded shadow-sm mb-2" 
-                                  width="80" height="80" style="object-fit:cover;">
+                              <img src="{{ asset('storage/' . $servicio->imagen) }}" alt="" class="rounded shadow-sm mb-2" width="80" height="80" style="object-fit:cover;">
                             @else
                               <span class="text-muted small">Sin imagen</span>
                             @endif
                             <input type="file" name="imagen" class="form-control form-control-sm mt-1" accept="image/*">
                           </td>
-
-                          <!-- Nombre -->
-                          <td style="width: 160px;">
-                            <input type="text" name="Nom_Servicio" value="{{ $servicio->Nom_Servicio }}" class="form-control form-control-sm text-center">
-                          </td>
-
-                          <!-- Descripción -->
-                          <td style="width: 250px;">
-                            <textarea name="Descripcion" class="form-control form-control-sm" rows="2">{{ $servicio->Descripcion }}</textarea>
-                          </td>
-
-                          <!-- Precio -->
-                          <td style="width: 100px;">
-                            <input type="number" step="0.01" name="Precio" value="{{ $servicio->Precio }}" class="form-control form-control-sm text-center">
-                          </td>
-
-                          <!-- Duración -->
-                          <td style="width: 90px;">
-                            <input type="number" name="Duracion" value="{{ $servicio->Duracion }}" class="form-control form-control-sm text-center">
-                          </td>
-
-                          <!-- Activo -->
-                          <td class="text-center" style="width: 60px;">
-                            <input type="checkbox" name="Activo" value="1" {{ $servicio->Activo ? 'checked' : '' }}>
-                          </td>
-
-                          <!-- Acciones -->
-                          <td class="text-center" style="width: 140px;">
-                            <button type="submit" class="btn btn-sm btn-primary me-1" title="Guardar cambios">
-                              💾
-                            </button>
+                          <td><input type="text" name="Nom_Servicio" value="{{ $servicio->Nom_Servicio }}" class="form-control form-control-sm text-center"></td>
+                          <td><textarea name="Descripcion" class="form-control form-control-sm" rows="2">{{ $servicio->Descripcion }}</textarea></td>
+                          <td><input type="number" step="0.01" name="Precio" value="{{ $servicio->Precio }}" class="form-control form-control-sm text-center"></td>
+                          <td><input type="number" name="Duracion" value="{{ $servicio->Duracion }}" class="form-control form-control-sm text-center"></td>
+                          <td class="text-center"><input type="checkbox" name="Activo" value="1" {{ $servicio->Activo ? 'checked' : '' }}></td>
+                          <td class="text-center">
+                            <button type="submit" class="btn btn-sm btn-primary me-1">💾</button>
                         </form>
                         <form action="{{ route('servicios.destroy', $servicio->id) }}" method="POST" style="display:inline;">
-                          @csrf
-                          @method('DELETE')
-                          <button type="submit" class="btn btn-sm btn-danger" title="Eliminar servicio" onclick="return confirm('¿Seguro que deseas eliminar este servicio?')">
-                            🗑️
-                          </button>
+                          @csrf @method('DELETE')
+                          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este servicio?')">🗑️</button>
                         </form>
                           </td>
                       </tr>
                     @empty
-                      <tr>
-                        <td colspan="7" class="text-center text-muted py-4">No hay servicios registrados aún.</td>
-                      </tr>
+                      <tr><td colspan="7" class="text-center text-muted py-4">No hay servicios registrados.</td></tr>
                     @endforelse
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
-
-          <!-- Mensaje de éxito -->
-          @if (session('success'))
-            <div class="alert alert-success mt-4 shadow-sm">
-              {{ session('success') }}
-            </div>
-          @endif
-
         </div>
-      </section>
-
+      </section>      
 
       <!-- CITAS -->
       <section id="citas" class="mb-5" style="display:none;">
