@@ -7,6 +7,8 @@ use App\Http\Controllers\ClientePanelController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\AdminPanelController;
+use App\Http\Controllers\CitaController;
+
 use function PHPUnit\Framework\callback;
 
 
@@ -48,6 +50,12 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::delete('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_destroy'])->name('clientes.destroy');
     Route::get('/paneladmin/clientes/{id}/edit', [AdminPanelController::class, 'clientes_edit'])->name('clientes.edit');
     Route::put('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_update'])->name('clientes.update');
+
+    //Rutas para Citas en el panel de Administrador
+    Route::get('paneladmin/citas',[CitaController::class, 'index'])->name('citas.index');
+    Route::post('paneladmin/citas', [CitaController::class, 'store'])->name('citas.store');
+    Route::delete('paneladmin/citas/{id}',[CitaController::class,'destroy'])->name('citas.destroy');
+
 
 });
 

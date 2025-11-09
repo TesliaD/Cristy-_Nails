@@ -58,16 +58,16 @@ class ServicioController extends Controller
         $request->validate([
             'Nom_Servicio' => 'required|string|max:100',
             'Descripcion'  => 'nullable|string',
-            'precio'       => 'required|numeric|min:0',
+            'Precio'       => 'required|numeric|min:0',
             'Duracion'     => 'nullable|integer|min:0',
             'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $servicio->Nom_Servicio = $request->Nom_Servicio;
         $servicio->Descripcion  = $request->Descripcion;
-        $servicio->Precio       = $request->precio;
+        $servicio->Precio       = $request->Precio;
         $servicio->Duracion     = $request->Duracion;
-        $servicio->Activo       = $request->has('activo');
+        $servicio->Activo       = $request->has('Activo');
 
         if ($request->hasFile('imagen')) {
             $path = $request->file('imagen')->store('servicios', 'public');
