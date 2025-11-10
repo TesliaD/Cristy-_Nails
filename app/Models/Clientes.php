@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User; // ✅ Importación necesaria
 
 class Clientes extends Model
 {
@@ -19,6 +20,7 @@ class Clientes extends Model
         'fecha_nacimiento',
     ];
 
+    // 🔹 Relación con la tabla usuarios
     public function usuario()
     {
         return $this->belongsTo(User::class, 'usuario_id');

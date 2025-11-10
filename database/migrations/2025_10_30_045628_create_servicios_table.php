@@ -6,33 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('servicios', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ✅ mejor usar id normal
             $table->string('Nom_Servicio', 100);
             $table->text('Descripcion')->nullable();
             $table->decimal('Precio', 8, 2);
-            $table->integer('Duracion')->nullable(); // minutos
-            $table->boolean('Activo')->default(true); // para activar/desactivar en la web
+            $table->integer('Duracion')->nullable(); 
+            $table->boolean('Activo')->default(true);
             $table->string('imagen')->nullable();
-            $table->timestamps(); //Crea de manera automatica las tablas de fecha de create y update
-
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('servicios');
     }
 };
+

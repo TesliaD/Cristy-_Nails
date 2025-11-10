@@ -11,28 +11,28 @@ return new class extends Migration
         Schema::create('citas', function (Blueprint $table) {
             $table->id();
 
-            // Relación con tabla de cliente
+            // Cliente
             $table->foreignId('cliente_id')
                 ->constrained('clientes')
                 ->onDelete('cascade');
 
-            //Relación con tabla de empleado 
+            // Empleado (usuarios con rol 'empleado')
             $table->foreignId('empleado_id')
-                ->constrained('empleados')
-                ->onDelete('set null')
-                ->nullable(); // por si la cita aún no tiene empleado asignado
+                ->nullable()
+                ->constrained('usuarios')
+                ->onDelete('set null');
 
-            // Relación con tabla de servicio
+            // Servicio
             $table->foreignId('servicio_id')
                 ->constrained('servicios')
                 ->onDelete('cascade');
 
-            // Tabla de citas cita
-            $table->date('fecha');           // Fecha de la cita
-            $table->time('hora');            // Hora de la cita
+            // Datos de cita
+            $table->date('fecha');
+            $table->time('hora');
             $table->enum('estado', ['pendiente', 'confirmada', 'cancelada', 'completada'])
                   ->default('pendiente');
-            $table->text('notas')->nullable(); // Notas opcionales del cliente
+            $table->text('notas')->nullable();
 
             $table->timestamps();
         });
