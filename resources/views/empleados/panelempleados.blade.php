@@ -8,7 +8,10 @@
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="{{ asset('css/panelempleados.css') }}">
 
+  
   <style>
     body { background: #f7f7f7; }
     .sidebar { background-color: #8b008b; min-height: 100vh; width: 230px; }
@@ -18,6 +21,11 @@
 </head>
 
 <body>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+    <script src="{{ asset('js/calendario.js') }}"></script>
+
 <div class="d-flex">
   <!-- Sidebar -->
   <div class="sidebar p-3">
@@ -71,6 +79,69 @@
       </div>
     </section>
 
+    <!-- DASHBOARD -->
+    
+      <section id="dashboard" class="mb-5">
+        <div class="d-flex justify-content-center flex-wrap gap-3">
+          <div class="col-md-3">
+            <div class="card text-center p-3 shadow-sm">
+              <h5>Clientes</h5>
+              <p>{{ $totalClientes ?? 0 }}</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center p-3 shadow-sm">
+              <h5>Citas</h5>
+              <p>{{ $totalCitas ?? 0 }}</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center p-3 shadow-sm">
+              <h5>Servicios</h5>
+              <p>{{ $totalServicios ?? 0 }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <!-- CALENDARIO -->
+    <section id="calendario">
+      <div class="calendariojoto">
+        <header class="clearfix">
+        </header>	
+        <section>
+        <div class="main">
+                  <div class="custom-calendar-wrap">
+                      <div id="custom-inner" class="custom-inner">
+                          <div class="custom-header clearfix">
+                              <nav>
+                                  <span id="custom-prev" class="custom-prev"></span>
+                                  <span id="custom-next" class="custom-next"></span>
+                              </nav>
+                              <h2 id="custom-month" class="custom-month"></h2>
+                              <h3 id="custom-year" class="custom-year"></h3>
+                          </div>
+                          <div id="calendar" class="fc-calendar-container"></div>
+                      </div>
+                  </div>
+              </div>
+      </div>
+
+      <div class="modal fade" id="modalEvento" tabindex="-1" aria-labelledby="modalEventoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalEventoLabel">Detalles del día</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="contenidoModal">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
     <!-- CITAS -->
     <section id="citas" style="display:none;">
       <h4><i class="bi bi-calendar-week"></i> Mis Citas de Hoy</h4>
@@ -93,9 +164,7 @@
     <!-- SERVICIOS -->
     <section id="servicios" style="display:none;">
       <h4><i class="bi bi-scissors"></i> Servicios Disponibles</h4>
-      <div class="row">
-
-      </div>
+      <div class="row"></div>
     </section>
 
     <!-- CLIENTES -->
@@ -119,9 +188,24 @@
 
 <script>
 function mostrarSeccion(id) {
-  document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-  document.getElementById(id).style.display = 'block';
+  const secciones = ['inicio', 'dashboard', 'citas', 'servicios', 'clientes', 'calendario'];
+  
+  secciones.forEach(sec => {
+    const elemento = document.getElementById(sec);
+    if (elemento) elemento.style.display = 'none';
+  });
+
+  if (id === 'inicio') {
+    document.getElementById('inicio').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('calendario').style.display = 'block';
+  } else {
+    const seccionActual = document.getElementById(id);
+    if (seccionActual) seccionActual.style.display = 'block';
+  }
 }
+
+
 </script>
 </body>
 </html>
