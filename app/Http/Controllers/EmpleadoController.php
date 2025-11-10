@@ -56,6 +56,16 @@ class EmpleadoController extends Controller
         return response()->json($eventos);
     }
 
+    public function panelMisCitas()
+    {
+        $empleadoId = auth()->id(); // Si quieres filtrar por empleado logueado
+        $citas = \App\Models\Cita::with('cliente.usuario')
+                    ->where('empleado_id', $empleadoId)
+                    ->whereDate('fecha', now()->toDateString())
+                    ->get();
+
+        return view('empleados.panelempleados', compact('citas'));
+    }
 
 
 }

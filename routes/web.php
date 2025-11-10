@@ -67,6 +67,8 @@ Route::middleware('auth')->prefix('empleado')->group(function () {
     // Calendario - Jalar Cita
     Route::get('/citasempleado', [EmpleadoController::class, 'citasEmpleado'])->name('empleado.citas');
 
+    Route::get('/panelempleado', [EmpleadoController::class, 'panelMisCitas'])->name('panel.miscitas');
+
 });
 
 

@@ -156,9 +156,22 @@
             <th>Acción</th>
           </tr>
         </thead>
-        <tbody>
-    
-        </tbody>
+      <tbody>
+        @forelse($citas as $cita)
+          <tr>
+            <td>{{ $cita->cliente->nombre ?? 'Sin cliente' }}</td>
+            <td>{{ $cita->servicio->Nom_Servicio ?? 'Sin servicio' }}</td>
+            <td>{{ $cita->hora }}</td>
+            <td>{{ $cita->estado ?? 'Pendiente' }}</td>
+            <td>No se que poner</td>
+          </tr>
+        @empty
+          <tr>
+            <td colspan="5" class="text-center">No tienes citas</td>
+          </tr>
+        @endforelse
+      </tbody>
+
       </table>
     </section>
 
@@ -179,9 +192,30 @@
             <th>Email</th>
           </tr>
         </thead>
+        @php
+        $usuariosMostrados = [];
+        @endphp
+
         <tbody>
-        
+          @foreach($citas as $cita)
+              @php
+                  $email = $cita->cliente->usuario->email ?? null;
+              @endphp
+
+              @if($email && !in_array($email, $usuariosMostrados))
+                  <tr>
+                      <td>{{ $cita->cliente->nombre }}</td>
+                      <td>{{ $cita->cliente->telefono }}</td>
+                      <td>{{ $email }}</td>
+                  </tr>
+
+                  @php
+                      $usuariosMostrados[] = $email;
+                  @endphp
+              @endif
+          @endforeach
         </tbody>
+
       </table>
     </section>
   </div>
