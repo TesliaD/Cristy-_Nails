@@ -315,3 +315,9 @@
     transform: translate(-50%, -50%);
   }
 }
+
+#modalEvento .modal-body {
+  max-height: 60vh; /* máximo 70% de la altura visible */
+  overflow-y: auto; /* activa scroll vertical */
+  padding-right: 1rem; /* separa del borde derecho */
+}

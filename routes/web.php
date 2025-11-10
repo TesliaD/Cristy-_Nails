@@ -64,6 +64,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 Route::middleware('auth')->prefix('empleado')->group(function () {
     Route::get('/panelempleado', [EmpleadoController::class, 'index'])->name('panelempleado');
 
+    // Calendario - Jalar Cita
+    Route::get('/citasempleado', [EmpleadoController::class, 'citasEmpleado'])->name('empleado.citas');
+
 });
 
 
@@ -88,3 +91,5 @@ Route::prefix('panel')->group(function () {
         return view('layouts.sobrenosotros');
     })->name('sobrenosotros');
 });
+
+

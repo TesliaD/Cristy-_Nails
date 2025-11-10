@@ -406,35 +406,66 @@ var codropsEvents = {
 
 $(function () {
 
-  // Cargar eventos desde la base de datos con AJAX
-  /*$.ajax({
-    url: 'obtener_eventos.php',
-    method: 'GET',
-    dataType: 'json',
-    success: function (eventos) {
-      // eventos sería algo como: { '2025-11-04': '<span>Evento desde BD</span>', ... }
+		$.ajax({
+	url: '/empleado/citasempleado',
+	method: 'GET',
+	dataType: 'json',
+	success: function (eventos) {
+		var cal = $('#calendar').calendario({
+		onDayClick: function ($el, $content, dateProperties) {
+			var day = String(dateProperties.day).padStart(2, '0');
+			var month = String(dateProperties.month).padStart(2, '0');
+			var fechaClave = `${dateProperties.year}-${month}-${day}`;
 
-      var cal = $('#calendar').calendario({
-        caldata: eventos,
-        onDayClick: function ($el, $content, dateProperties) {
-          var fecha = dateProperties.day + '/' + dateProperties.month + '/' + dateProperties.year;
+			// 🔹 Filtrar las citas de esa fecha
+			var citasDelDia = eventos.filter(e => e.fecha === fechaClave);
 
-          var contenido = `
-            <p><strong>Fecha seleccionada:</strong> ${fecha}</p>
-            <p>${$content.html() ? $content.html() : '<em>No hay eventos para este día.</em>'}</p>
-          `;
+			var contenido = `
+			<div class="text-center mb-3">
+				<h5 class="fw-bold text-primary mb-1">📅 Citas del ${day}/${month}/${dateProperties.year}</h5>
+			</div>
+			`;
 
-          $('#contenidoModal').html(contenido);
+			if (citasDelDia.length > 0) {
+			citasDelDia.forEach((evento, i) => {
+				contenido += `
+				<div class="card mb-3 shadow-sm border-0" style="border-left: 5px solid #007bff; border-radius: 10px;">
+					<div class="card-body">
+					<h6 class="card-title text-primary fw-semibold">Cita ${i + 1}</h6>
+					<p class="mb-1"><strong>👤 Cliente:</strong> ${evento.cliente}</p>
+					<p class="mb-1"><strong>⏰ Hora:</strong> ${evento.hora}</p>
+					<p class="mb-1"><strong>💅 Servicio:</strong> ${evento.servicio}</p>
+					<p class="mb-0"><strong>📝 Notas:</strong> ${evento.notas}</p>
+					</div>
+				</div>
+				`;
+			});
+			} else {
+			contenido += `
+				<div class="alert alert-info text-center" role="alert">
+				<i class="bi bi-info-circle"></i> No hay citas programadas para este día.
+				</div>
+			`;
+			}
 
-          var modal = new bootstrap.Modal(document.getElementById('modalEvento'));
-          modal.show();
-        }
-      });
-    },
-    error: function (xhr, status, error) {
-      console.error("Error al cargar eventos:", error);
-    }
-  });*/
+			$('#contenidoModal').html(contenido);
+			var modal = new bootstrap.Modal(document.getElementById('modalEvento'));
+			modal.show();
+		}
+		});
+	},
+	error: function (xhr, status, error) {
+		console.error("Error al cargar eventos:", error);
+	}
+	});
+
+
+
+
+
+
+
+/*
 var eventos = {
     '2025-11-08': '<span>Sacarse la polla enfrente de todos<br>5 P.M.<br>En la plaza de las letras</span>',
     '2025-11-10': '<span>Peru</span>'
@@ -465,5 +496,7 @@ var eventos = {
       modal.show();
     }
   });
+
+*/
 });
 
