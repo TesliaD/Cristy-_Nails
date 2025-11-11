@@ -158,7 +158,7 @@
             <td>{{ $cita->servicio->Nom_Servicio ?? 'Sin servicio' }}</td>
             <td>{{ $cita->hora }}</td>
             <td>{{ $cita->estado ?? 'Pendiente' }}</td>
-            <td>No se que poner</td>
+            <td>No se que poner xd</td>
           </tr>
         @empty
           <tr>
