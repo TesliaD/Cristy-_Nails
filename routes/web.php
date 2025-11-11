@@ -62,13 +62,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 //Panel para Empleados
 
 Route::middleware('auth')->prefix('empleado')->group(function () {
-    Route::get('/panelempleado', [EmpleadoController::class, 'index'])->name('panelempleado');
+    Route::get('/panelempleado', [EmpleadoController::class, 'panelMisCitas'])->name('panelempleado');
 
     // Calendario - Jalar Cita
     Route::get('/citasempleado', [EmpleadoController::class, 'citasEmpleado'])->name('empleado.citas');
-
-    Route::get('/panelempleado', [EmpleadoController::class, 'panelMisCitas'])->name('panel.miscitas');
-
 });
 
 
