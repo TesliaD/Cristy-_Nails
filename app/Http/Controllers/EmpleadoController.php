@@ -58,10 +58,19 @@ class EmpleadoController extends Controller
 
     public function panelMisCitas()
     {
-        $empleadoId = auth()->id(); // Si quieres filtrar por empleado logueado
-        $citas = \App\Models\Cita::with('cliente.usuario')
+        $empleadoId = auth()->id();
+
+        // Definir la zona horaria de Arizona
+        $zona = 'America/Phoenix';
+
+        // Crear rango de hoy en Arizona
+        $inicio = Carbon::today($zona)->startOfDay(); // 00:00
+        $fin = Carbon::today($zona)->endOfDay();     // 23:59:59
+
+        // Traer todas las citas del día para ese empleado
+        $citas = \App\Models\Cita::with(['cliente.usuario', 'servicio'])
                     ->where('empleado_id', $empleadoId)
-                    ->whereDate('fecha', now()->toDateString())
+                    ->whereBetween('fecha', [$inicio, $fin])
                     ->get();
 
         return view('empleados.panelempleados', compact('citas'));
