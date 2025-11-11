@@ -120,7 +120,6 @@ class AuthController extends Controller
             // 🔹 Cargar todos los clientes junto con su usuario
             $clientes = Clientes::with('usuario')->get();
 
-            // ✅ Pasamos $clientes también a la vista
             return view('admin.paneladmin', compact('user', 'admin', 'servicios', 'clientes'));
         }
 

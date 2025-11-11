@@ -46,11 +46,6 @@
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a href="#" class="nav-link fw-bold" onclick="mostrarSeccion('servicios')">
-          <i class="bi bi-scissors"></i> Servicios
-        </a>
-      </li>
-      <li class="nav-item mb-2">
         <a href="#" class="nav-link fw-bold" onclick="mostrarSeccion('clientes')">
           <i class="bi bi-person-lines-fill"></i> Clientes
         </a>
@@ -173,12 +168,6 @@
       </tbody>
 
       </table>
-    </section>
-
-    <!-- SERVICIOS -->
-    <section id="servicios" style="display:none;">
-      <h4><i class="bi bi-scissors"></i> Servicios Disponibles</h4>
-      <div class="row"></div>
     </section>
 
     <!-- CLIENTES -->

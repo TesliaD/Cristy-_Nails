@@ -58,23 +58,26 @@ class EmpleadoController extends Controller
 
     public function panelMisCitas()
     {
-        $empleadoId = auth()->id();
+    $empleadoId = auth()->id();
 
-        // Definir la zona horaria de Arizona
-        $zona = 'America/Phoenix';
+    // Zona horaria de Arizona para las citas de hoy
+    $zona = 'America/Phoenix';
+    $inicio = \Carbon\Carbon::today($zona)->startOfDay();
+    $fin = \Carbon\Carbon::today($zona)->endOfDay();
 
-        // Crear rango de hoy en Arizona
-        $inicio = Carbon::today($zona)->startOfDay(); // 00:00
-        $fin = Carbon::today($zona)->endOfDay();     // 23:59:59
+    // Traer las citas del día
+    $citas = Cita::with(['cliente.usuario', 'servicio'])
+                ->where('empleado_id', $empleadoId)
+                ->whereBetween('fecha', [$inicio, $fin])
+                ->get();
 
-        // Traer todas las citas del día para ese empleado
-        $citas = \App\Models\Cita::with(['cliente.usuario', 'servicio'])
-                    ->where('empleado_id', $empleadoId)
-                    ->whereBetween('fecha', [$inicio, $fin])
-                    ->get();
+    // Contar totales
+    $totalClientes = Clientes::has('citas')->count();  // Todos los clientes
+    $totalCitas = $citas->count();      // Solo las citas de hoy
+    $totalServicios = Servicios::count();
 
-        return view('empleados.panelempleados', compact('citas'));
+    // Pasar todo a la vista
+    return view('empleados.panelempleados', compact('citas', 'totalClientes', 'totalCitas', 'totalServicios'));
     }
-
 
 }
