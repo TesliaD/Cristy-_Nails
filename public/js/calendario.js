@@ -420,6 +420,12 @@ $(function () {
 			// 🔹 Filtrar las citas de esa fecha
 			var citasDelDia = eventos.filter(e => e.fecha === fechaClave);
 
+			// 🔹 Ordenarlas por hora (ascendente)
+			citasDelDia.sort((a, b) => {
+			return a.hora.localeCompare(b.hora);
+			});
+
+
 			var contenido = `
 			<div class="text-center mb-3">
 				<h5 class="fw-bold text-primary mb-1">📅 Citas del ${day}/${month}/${dateProperties.year}</h5>

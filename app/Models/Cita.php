@@ -22,4 +22,5 @@ class Cita extends Model
     public function cliente() { return $this->belongsTo(Clientes::class, 'cliente_id'); }
     public function empleado() { return $this->belongsTo(Empleados::class, 'empleado_id'); }
     public function servicio() { return $this->belongsTo(Servicios::class, 'servicio_id'); }
+    
 }

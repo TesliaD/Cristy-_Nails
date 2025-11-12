@@ -148,7 +148,6 @@
             <th>Servicio</th>
             <th>Hora</th>
             <th>Estado</th>
-            <th>Acción</th>
           </tr>
         </thead>
       <tbody>
@@ -158,7 +157,6 @@
             <td>{{ $cita->servicio->Nom_Servicio ?? 'Sin servicio' }}</td>
             <td>{{ $cita->hora }}</td>
             <td>{{ $cita->estado ?? 'Pendiente' }}</td>
-            <td>No se que poner xd</td>
           </tr>
         @empty
           <tr>
@@ -211,6 +209,7 @@
 </div>
 
 <script>
+
 function mostrarSeccion(id) {
   const secciones = ['inicio', 'dashboard', 'citas', 'servicios', 'clientes', 'calendario'];
   
@@ -228,7 +227,6 @@ function mostrarSeccion(id) {
     if (seccionActual) seccionActual.style.display = 'block';
   }
 }
-
 
 </script>
 </body>
