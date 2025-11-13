@@ -96,7 +96,7 @@
               <p>{{ $totalServicios ?? 0 }}</p>
             </div>
           </div>
-        </div>
+        </div> 
       </section>
 
     <!-- CALENDARIO -->

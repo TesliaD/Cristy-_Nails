@@ -16,10 +16,21 @@ class Cita extends Model
         'fecha',
         'hora',
         'estado',
-        'notas',
+        'notas', // ✅ agregado
     ];
 
-    public function cliente() { return $this->belongsTo(Clientes::class, 'cliente_id'); }
-    public function empleado() { return $this->belongsTo(Empleados::class, 'empleado_id'); }
-    public function servicio() { return $this->belongsTo(Servicios::class, 'servicio_id'); }
+    public function cliente()
+    {
+        return $this->belongsTo(Clientes::class, 'cliente_id');
+    }
+
+    public function empleado()
+    {
+        return $this->belongsTo(User::class, 'empleado_id'); 
+    }
+
+    public function servicio()
+    {
+        return $this->belongsTo(Servicios::class, 'servicio_id');
+    }
 }

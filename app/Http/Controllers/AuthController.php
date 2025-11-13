@@ -107,21 +107,52 @@ class AuthController extends Controller
         return view('clientes.panelclientes', compact('user', 'cliente'));
     }
 
-        //Mostrar panel de Administrador con sus datos
-        
     public function mostrarpaneladmin()
-        {
-            $user = Auth::user();
-            $admin = $user;
+    {
+        $user = Auth::user();
+        $admin = $user;
 
-            // 🔹 Cargar todos los servicios
-            $servicios = Servicios::all();
+        // 🔹 Cargar todos los servicios
+        $servicios = Servicios::all();
 
-            // 🔹 Cargar todos los clientes junto con su usuario
-            $clientes = Clientes::with('usuario')->get();
+        // 🔹 Cargar todos los clientes junto con su usuario
+        $clientes = Clientes::with('usuario')->get();
 
-            return view('admin.paneladmin', compact('user', 'admin', 'servicios', 'clientes'));
-        }
+        // 🔹 Cargar todos los empleados (usuarios con rol empleado)
+        $empleados = User::where('rol', 'empleado')->get();
+
+        // 🔹 Cargar todas las citas con sus relaciones
+        $citas = \App\Models\Cita::with(['cliente', 'servicio', 'empleado'])
+            ->get();
+
+        // 🔹 Preparar datos para el calendario (FullCalendar)
+        $citasData = $citas->map(function ($cita) {
+            return [
+                'id' => $cita->id,
+                'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio') . ' - ' . ($cita->cliente->nombre ?? 'Sin cliente'),
+                'start' => $cita->fecha . 'T' . $cita->hora,
+                'hora' => $cita->hora,
+                'fecha' => $cita->fecha,
+                'cliente_id' => $cita->cliente_id,
+                'servicio_id' => $cita->servicio_id,
+                'empleado_id' => $cita->empleado_id,
+                'notas' => $cita->notas,
+                'backgroundColor' => $cita->estado == 'cancelada' ? '#ccc' : '#9ef5b0',
+            ];
+        });
+
+        return view('admin.paneladmin', compact(
+            'user',
+            'admin',
+            'servicios',
+            'clientes',
+            'empleados',
+            'citas',
+            'citasData'
+        ));
+    }
+
+
 
     public function mostrarpanelempleado(){
         $user = Auth::user();

@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </section>      
 
-        <!-- ============================= -->
+            <!-- ============================= -->
       <!-- CITAS (CALENDARIO) -->
       <!-- ============================= -->
       <section id="citas" style="display:none; min-height:100vh;">
@@ -494,24 +494,31 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </section>
 
-      <!-- MODAL PARA NUEVA CITA -->
-      <div class="modal fade" id="nuevaCitaModal" tabindex="-1" aria-hidden="true">
+      <!-- ============================= -->
+      <!-- MODAL PARA CITA (con notas) -->
+      <!-- ============================= -->
+      <div class="modal fade" id="citaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
-            <form id="formNuevaCita">
+            <form id="formCita">
               <div class="modal-header">
-                <h5 class="modal-title">Agregar nueva cita</h5>
+                <h5 class="modal-title" id="modalTitulo">Agregar Cita</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
               </div>
+
               <div class="modal-body">
+                <input type="hidden" id="cita_id" name="cita_id">
+
                 <div class="mb-3">
                   <label class="form-label">Fecha</label>
-                  <input type="date" name="fecha" id="fechaCita" class="form-control" readonly>
+                  <input type="date" name="fecha" id="fechaCita" class="form-control" required>
                 </div>
+
                 <div class="mb-3">
                   <label class="form-label">Hora</label>
                   <input type="time" name="hora" id="horaCita" class="form-control" required>
                 </div>
+
                 <div class="mb-3">
                   <label class="form-label">Cliente</label>
                   <select name="cliente_id" id="clienteCita" class="form-select" required>
@@ -521,6 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     @endforeach
                   </select>
                 </div>
+
                 <div class="mb-3">
                   <label class="form-label">Servicio</label>
                   <select name="servicio_id" id="servicioCita" class="form-select" required>
@@ -530,21 +538,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     @endforeach
                   </select>
                 </div>
+
                 <div class="mb-3">
                   <label class="form-label">Empleado</label>
-                  <input type="number" name="empleado_id" id="empleadoCita" class="form-control" placeholder="ID del empleado" required>
+                  <select name="empleado_id" id="empleadoCita" class="form-select" required>
+                    <option value="">Selecciona un empleado</option>
+                    @foreach($empleados as $e)
+                      <option value="{{ $e->id }}">{{ $e->usuario }}</option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <!-- 📝 Campo de notas -->
+                <div class="mb-3">
+                  <label class="form-label">Notas</label>
+                  <textarea name="notas" id="notasCita" class="form-control" rows="3" placeholder="Detalles adicionales sobre la cita..."></textarea>
                 </div>
               </div>
+
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar cita</button>
+                <button type="button" class="btn btn-danger" id="btnEliminar" style="display:none;">Eliminar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
               </div>
             </form>
           </div>
         </div>
       </div>
 
-      
+            
       <!-- REPORTES -->
       <section id="reportes" class="mb-5" style="display:none;">
         <h4 class="mb-3">Reportes y Estadísticas</h4>
@@ -560,104 +582,185 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 
-   <!--ssss Scripts -->
+    <!--ssss Scripts -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-
-    @php
-      if (isset($citasData)) {
-          $events = $citasData;
-      } elseif (isset($citas)) {
-          $events = $citas->map(function($cita) {
-              return [
-                  'id' => $cita->id,
-                  'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio') . ' - ' . ($cita->cliente->nombre ?? 'Sin cliente'),
-                  'start' => $cita->fecha . 'T' . $cita->hora,
-                  'backgroundColor' => $cita->estado == 'cancelada' ? '#ccc' : '#9ef5b0',
-              ];
-          })->toArray();
-      } else {
-          $events = [];
+    <style>
+      #calendar {
+        min-height: 700px;
       }
-    @endphp
+      .fc {
+        background: white;
+        border-radius: 10px;
+        padding: 10px;
+      }
+    </style>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const calendarEl = document.getElementById('calendar');
-      if (!calendarEl) return;
-      const modal = new bootstrap.Modal(document.getElementById('nuevaCitaModal'));
-      const form = document.getElementById('formNuevaCita');
-      const fechaInput = document.getElementById('fechaCita');
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        height: 650,
-        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
-        events: @json($events),
-        dateClick: function(info) {
-          fechaInput.value = info.dateStr;
-          modal.show();
-        },
-        eventClick: function(info) {
-          if (confirm("¿Eliminar esta cita?")) {
-            fetch(`/admin/citas/${info.event.id}`, {
-              method: 'DELETE',
-              headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            }).then(r => r.json()).then(data => {
-              if (data.success) {
-                info.event.remove();
-                alert("Cita eliminada correctamente.");
-              } else {
-                alert("Error al eliminar la cita.");
-              }
-            });
-          }
+              @php
+        if (isset($citasData)) {
+            $events = $citasData;
+        } elseif (isset($citas)) {
+            $events = $citas->map(function($cita) {
+                return [
+                    'id' => $cita->id,
+                    'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio') . ' - ' . ($cita->cliente->nombre ?? 'Sin cliente'),
+                    'start' => $cita->fecha . 'T' . $cita->hora,
+                    'backgroundColor' => $cita->estado == 'cancelada' ? '#ccc' : '#9ef5b0',
+                    'extendedProps' => [
+                        'fecha' => $cita->fecha,
+                        'hora' => $cita->hora,
+                        'cliente_id' => $cita->cliente_id,
+                        'servicio_id' => $cita->servicio_id,
+                        'empleado_id' => $cita->empleado_id,
+                        'notas' => $cita->notas ?? '',
+                    ],
+                ];
+            })->toArray();
+        } else {
+            $events = [];
         }
-      });
+        @endphp
 
-      calendar.render();
 
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const data = {
-          fecha: document.getElementById('fechaCita').value,
-          hora: document.getElementById('horaCita').value,
-          servicio_id: document.getElementById('servicioCita').value,
-          cliente_id: document.getElementById('clienteCita').value,
-          empleado_id: document.getElementById('empleadoCita').value
-        };
+            <!-- ============================= -->
+      <!-- SCRIPT FULLCALENDAR -->
+      <!-- ============================= -->
+      <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const modal = new bootstrap.Modal(document.getElementById('citaModal'));
+        const form = document.getElementById('formCita');
 
-        fetch('{{ route('citas.store') }}', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-          body: JSON.stringify(data)
-        }).then(r => r.json()).then(data => {
-          if (data.success) {
-            modal.hide();
-            calendar.refetchEvents();
-            alert('Cita guardada correctamente.');
-            location.reload();
-          } else {
-            alert('Error al guardar la cita.');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          selectable: true,
+          locale: 'es',
+          events: @json($events),
+
+          dateClick: function(info) {
+            form.reset();
+            document.getElementById('modalTitulo').innerText = 'Agregar Cita';
+            document.getElementById('btnEliminar').style.display = 'none';
+            document.getElementById('cita_id').value = '';
+            document.getElementById('fechaCita').value = info.dateStr;
+            modal.show();
+          },
+
+          eventClick: function(info) {
+            const cita = info.event.extendedProps;
+            console.log("📋 Datos del evento:", cita);
+
+            document.getElementById('modalTitulo').innerText = 'Editar Cita';
+            document.getElementById('btnEliminar').style.display = 'inline-block';
+
+            document.getElementById('cita_id').value = info.event.id;
+            document.getElementById('fechaCita').value = cita.fecha;
+            document.getElementById('horaCita').value = cita.hora;
+            document.getElementById('clienteCita').value = cita.cliente_id;
+            document.getElementById('servicioCita').value = cita.servicio_id;
+            document.getElementById('empleadoCita').value = cita.empleado_id;
+
+            //Mostrar las notas correctamente
+            const notasCampo = document.getElementById('notasCita');
+            notasCampo.value = cita.notas ? cita.notas : '';
+            console.log("🧾 Notas asignadas al campo:", notasCampo.value);
+
+            modal.show();
           }
+
+        });
+
+        calendar.render();
+
+        // Guardar o actualizar cita
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          const id = document.getElementById('cita_id').value;
+          const url = id ? `/citas/${id}` : '/citas';
+          const method = id ? 'PUT' : 'POST';
+
+          fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+              fecha: form.fecha.value,
+              hora: form.hora.value,
+              cliente_id: form.cliente_id.value,
+              servicio_id: form.servicio_id.value,
+              empleado_id: form.empleado_id.value,
+              notas: form.notas.value
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              modal.hide();
+              location.reload();
+            }
+          });
+        });
+
+        // Eliminar cita
+        document.getElementById('btnEliminar').addEventListener('click', function() {
+          const id = document.getElementById('cita_id').value;
+          if (!confirm('¿Eliminar esta cita?')) return;
+
+          fetch(`/citas/${id}`, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              modal.hide();
+              location.reload();
+            }
+          });
         });
       });
-    });
+      </script>
 
-    function mostrarSeccion(id) {
-      document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'block';
-    }
-  </script>
+      <script>
+        let calendar; // la haremos global
 
-  <script>
-    function mostrarSeccion(id) {
-      document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-      document.getElementById(id).style.display = 'block';
-    }
-  </script>
+        function mostrarSeccion(id) {
+          const secciones = document.querySelectorAll('#page-content > section');
+          secciones.forEach(sec => sec.style.display = 'none');
+
+          const activa = document.getElementById(id);
+          if (activa) {
+            activa.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+
+          // ✅ Si mostramos el calendario, volver a renderizarlo
+          if (id === 'citas' && calendar) {
+            setTimeout(() => calendar.render(), 200);
+          }
+
+          document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.classList.remove('active', 'bg-light');
+            link.classList.add('text-white');
+          });
+
+          const activo = document.querySelector(`.sidebar .nav-link[onclick="mostrarSeccion('${id}')"]`);
+          if (activo) {
+            activo.classList.add('bg-light', 'text-dark');
+          }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          mostrarSeccion('dashboard');
+        });
+      </script>
+
+      
+
 </body>
 </html>
