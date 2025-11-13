@@ -69,10 +69,13 @@ class EmpleadoController extends Controller
     $citas = Cita::with(['cliente.usuario', 'servicio'])
                 ->where('empleado_id', $empleadoId)
                 ->whereBetween('fecha', [$inicio, $fin])
+                ->orderBy('hora', 'asc')
                 ->get();
 
     // Contar totales
-    $totalClientes = Clientes::has('citas')->count();  // Todos los clientes
+    $totalClientes = Clientes::whereHas('citas', function ($query) use ($empleadoId, $inicio, $fin) {
+    $query->where('empleado_id', $empleadoId)
+          ->whereBetween('fecha', [$inicio, $fin]);})->distinct()->count();
     $totalCitas = $citas->count();      // Solo las citas de hoy
     $totalServicios = Servicios::count();
 
