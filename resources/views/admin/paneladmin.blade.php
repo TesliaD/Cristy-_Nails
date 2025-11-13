@@ -591,11 +591,13 @@ document.addEventListener('DOMContentLoaded', () => {
       #calendar {
         min-height: 700px;
       }
+      .fc-event { cursor: pointer; }
       .fc {
         background: white;
         border-radius: 10px;
         padding: 10px;
       }
+
     </style>
 
               @php

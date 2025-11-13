@@ -56,7 +56,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('paneladmin/citas', [CitaController::class, 'store'])->name('citas.store');
     Route::delete('paneladmin/citas/{id}',[CitaController::class,'destroy'])->name('citas.destroy');
 
-
+    
 });
 
 //Panel para Empleados

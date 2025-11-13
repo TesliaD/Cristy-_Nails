@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Clientes;
+use App\Models\Cita;
+use App\Models\Servicios;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\EmpleadoController;
+use Carbon\Carbon;
 
 class AdminPanelController extends Controller
 {
@@ -16,6 +20,8 @@ class AdminPanelController extends Controller
         $clientes = Clientes::with('usuario')->get(); // Carga clientes + usuario relacionado
         return view('admin.paneladmin', compact('clientes'));
     }
+
+
 
 
     // 💾 Guardar nuevo cliente
@@ -51,7 +57,6 @@ class AdminPanelController extends Controller
 
         return redirect()->back()->with('success', 'Cliente agregado correctamente.');
     }
-
 
     // 🔄 Actualizar cliente
     public function clientes_update(Request $request, $id)
@@ -91,6 +96,8 @@ class AdminPanelController extends Controller
             $cliente->delete();
         }
 
+
         return redirect()->back()->with('success', 'Cliente y usuario eliminados correctamente.');
     }
+
 }

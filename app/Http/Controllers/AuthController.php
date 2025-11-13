@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Servicios;
+use App\Models\Cita;
 use PHPUnit\Framework\Constraint\Operator;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -141,6 +143,29 @@ class AuthController extends Controller
             ];
         });
 
+         // Zona horaria de Arizona para las citas de hoy
+        $zona = 'America/Phoenix';
+        $hoy = Carbon::today($zona);
+
+        // Traer todas las citas del día
+        $citasHoy = Cita::with(['cliente.usuario', 'servicio'])
+            ->whereDate('fecha', $hoy)
+            ->orderBy('hora', 'asc')
+            ->get();
+
+        // Traer solo los clientes que tienen citas hoy
+        $clientesHoy = Clientes::whereHas('citas', function ($q) use ($hoy) {
+            $q->whereDate('fecha', $hoy);
+        })
+        ->with('usuario')
+        ->get();
+
+        // Contar totales
+        $totalClientes = $clientesHoy->count();      
+        $totalCitas = $citasHoy->count();      
+        $totalServicios = Servicios::count();
+        $totalIngresos = 12;
+
         return view('admin.paneladmin', compact(
             'user',
             'admin',
@@ -148,11 +173,13 @@ class AuthController extends Controller
             'clientes',
             'empleados',
             'citas',
-            'citasData'
+            'citasData',
+            'totalClientes',
+            'totalCitas',
+            'totalServicios',
+            'totalIngresos'
         ));
     }
-
-
 
     public function mostrarpanelempleado(){
         $user = Auth::user();

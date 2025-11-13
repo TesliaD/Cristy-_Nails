@@ -17,6 +17,7 @@
     .sidebar { background-color: #8b008b; min-height: 100vh; width: 230px; }
     .sidebar a { color: white; text-decoration: none; }
     .sidebar a:hover { background: rgba(255,255,255,0.2); border-radius: 5px; }
+    .fc-event { cursor: pointer; }
   </style>
 </head>
 
