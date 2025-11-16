@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </section>      
 
-            <!-- ============================= -->
+      <!-- ============================= -->
       <!-- CITAS (CALENDARIO) -->
       <!-- ============================= -->
       <section id="citas" style="display:none; min-height:100vh;">
@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="mb-3">
                   <label class="form-label">Hora</label>
-                  <input type="time" name="hora" id="horaCita" class="form-control" required>
+                  <input type="time" name="hora" id="horaCita" step="1" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
@@ -581,10 +581,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     </div>
   </div>
+      <!-- =================================================== -->
+    <!--      SCRIPTS PRINCIPALES (ÚNICOS Y CORREGIDOS)      -->
+    <!-- =================================================== -->
 
-    <!--ssss Scripts -->
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <style>
@@ -598,169 +602,245 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     </style>
 
-              @php
-        if (isset($citasData)) {
-            $events = $citasData;
-        } elseif (isset($citas)) {
-            $events = $citas->map(function($cita) {
-                return [
-                    'id' => $cita->id,
-                    'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio') . ' - ' . ($cita->cliente->nombre ?? 'Sin cliente'),
-                    'start' => $cita->fecha . 'T' . $cita->hora,
-                    'backgroundColor' => $cita->estado == 'cancelada' ? '#ccc' : '#9ef5b0',
-                    'extendedProps' => [
-                        'fecha' => $cita->fecha,
-                        'hora' => $cita->hora,
-                        'cliente_id' => $cita->cliente_id,
-                        'servicio_id' => $cita->servicio_id,
-                        'empleado_id' => $cita->empleado_id,
-                        'notas' => $cita->notas ?? '',
-                    ],
-                ];
-            })->toArray();
-        } else {
-            $events = [];
-        }
-        @endphp
+    @php
+    if (isset($citasData)) {
+        $events = $citasData;
+    } elseif (isset($citas)) {
+        $events = $citas->map(function($cita) {
+            return [
+                'id' => $cita->id,
+                'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio') . ' - ' . ($cita->cliente->nombre ?? 'Sin cliente'),
+                'start' => $cita->fecha . 'T' . $cita->hora,
+                'backgroundColor' => $cita->estado == 'cancelada' ? '#ccc' : '#9ef5b0',
+                'extendedProps' => [
+                    'fecha' => $cita->fecha,
+                    'hora' => $cita->hora,
+                    'cliente_id' => $cita->cliente_id,
+                    'servicio_id' => $cita->servicio_id,
+                    'empleado_id' => $cita->empleado_id,
+                    'notas' => $cita->notas ?? '',
+                ],
+            ];
+        })->toArray();
+    } else {
+        $events = [];
+    }
+    @endphp
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
 
-
-            <!-- ============================= -->
-      <!-- SCRIPT FULLCALENDAR -->
-      <!-- ============================= -->
-      <script>
-      document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
         const modal = new bootstrap.Modal(document.getElementById('citaModal'));
         const form = document.getElementById('formCita');
+        const btnEliminar = document.getElementById('btnEliminar');
 
-        calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          selectable: true,
-          locale: 'es',
-          events: @json($events),
+        let cita_id = null;
 
-          dateClick: function(info) {
-            form.reset();
-            document.getElementById('modalTitulo').innerText = 'Agregar Cita';
-            document.getElementById('btnEliminar').style.display = 'none';
-            document.getElementById('cita_id').value = '';
-            document.getElementById('fechaCita').value = info.dateStr;
-            modal.show();
-          },
+        //HACEMOS EL CALENDARIO GLOBAL
+        window.calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            locale: 'es',
+            events: @json($events),
 
-          eventClick: function(info) {
-            const cita = info.event.extendedProps;
-            console.log("📋 Datos del evento:", cita);
+            dateClick: function(info) {
+                cita_id = null;
+                form.reset();
 
-            document.getElementById('modalTitulo').innerText = 'Editar Cita';
-            document.getElementById('btnEliminar').style.display = 'inline-block';
+                document.getElementById('modalTitulo').innerText = 'Agregar Cita';
+                btnEliminar.style.display = 'none';
 
-            document.getElementById('cita_id').value = info.event.id;
-            document.getElementById('fechaCita').value = cita.fecha;
-            document.getElementById('horaCita').value = cita.hora;
-            document.getElementById('clienteCita').value = cita.cliente_id;
-            document.getElementById('servicioCita').value = cita.servicio_id;
-            document.getElementById('empleadoCita').value = cita.empleado_id;
-
-            //Mostrar las notas correctamente
-            const notasCampo = document.getElementById('notasCita');
-            notasCampo.value = cita.notas ? cita.notas : '';
-            console.log("🧾 Notas asignadas al campo:", notasCampo.value);
-
-            modal.show();
-          }
-
-        });
-
-        calendar.render();
-
-        // Guardar o actualizar cita
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-
-          const id = document.getElementById('cita_id').value;
-          const url = id ? `/citas/${id}` : '/citas';
-          const method = id ? 'PUT' : 'POST';
-
-          fetch(url, {
-            method: method,
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                document.getElementById('fechaCita').value = info.dateStr;
+                modal.show();
             },
-            body: JSON.stringify({
-              fecha: form.fecha.value,
-              hora: form.hora.value,
-              cliente_id: form.cliente_id.value,
-              servicio_id: form.servicio_id.value,
-              empleado_id: form.empleado_id.value,
-              notas: form.notas.value
+
+            eventClick: function(info) {
+                const e = info.event;
+                cita_id = e.id;
+
+                document.getElementById('modalTitulo').innerText = 'Editar Cita';
+                btnEliminar.style.display = 'inline-block';
+
+                document.getElementById('cita_id').value = e.id;
+                document.getElementById('fechaCita').value = e.extendedProps.fecha || '';
+                document.getElementById('horaCita').value = e.extendedProps.hora || '';
+                document.getElementById('clienteCita').value = e.extendedProps.cliente_id || '';
+                document.getElementById('servicioCita').value = e.extendedProps.servicio_id || '';
+                document.getElementById('empleadoCita').value = e.extendedProps.empleado_id || '';
+                document.getElementById('notasCita').value = e.extendedProps.notas || '';
+
+                console.log("Evento seleccionado:", e.extendedProps);
+                modal.show();
+            }
+        });
+
+        //Render inicial
+        window.calendar.render();
+
+        const CSRF = '{{ csrf_token() }}';
+
+        // GUARDAR / ACTUALIZAR
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const payload = {
+                fecha: form.fechaCita.value,
+                hora: form.horaCita.value,
+                cliente_id: form.clienteCita.value,
+                servicio_id: form.servicioCita.value,
+                empleado_id: form.empleadoCita.value,
+                notas: form.notasCita.value
+            };
+
+            const url = cita_id
+                ? `/admin/paneladmin/citas/${cita_id}`
+                : `/admin/paneladmin/citas`;
+
+            const method = cita_id ? 'PUT' : 'POST';
+
+            console.log("Enviando:", method, url, payload);
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
             })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              modal.hide();
-              location.reload();
-            }
-          });
+            .then(async res => {
+                const text = await res.text();
+                let data;
+                try { data = JSON.parse(text); }
+                catch { data = { raw: text }; }
+
+                console.log("Respuesta guardar:", res.status, data);
+
+                if (res.ok && data.success) {
+                    modal.hide();
+                    window.location.reload();
+                } else {
+                    alert("Error al guardar. Ver consola.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error de red al guardar.");
+            });
         });
 
-        // Eliminar cita
-        document.getElementById('btnEliminar').addEventListener('click', function() {
-          const id = document.getElementById('cita_id').value;
-          if (!confirm('¿Eliminar esta cita?')) return;
+        // ELIMINAR
+        btnEliminar.addEventListener('click', function() {
+            if (!cita_id) return alert("No hay cita seleccionada.");
 
-          fetch(`/citas/${id}`, {
-            method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              modal.hide();
-              location.reload();
-            }
-          });
+            if (!confirm("¿Eliminar esta cita?")) return;
+
+            fetch(`/admin/paneladmin/citas/${cita_id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async res => {
+                const text = await res.text();
+                let data;
+                try { data = JSON.parse(text); }
+                catch { data = { raw: text }; }
+
+                console.log("Respuesta eliminar:", res.status, data);
+
+                if (res.ok && data.success) {
+                    modal.hide();
+                    window.location.reload();
+                } else {
+                    alert("No se pudo eliminar. Ver consola.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error de red al eliminar.");
+            });
         });
-      });
-      </script>
 
-      <script>
-        let calendar; // la haremos global
+    });
+    </script>
 
-        function mostrarSeccion(id) {
-          const secciones = document.querySelectorAll('#page-content > section');
-          secciones.forEach(sec => sec.style.display = 'none');
+    <!-- =============================== -->
+    <!--      CONTROL DE SECCIONES      -->
+    <!-- =============================== -->
+    <script>
+    function mostrarSeccion(id) {
 
-          const activa = document.getElementById(id);
-          if (activa) {
+        const secciones = document.querySelectorAll('#page-content > section');
+        secciones.forEach(sec => sec.style.display = 'none');
+
+        const activa = document.getElementById(id);
+        if (activa) {
             activa.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-
-          // ✅ Si mostramos el calendario, volver a renderizarlo
-          if (id === 'citas' && calendar) {
-            setTimeout(() => calendar.render(), 200);
-          }
-
-          document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.classList.remove('active', 'bg-light');
-            link.classList.add('text-white');
-          });
-
-          const activo = document.querySelector(`.sidebar .nav-link[onclick="mostrarSeccion('${id}')"]`);
-          if (activo) {
-            activo.classList.add('bg-light', 'text-dark');
-          }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-          mostrarSeccion('dashboard');
+        // CORREGIDO → NO USAR .render() DENTRO, SOLO updateSize()
+        if (id === 'citas' && window.calendar) {
+            setTimeout(() => window.calendar.updateSize(), 200);
+        }
+
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.classList.remove('active', 'bg-light');
+            link.classList.add('text-white');
         });
-      </script>
 
-      
+        const activo = document.querySelector(`.sidebar .nav-link[onclick="mostrarSeccion('${id}')"]`);
+        if (activo) {
+            activo.classList.add('bg-light', 'text-dark');
+        }
+    }
 
+    document.addEventListener('DOMContentLoaded', () => {
+        mostrarSeccion('dashboard');
+    });
+    </script>
+
+
+
+    <!-- =============================== -->
+    <!--      CONTROL DE SECCIONES      -->
+    <!-- =============================== -->
+    <script>
+    function mostrarSeccion(id) {
+
+        const secciones = document.querySelectorAll('#page-content > section');
+        secciones.forEach(sec => sec.style.display = 'none');
+
+        const activa = document.getElementById(id);
+        if (activa) {
+            activa.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Si es el calendario → renderizarlo
+        if (id === 'citas' && window.calendar) {
+            setTimeout(() => window.calendar.render(), 200);
+        }
+
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.classList.remove('active', 'bg-light');
+            link.classList.add('text-white');
+        });
+
+        const activo = document.querySelector(`.sidebar .nav-link[onclick="mostrarSeccion('${id}')"]`);
+        if (activo) {
+            activo.classList.add('bg-light', 'text-dark');
+        }
+    }
+
+    // Mostrar dashboard al iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        mostrarSeccion('dashboard');
+    });
+    </script>
 </body>
 </html>
+   
