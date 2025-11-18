@@ -18,7 +18,7 @@ use function PHPUnit\Framework\callback;
 Route::prefix('auth')->group(function () {
     // LOGIN
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post'); // 👈 Añadido el name
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post'); // Añadido el name
 
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -28,12 +28,24 @@ Route::prefix('auth')->group(function () {
     Route::post('/registro', [AuthController::class, 'registrarUsuario'])->name('registro.guardar');
 });
 
-//Panel para clientes
 
-Route::middleware('auth')->prefix('cliente')->group(function () {
-    Route::get('/panel', [AuthController::class, 'mostrarpanelclientes'])->name('panelclientes');
-    Route::post('/panel/update', [ClientePanelController::class, 'update'])->name('panelcliente.update');
+// Panel Clientes
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/panelcliente', [ClientePanelController::class, 'index'])->name('panelcliente.index');
+
+    Route::post('/panelcliente/update', [ClientePanelController::class, 'update'])->name('panelcliente.update');
+
+    // Citas del cliente
+    Route::post('/panelcliente/citas', [ClientePanelController::class, 'storeCita'])->name('panelcliente.citas.store');
+    Route::delete('/panelcliente/citas/{id}', [ClientePanelController::class, 'borrarCita'])->name('panelcliente.citas.destroy');
+
+    // NUEVA RUTA PARA CANCELAR DESDE EL MODAL 
+    Route::delete('/panelcliente/cita/{id}/cancelar', [CitaController::class, 'cancelar'])
+        ->name('citas.cancelar');
 });
+
+
 
 //Panel para Administrador
 Route::middleware('auth')->prefix('admin')->group(function () {
@@ -72,23 +84,25 @@ Route::middleware('auth')->prefix('empleado')->group(function () {
 
 // Página pública donde se listan los servicios
 // -----------------------------------------------------------
-// 🚀 RUTA PRINCIPAL — Muestra los servicios dinámicos
-// -----------------------------------------------------------
-// -----------------------------------------------------------
 // 🏠 GRUPO DE VISTAS GENERALES (Panel Interno)
 // -----------------------------------------------------------
 Route::prefix('panel')->group(function () {
 
-    Route::get('/dashboard', [ServicioController::class, 'mostrarServicios'])->name('dashboard');
-    Route::get('/agendar', [ServicioController::class, 'mostrarServicios'])->name('agendar');
-  
-    Route::get('/agendar', function () {
-        return view('layouts.agendar');
-    })->name('agendar');
+    Route::get('/dashboard', [ServicioController::class, 'mostrarServicios'])
+        ->name('dashboard');
+
+    Route::get('/agendar', [ServicioController::class, 'mostrarAgendar'])
+        ->name('agendar');
+
+    // ⭐ Ruta POST que guarda la cita del cliente
+    Route::post('/agendar', [CitaController::class, 'storeCliente'])
+        ->name('agendar.store');
 
     Route::get('/sobrenosotros', function () {
         return view('layouts.sobrenosotros');
     })->name('sobrenosotros');
 });
+
+
 
 

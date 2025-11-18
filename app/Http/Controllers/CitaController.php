@@ -10,7 +10,7 @@ use App\Models\Servicios;
 
 class CitaController extends Controller
 {
-    // 🔹 Mostrar calendario con citas
+    // Mostrar calendario con citas
     public function index()
     {
         // Cargar las citas con sus relaciones
@@ -41,7 +41,7 @@ class CitaController extends Controller
         return view('admin.paneladmin', compact('citas', 'clientes', 'empleados', 'servicios', 'citasData'));
     }
 
-    // 🔹 Guardar nueva cita
+    // Guardar nueva cita
     public function store(Request $request)
     {
         $request->validate([
@@ -58,7 +58,7 @@ class CitaController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // 🔹 Actualizar cita existente
+    // Actualizar cita existente
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -76,7 +76,7 @@ class CitaController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // 🔹 Eliminar cita
+    // Eliminar cita
     public function destroy($id)
     {
         $cita = Cita::findOrFail($id);
@@ -84,4 +84,54 @@ class CitaController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    //Store para los clientes
+    public function storeCliente(Request $request)
+    {
+        $request->validate([
+            'servicio' => 'required|exists:servicios,id',
+            'fecha' => 'required|date',
+            'hora' => 'required',
+            'notas' => 'nullable|string',
+        ]);
+
+        // 🔍 Obtener al cliente que corresponde al usuario loggeado
+        $cliente = Clientes::where('usuario_id', auth()->user()->id)->first();
+
+        if (!$cliente) {
+            return redirect()->back()->with('error', 'No se encontró el cliente asociado al usuario.');
+        }
+
+        // Crear la cita
+        Cita::create([
+            'cliente_id' => $cliente->id,
+            'empleado_id' => null, // o si quieres asignar después
+            'servicio_id' => $request->servicio,
+            'fecha' => $request->fecha,
+            'hora' => $request->hora,
+            'notas' => $request->notas,
+            'estado' => 'pendiente'
+        ]);
+
+        return redirect()->route('dashboard')->with('mensaje', 'Cita agendada con éxito.');
+    }
+
+    //Cancelar cita del cliente
+    public function cancelar($id)
+    {
+        $cita = Cita::findOrFail($id);
+
+        // Validación: solo el dueño puede cancelar
+        $cliente = Clientes::where('usuario_id', auth()->id())->first();
+        if (!$cliente || $cita->cliente_id != $cliente->id) {
+            return redirect()->back()->with('error', 'No tienes permiso para cancelar esta cita.');
+        }
+
+        $cita->estado = "cancelada";
+        $cita->save();
+
+        return redirect()->back()->with('success', 'La cita ha sido cancelada correctamente.');
+    }
+
+
 }

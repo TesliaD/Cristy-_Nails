@@ -46,7 +46,7 @@
 
             @elseif(Auth::user()->rol === 'cliente')
                 <!-- 🔹 Opciones del cliente -->
-                <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Mi Panel</a></li>
+                <li><a class="dropdown-item" href="{{ route('panelcliente.index') }}">Mi Panel</a></li>
                 <li><a class="dropdown-item" href="{{ route('agendar') }}">Agendar Cita</a></li>
                 <li><a class="dropdown-item" href="{{ route('login') }}">Mis Citas</a></li>
             @endif
