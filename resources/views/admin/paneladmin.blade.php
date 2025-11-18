@@ -26,9 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const button = event.relatedTarget;
     const id = button.getAttribute('data-id');
 
-    // 🔹 Cambiar la ruta del formulario dinámicamente
+    // Cambiar la ruta del formulario dinámicamente
     form.action = "{{ url('admin/paneladmin/clientes') }}/" + id;
-    // 🔹 Llenar los campos del modal
+    // Llenar los campos del modal
     document.getElementById('editUsuario').value = button.getAttribute('data-usuario');
     document.getElementById('editNombre').value = button.getAttribute('data-nombre');
     document.getElementById('editEmail').value = button.getAttribute('data-email');
@@ -87,13 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('reportes')">
             <i class="bi bi-bar-chart-line"></i> Reportes
-          </a>
-        </li>
-
-        <!-- Configuración -->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('configuracion')">
-            <i class="bi bi-gear-fill"></i> Configuración
           </a>
         </li>
 
