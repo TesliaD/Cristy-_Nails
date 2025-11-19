@@ -1059,6 +1059,104 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       </script>
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // Detecta clic en tarjetas y abre modal de fechas
+      document.querySelectorAll(".tarjetareportes").forEach(t => {
+        t.addEventListener("click", function () {
+          const titulo = this.querySelector("h3").innerText.trim();
+          const texto = titulo.toLowerCase();
+
+          let tipo = "";
+          if (texto.includes("cliente")) tipo = "clientes";
+          else if (texto.includes("cita")) tipo = "citas";
+          else if (texto.includes("servicio")) tipo = "servicios";
+          else if (texto.includes("ingreso") || texto.includes("venta") || texto.includes("ganancia")) tipo = "ingresos";
+          if (!tipo) tipo = texto.replace(/\s+/g, "_");
+
+          document.getElementById("tituloModal").innerText = titulo;
+          document.getElementById("tipoReporte").value = tipo;
+
+          // show modal
+          new bootstrap.Modal(document.getElementById('modalReporte')).show();
+        });
+      });
+
+      // Submit del formulario: usar fetch para recibir JSON y mostrar modal resultado
+      const form = document.getElementById('formFechas');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Muestra un spinner simple en el botón (opcional)
+        const btn = this.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'Generando...';
+
+        try {
+          const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]').value;
+
+          const res = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': token,
+              'Accept': 'application/json'
+            },
+            body: formData
+          });
+
+          const data = await res.json();
+
+          if (data.success && data.url) {
+            const verBtn = document.getElementById('verReporteBtn');
+            const descargarBtn = document.getElementById('descargarReporteBtn');
+            const iframeContainer = document.getElementById('iframeContainer');
+
+            const url = data.url;
+
+            // Mostrar PDF en el modal con iframe
+            iframeContainer.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="border:none;"></iframe>`;
+
+            // Botón "Ver" abre en nueva pestaña
+            verBtn.setAttribute('href', url);
+            verBtn.setAttribute('target', '_blank');
+
+            // Botón "Descargar" fuerza la descarga
+            descargarBtn.setAttribute('href', url);
+            const filename = url.split('/').pop();
+            descargarBtn.setAttribute('download', filename);
+
+            // Cerrar modal de fechas y abrir modal resultado
+            bootstrap.Modal.getInstance(document.getElementById('modalReporte')).hide();
+            new bootstrap.Modal(document.getElementById('modalResultado')).show();
+          }
+          else {
+                    alert(data.mensaje || 'Error al generar el reporte');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  alert('Error en la petición, revisa la consola.');
+                } finally {
+                  btn.disabled = false;
+                  btn.innerHTML = originalText;
+                }
+              });
+
+          });
+  </script>
+
+
+>>>>>>> f6e97fe (Muchos cambios)
 
 
 
