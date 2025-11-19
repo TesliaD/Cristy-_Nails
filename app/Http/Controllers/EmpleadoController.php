@@ -9,7 +9,8 @@ use App\Models\Servicios;
 use App\Models\Clientes;
 use App\Http\Controllers\Log;
 use Carbon\Carbon;
-//use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class EmpleadoController extends Controller
 {
@@ -19,6 +20,59 @@ class EmpleadoController extends Controller
         $user = Auth::user();
 
         return view('empleados.panelempleados', compact('user'));
+    }
+    // Crear empleado
+    public function store(Request $request)
+    {
+        $request->validate([
+            'usuario' => 'required|string|max:255',
+            'email'   => 'required|email|unique:usuarios,email', 
+            'rol'     => 'required|string',
+            'password' => 'required|min:6'
+        ]);
+
+        User::create([
+            'usuario' => $request->usuario,
+            'email'   => $request->email,
+            'rol'     => $request->rol,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->back()->with('success', 'Empleado creado correctamente');
+    }
+
+
+    // Actualizar empleado
+    public function update(Request $request, $id)
+    {
+        $empleado = User::findOrFail($id);
+
+        $request->validate([
+            'usuario' => 'required|string|max:255',
+            'email'   => 'required|email|unique:users,email,' . $empleado->id,
+            'rol'     => 'required|string',
+        ]);
+
+        $empleado->usuario = $request->usuario;
+        $empleado->email   = $request->email;
+        $empleado->rol     = $request->rol;
+
+        if ($request->password) {
+            $empleado->password = Hash::make($request->password);
+        }
+
+        $empleado->save();
+
+        return redirect()->back()->with('success', 'Empleado actualizado correctamente');
+    }
+
+    // Eliminar empleado
+    public function destroy($id)
+    {
+        $empleado = User::findOrFail($id);
+        $empleado->delete();
+
+        return redirect()->back()->with('success', 'Empleado eliminado');
     }
 
     public function citasEmpleado()

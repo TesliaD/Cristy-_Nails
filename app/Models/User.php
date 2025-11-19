@@ -6,16 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Clientes; 
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    // Nombre de la tabla en la base de datos
     protected $table = 'usuarios';
-
-    // Si no desactivas los timestamps, Laravel manejará 'created_at' y 'updated_at'
-    // public $timestamps = false; // No es necesario si usas 'created_at' y 'updated_at'
 
     protected $fillable = [
         'usuario',
@@ -30,11 +27,11 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime', // Esto es para asegurar que se convierta en objeto de fecha.
+        'email_verified_at' => 'datetime',
     ];
 
-     public function cliente()
+    public function cliente()
     {
-        return $this->hasOne(clientes::class, 'usuario_id');
+        return $this->hasOne(Clientes::class, 'usuario_id'); // 👈 FIX
     }
 }

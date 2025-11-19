@@ -62,6 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
           </a>
         </li>
 
+        <!--Gestion de Empleados-->
+        <li class="nav-item mb-2">
+          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('empleados')">
+              <i class="bi bi-person-raised-hand"></i> Empleados
+          </a>
+        </li>
+
         <!-- Gestión de clientes -->
         <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('clientes')">
@@ -145,6 +152,197 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       </section>
+      
+      <!-- EMPLEADOS -->
+      <section id="empleados" class="mb-5" style="display:none;">
+          <h4 class="mb-3">Gestión de Empleados</h4>
+
+          <!-- Barra búsqueda -->
+          <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" id="buscarEmpleado" class="form-control" placeholder="Buscar empleado...">
+          </div>
+
+          <!-- Botón agregar -->
+          <a href="#" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#nuevoEmpleadoModal">
+              <i class="bi bi-plus-circle"></i> Nuevo Empleado
+          </a>
+
+          <div class="table-responsive">
+              <table class="table table-striped align-middle" id="tablaEmpleados">
+                  <thead>
+                  <tr>
+                      <th>ID</th>
+                      <th>Usuario</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                      <th>Acciones</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  @foreach ($empleados as $empleado)
+                      <tr>
+                          <td>{{ $empleado->id }}</td>
+                          <td>{{ $empleado->usuario }}</td>
+                          <td>{{ $empleado->email }}</td>
+                          <td>{{ $empleado->rol }}</td>
+
+                          <td>
+
+                              <!-- Botón editar -->
+                              <button class="btn btn-primary btn-sm editarEmpleadoBtn"
+                                      data-id="{{ $empleado->id }}"
+                                      data-usuario="{{ $empleado->usuario }}"
+                                      data-email="{{ $empleado->email }}"
+                                      data-rol="{{ $empleado->rol }}">
+                                  <i class="bi bi-pencil-square"></i>
+                              </button>
+
+                              <!-- Botón eliminar -->
+                              <form action="{{ route('empleados.destroy', $empleado->id) }}"
+                                    method="POST" class="d-inline">
+                                  @csrf
+                                  @method('DELETE')
+
+                                  <button onclick="return confirm('¿Eliminar empleado?')" class="btn btn-danger btn-sm">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </form>
+
+                          </td>
+                      </tr>
+                  @endforeach
+                  </tbody>
+              </table>
+          </div>
+      </section>
+
+      <!-- MODAL: NUEVO EMPLEADO -->
+      <div class="modal fade" id="nuevoEmpleadoModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <form action="{{ route('empleados.store') }}" method="POST">
+                      @csrf
+
+                      <div class="modal-header">
+                          <h5 class="modal-title">Agregar Empleado</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <div class="modal-body">
+
+                          <div class="mb-3">
+                              <label class="form-label">Usuario</label>
+                              <input name="usuario" class="form-control" required>
+                          </div>
+
+                          <div class="mb-3">
+                              <label class="form-label">Email</label>
+                              <input type="email" name="email" class="form-control" required>
+                          </div>
+
+                          <div class="mb-3">
+                              <label class="form-label">Contraseña</label>
+                              <input type="password" name="password" class="form-control" required>
+                          </div>
+
+                          <div class="mb-3">
+                              <label class="form-label">Rol</label>
+                              <select name="rol" class="form-select" required>
+                                  <option value="empleado">Empleado</option>
+                                  <option value="admin">Administrador</option>
+                              </select>
+                          </div>
+
+                      </div>
+
+                      <div class="modal-footer">
+                          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                          <button class="btn btn-success" type="submit">Guardar</button>
+                      </div>
+
+                  </form>
+              </div>
+          </div>
+      </div>
+
+      <!-- MODAL: EDITAR EMPLEADO -->
+      <div class="modal fade" id="editarEmpleadoModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+
+                  <form id="editarEmpleadoForm" method="POST">
+                      @csrf
+                      @method('PUT')
+
+                      <div class="modal-header">
+                          <h5 class="modal-title">Editar Empleado</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <div class="modal-body">
+
+                          <div class="mb-3">
+                              <label class="form-label">Usuario</label>
+                              <input name="usuario" id="edit_emp_usuario" class="form-control" required>
+                          </div>
+
+                          <div class="mb-3">
+                              <label class="form-label">Email</label>
+                              <input type="email" name="email" id="edit_emp_email" class="form-control" required>
+                          </div>
+
+                          <div class="mb-3">
+                              <label class="form-label">Rol</label>
+                              <select name="rol" id="edit_emp_rol" class="form-select">
+                                  <option value="empleado">Empleado</option>
+                                  <option value="admin">Administrador</option>
+                              </select>
+                          </div>
+
+                          <div class="mb-3">
+                              <label class="form-label">Nueva contraseña (opcional)</label>
+                              <input type="password" name="password" class="form-control"
+                                    placeholder="Dejar vacío para no cambiar">
+                          </div>
+
+                      </div>
+
+                      <div class="modal-footer">
+                          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                          <button type="submit" class="btn btn-success">Guardar cambios</button>
+                      </div>
+
+                  </form>
+
+              </div>
+          </div>
+      </div>
+
+      <!-- SCRIPT MODAL EDICIÓN -->
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+
+          let modal = new bootstrap.Modal(document.getElementById('editarEmpleadoModal'));
+          let form = document.getElementById('editarEmpleadoForm');
+
+          document.querySelectorAll('.editarEmpleadoBtn').forEach(btn => {
+              btn.addEventListener('click', () => {
+
+                  form.action = `/empleados/${btn.dataset.id}`;
+
+                  document.getElementById('edit_emp_usuario').value = btn.dataset.usuario;
+                  document.getElementById('edit_emp_email').value = btn.dataset.email;
+                  document.getElementById('edit_emp_rol').value = btn.dataset.rol;
+
+                  modal.show();
+              });
+          });
+
+      });
+      </script>
+
+
 
       <!-- CLIENTES -->
       <section id="clientes" class="mb-5" style="display:none;">
@@ -235,23 +433,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 <th>Acciones</th>
               </tr>
             </thead>
+
             <tbody>
               @foreach ($clientes as $cliente)
               <tr>
                 <td>{{ $cliente->id }}</td>
-                <td>{{ $cliente->usuario->usuario}}</td>
+                <td>{{ $cliente->usuario->usuario ?? 'SIN USUARIO' }}</td>
                 <td>{{ $cliente->nombre }}</td>
-                <td>{{ $cliente->usuario->email}}</td>
+                <td>{{ $cliente->usuario->email ?? 'N/A' }}</td>
                 <td>{{ $cliente->telefono }}</td>
                 <td>{{ $cliente->direccion }}</td>
                 <td>{{ $cliente->usuario->rol ?? 'cliente' }}</td>
+
                 <td>
-                  <!-- Botón para abrir modal de edición -->
+                  <!-- EDITAR -->
                   <button type="button" class="btn btn-sm btn-primary editarClienteBtn"
                           data-id="{{ $cliente->id }}"
                           data-nombre="{{ $cliente->nombre }}"
-                          data-usuario="{{ $cliente->usuario->usuario }}"
-                          data-email="{{ $cliente->usuario->email }}"
+                          data-usuario="{{ $cliente->usuario->usuario ?? '' }}"
+                          data-email="{{ $cliente->usuario->email ?? '' }}"
                           data-telefono="{{ $cliente->telefono }}"
                           data-direccion="{{ $cliente->direccion }}"
                           data-fecha="{{ $cliente->fecha_nacimiento }}"
@@ -259,11 +459,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class="bi bi-pencil-square"></i>
                   </button>
 
-                  <!-- Formulario eliminar -->
+                  <!-- ELIMINAR -->
                   <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar cliente?')">
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('¿Eliminar cliente?')">
                       <i class="bi bi-trash-fill"></i>
                     </button>
                   </form>
@@ -275,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <!-- Modal Editar Cliente -->
-        <div class="modal fade" id="editarClienteModal" tabindex="-1" aria-labelledby="editarClienteLabel" aria-hidden="true">
+        <div class="modal fade" id="editarClienteModal" tabindex="-1">
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
               <form id="editarClienteForm" method="POST">
@@ -283,8 +484,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 @method('PUT')
 
                 <div class="modal-header">
-                  <h5 class="modal-title" id="editarClienteLabel">Editar Cliente</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  <h5 class="modal-title">Editar Cliente</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
@@ -316,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       <input type="text" name="direccion" class="form-control" id="edit_direccion">
                     </div>
                     <div class="col-md-6 mb-3">
-                      <label class="form-label">Fecha de nacimiento</label>
+                      <label class="form-label">Fecha nacimiento</label>
                       <input type="date" name="fecha_nacimiento" class="form-control" id="edit_fecha">
                     </div>
                   </div>
@@ -341,7 +542,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </section>
 
-      <!-- Script para llenar el modal de edición -->
+
+      <!-- SCRIPT EDITAR CLIENTE -->
       <script>
       document.addEventListener('DOMContentLoaded', () => {
         const modal = new bootstrap.Modal(document.getElementById('editarClienteModal'));
@@ -362,6 +564,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
       </script>
+
+      <!-- SCRIPT BUSCAR CLIENTES -->
+      <script>
+      document.getElementById('buscarCliente').addEventListener('keyup', function () {
+        let filtro = this.value.toLowerCase();
+        let filas = document.querySelectorAll('#tablaClientes tbody tr');
+
+        filas.forEach(fila => {
+          let texto = fila.innerText.toLowerCase();
+          fila.style.display = texto.includes(filtro) ? '' : 'none';
+        });
+      });
+      </script>
+
 
        <!-- SERVICIOS -->
       <section id="servicios" class="mb-5" style="display:none; min-height:100vh;">
@@ -936,8 +1152,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
           });
   </script>
-
-
-
 </body>
 </html>

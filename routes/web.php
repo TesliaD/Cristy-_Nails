@@ -46,8 +46,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('citas.cancelar');
 });
 
-
-
 //Panel para Administrador
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/paneladmin', [AuthController::class, 'mostrarpaneladmin'])->name('paneladmin');
@@ -66,13 +64,18 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::delete('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_destroy'])->name('clientes.destroy');
     Route::get('/paneladmin/clientes/{id}/edit', [AdminPanelController::class, 'clientes_edit'])->name('clientes.edit');
     Route::put('/paneladmin/clientes/{id}', [AdminPanelController::class, 'clientes_update'])->name('clientes.update');
- 
-    //Rutas para Citas en el panel de Administrador
-    Route::get('paneladmin/citas',[CitaController::class, 'index'])->name('citas.index');
-    Route::post('paneladmin/citas', [CitaController::class, 'store'])->name('citas.store');
-    Route::put('paneladmin/citas/{id}', [CitaController::class, 'update'])->name('citas.update');  
-    Route::delete('paneladmin/citas/{id}',[CitaController::class,'destroy'])->name('citas.destroy');
 
+    //Rutas para Citas en el panel de Administrador
+    Route::get('/paneladmin/citas',[CitaController::class, 'index'])->name('citas.index');
+    Route::post('/paneladmin/citas', [CitaController::class, 'store'])->name('citas.store');
+    Route::put('/paneladmin/citas/{id}', [CitaController::class, 'update'])->name('citas.update');  
+    Route::delete('/paneladmin/citas/{id}',[CitaController::class,'destroy'])->name('citas.destroy');
+
+    // RUTAS DE EMPLEADOS
+    Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados.index');
+    Route::post('/empleados', [EmpleadoController::class, 'store'])->name('empleados.store');
+    Route::put('/empleados/{id}', [EmpleadoController::class, 'update'])->name('empleados.update');
+    Route::delete('/empleados/{id}', [EmpleadoController::class, 'destroy'])->name('empleados.destroy');
 });
 
 //Panel para Empleados

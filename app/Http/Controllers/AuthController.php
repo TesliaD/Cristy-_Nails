@@ -93,7 +93,7 @@ class AuthController extends Controller
         // Iniciar sesión automáticamente después de registrarse
         Auth::login($user);
 
-        return redirect()->route('panelclientes') // 👈 también redirige al panel del cliente
+        return redirect()->route('panelcliente.index') 
             ->with('success', '¡Bienvenido! Tu cuenta se creó correctamente.');
     }
 

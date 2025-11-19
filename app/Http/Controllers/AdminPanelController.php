@@ -17,12 +17,22 @@ class AdminPanelController extends Controller
     // 🧩 Mostrar vista de clientes
     public function clientes_index()
     {
-        $clientes = Clientes::with('usuario')->get(); // Carga clientes + usuario relacionado
+        $clientes = Clientes::with('usuario')
+            ->whereHas('usuario', function ($q) {
+                $q->where('rol', 'cliente');
+            })
+            ->get();
+
         return view('admin.paneladmin', compact('clientes'));
     }
 
+    //Montrar vista de empleados
+    public function empleados_index()
+    {
+        $empleados = User::where('rol', 'empleado')->get();
 
-
+        return view('admin.paneladmin', compact('empleados'));
+    }
 
     // 💾 Guardar nuevo cliente
     public function clientes_store(Request $request)
