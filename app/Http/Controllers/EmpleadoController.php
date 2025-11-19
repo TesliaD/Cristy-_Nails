@@ -79,6 +79,7 @@ class EmpleadoController extends Controller
     $totalCitas = $citas->count();      // Solo las citas de hoy
     $totalServicios = Servicios::count();
 
+
     // Pasar todo a la vista
     return view('empleados.panelempleados', compact('citas', 'totalClientes', 'totalCitas', 'totalServicios'));
     }

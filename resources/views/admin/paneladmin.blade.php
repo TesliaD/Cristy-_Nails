@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="col-md-3">
             <div class="card text-center p-3 shadow-sm">
               <h5>Ingresos</h5>
-              <p>${{ $totalIngresos ?? 0 }}</p>
+              <p>${{ number_format($totalIngresos ?? 0, 2) }}</p>
             </div>
           </div>
         </div>

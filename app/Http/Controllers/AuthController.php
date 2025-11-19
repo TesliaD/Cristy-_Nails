@@ -142,6 +142,7 @@ class AuthController extends Controller
             ->orderBy('hora', 'asc')
             ->get();
 
+
         // Traer solo los clientes que tienen citas hoy
         $clientesHoy = Clientes::whereHas('citas', function ($q) use ($hoy) {
             $q->whereDate('fecha', $hoy);
@@ -153,7 +154,11 @@ class AuthController extends Controller
         $totalClientes = $clientesHoy->count();      
         $totalCitas = $citasHoy->count();      
         $totalServicios = Servicios::count();
-        $totalIngresos = 12;
+        $totalIngresos = Cita::whereDate('fecha', $hoy)
+        ->where('estado', 'completada')
+        ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
+        ->sum('servicios.Precio');   
+
 
         return view('admin.paneladmin', compact(
             'user',
