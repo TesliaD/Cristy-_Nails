@@ -14,7 +14,7 @@ class ServicioController extends Controller
         return view('admin.paneladmin', compact('servicios'));
     }
 
-    // Mostrar servicios en la página pública del cliente
+    // Mostrar servicios en la página pública del cliente (DASHBOARD)
     public function mostrarServicios()
     {
         // obtiene los servicios activos
@@ -22,6 +22,13 @@ class ServicioController extends Controller
 
         // devuelve la vista dashboard y le pasa los servicios
         return view('layouts.dashboard', ['servicios' => $servicios]);
+    }
+
+    // 👉 NUEVO MÉTODO: Mostrar servicios en la vista AGENDAR
+    public function mostrarAgendar()
+    {
+        $servicios = Servicios::where('Activo', 1)->get();
+        return view('layouts.agendar', compact('servicios'));
     }
 
     //Guardar un nuevo servicio
@@ -32,7 +39,7 @@ class ServicioController extends Controller
             'Descripcion'  => 'nullable|string',
             'Precio'       => 'required|numeric|min:0',
             'Duracion'     => 'nullable|integer|min:0',
-            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120', // Aumenté a 5MB
+            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         $data = $request->all();
@@ -48,7 +55,6 @@ class ServicioController extends Controller
 
         return redirect()->back()->with('success', 'Servicio agregado correctamente.');
     }
-
 
     //Actualizar Servicio
     public function update(Request $request, $id)

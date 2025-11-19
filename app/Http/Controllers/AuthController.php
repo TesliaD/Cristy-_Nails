@@ -36,7 +36,7 @@ class AuthController extends Controller
                 case 'empleado':
                     return redirect()->route('panelempleado');
                 case 'cliente':
-                    return redirect()->route('panelclientes'); 
+                    return redirect()->route('panelcliente.index'); 
                 default:
                     Auth::logout();
                     return back()->withErrors(['email' => '⚠️ Rol no reconocido']);
@@ -97,17 +97,6 @@ class AuthController extends Controller
             ->with('success', '¡Bienvenido! Tu cuenta se creó correctamente.');
     }
 
-    //Mostrar panel del cliente con sus datos
-    public function mostrarpanelclientes()
-    {
-        $user = Auth::user();
-
-        // Buscar el cliente asociado al usuario
-        $cliente = Clientes::where('usuario_id', $user->id)->first();
-
-        // Enviar datos a la vista
-        return view('clientes.panelclientes', compact('user', 'cliente'));
-    }
 
     public function mostrarpaneladmin()
     {

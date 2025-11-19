@@ -1,0 +1,112 @@
+/* --- AJUSTE GENERAL DE LA SECCIÓN --- */
+#reportes {
+    padding: 10px 0 0 0 !important;
+}
+
+/* Espaciado del texto descriptivo */
+#reportes p {
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+/* --- CONTENEDOR DE TARJETAS (centrado) --- */
+.contenedor-tarjetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 0;
+    justify-content: center; /* 👈 CENTRA TODAS LAS TARJETAS */
+}
+
+/* --- TARJETAS --- */
+.tarjetareportes {
+    width: 220px;
+    height: 160px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.tarjetareportes:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+/* Icono */
+.tarjetareportes .icono {
+    font-size: 40px;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+/* Texto */
+.tarjetareportes h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.icono i {
+    color: #ff30d2;
+}
+
+/* Ajustar la posición del modal para compensar la sidebar */
+#modalReporte .modal-dialog {
+  position: fixed;
+  left: calc(230px + (100vw - 230px) / 2);
+  top: 35%;
+  transform: translate(-50%, -50%);
+  max-width: 600px; /* más ancho */
+  width: 90%; 
+}
+
+/* Ajustar teléfono */
+@media (max-width: 768px) {
+  #modalReporte .modal-dialog {
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 95%; /* más grande en celular */
+  }
+}
+
+/* Cuerpo del modal */
+#modalReporte .modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 1rem;
+}
+
+
+/* Ajustar teléfono */
+@media (max-width: 768px) {
+  #modalResultado .modal-dialog {
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 95%; /* más grande en celular */
+  }
+}
+
+#modalResultado .modal-dialog {
+  position: fixed;
+  left: calc(230px + (100vw - 230px) / 2);
+  top: 35%;
+  transform: translate(-50%, -50%);
+  max-width: 800px; /* más ancho */
+  width: 90%; 
+}
+
+#modalResultado .modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-right: 1rem;
+}
+

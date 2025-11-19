@@ -11,8 +11,11 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="{{ asset('css/panelclientes.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/tarjetasdereporte.css') }}">
 </head>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -567,10 +570,92 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
 
             
-      <!-- REPORTES -->
-      <section id="reportes" class="mb-5" style="display:none;">
-        <h4 class="mb-3">Reportes y Estadísticas</h4>
-        <p>Generar reportes de clientes, citas, servicios e ingresos.</p>
+  <!-- REPORTES -->
+  <section id="reportes" class="mb-5" style="display:none;">
+      <h4 class="mb-3">Reportes y Estadísticas</h4>
+      <p>Generar reportes de clientes, citas, servicios e ingresos.</p>
+
+      <div class="contenedor-tarjetas">
+
+          <a class="tarjetareportes card-btn" data-tipo="clientes">
+              <div class="icono"><i class="fa-solid fa-users"></i></div>
+              <h3>Reporte de Clientes</h3>
+          </a>
+
+          <a class="tarjetareportes card-btn" data-tipo="citas">
+              <div class="icono"><i class="fa-solid fa-calendar-check"></i></div>
+              <h3>Reporte de Citas</h3>
+          </a>
+
+          <a class="tarjetareportes card-btn" data-tipo="servicios">
+              <div class="icono"><i class="fa-solid fa-scissors"></i></div>
+              <h3>Reporte de Servicios</h3>
+          </a>
+
+          <a class="tarjetareportes card-btn" data-tipo="ingresos">
+              <div class="icono"><i class="fa-solid fa-money-bill-wave"></i></div>
+              <h3>Reporte de Ingresos</h3>
+          </a>
+
+      </div>
+
+      <!-- MODAL -->
+  <div class="modal fade" id="modalReporte" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModal">Generar Reporte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="formFechas" action="{{ route('reportes.generar') }}">
+                    @csrf
+
+                    <label>Fecha inicial</label>
+                    <input type="date" name="inicio" class="form-control mb-3" required>
+
+                    <label>Fecha final</label>
+                    <input type="date" name="fin" class="form-control mb-3" required>
+
+                    <input type="hidden" id="tipoReporte" name="tipo">
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Generar Reporte
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+  <!-- Modal Resultado (Ver / Descargar) -->
+  <div class="modal fade" id="modalResultado" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reporte listo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div id="iframeContainer" style="width:100%; height:400px;"></div>
+          <div class="d-flex gap-2 justify-content-center mt-2">
+            <a id="verReporteBtn" class="btn btn-outline-primary" target="_blank" rel="noopener">Ver</a>
+            <a id="descargarReporteBtn" class="btn btn-primary" download>Descargar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  </section>
+
+
+
       </section>
 
       <!-- CONFIGURACIÓN -->
@@ -591,11 +676,14 @@ document.addEventListener('DOMContentLoaded', () => {
       #calendar {
         min-height: 700px;
       }
-      .fc-event { cursor: pointer; }
+      .fc-event { 
+        cursor: pointer;
+      }
       .fc {
         background: white;
         border-radius: 10px;
         padding: 10px;
+        
       }
 
     </style>
@@ -629,7 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <!-- ============================= -->
       <!-- SCRIPT FULLCALENDAR -->
       <!-- ============================= -->
-      <script>
+     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
         const modal = new bootstrap.Modal(document.getElementById('citaModal'));
@@ -762,7 +850,101 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       </script>
 
-      
+
+
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // Detecta clic en tarjetas y abre modal de fechas
+      document.querySelectorAll(".tarjetareportes").forEach(t => {
+        t.addEventListener("click", function () {
+          const titulo = this.querySelector("h3").innerText.trim();
+          const texto = titulo.toLowerCase();
+
+          let tipo = "";
+          if (texto.includes("cliente")) tipo = "clientes";
+          else if (texto.includes("cita")) tipo = "citas";
+          else if (texto.includes("servicio")) tipo = "servicios";
+          else if (texto.includes("ingreso") || texto.includes("venta") || texto.includes("ganancia")) tipo = "ingresos";
+          if (!tipo) tipo = texto.replace(/\s+/g, "_");
+
+          document.getElementById("tituloModal").innerText = titulo;
+          document.getElementById("tipoReporte").value = tipo;
+
+          // show modal
+          new bootstrap.Modal(document.getElementById('modalReporte')).show();
+        });
+      });
+
+      // Submit del formulario: usar fetch para recibir JSON y mostrar modal resultado
+      const form = document.getElementById('formFechas');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Muestra un spinner simple en el botón (opcional)
+        const btn = this.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'Generando...';
+
+        try {
+          const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]').value;
+
+          const res = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': token,
+              'Accept': 'application/json'
+            },
+            body: formData
+          });
+
+          const data = await res.json();
+
+          if (data.success && data.url) {
+            const verBtn = document.getElementById('verReporteBtn');
+            const descargarBtn = document.getElementById('descargarReporteBtn');
+            const iframeContainer = document.getElementById('iframeContainer');
+
+            const url = data.url;
+
+            // Mostrar PDF en el modal con iframe
+            iframeContainer.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="border:none;"></iframe>`;
+
+            // Botón "Ver" abre en nueva pestaña
+            verBtn.setAttribute('href', url);
+            verBtn.setAttribute('target', '_blank');
+
+            // Botón "Descargar" fuerza la descarga
+            descargarBtn.setAttribute('href', url);
+            const filename = url.split('/').pop();
+            descargarBtn.setAttribute('download', filename);
+
+            // Cerrar modal de fechas y abrir modal resultado
+            bootstrap.Modal.getInstance(document.getElementById('modalReporte')).hide();
+            new bootstrap.Modal(document.getElementById('modalResultado')).show();
+          }
+          else {
+                    alert(data.mensaje || 'Error al generar el reporte');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  alert('Error en la petición, revisa la consola.');
+                } finally {
+                  btn.disabled = false;
+                  btn.innerHTML = originalText;
+                }
+              });
+
+          });
+  </script>
+
+
 
 </body>
 </html>

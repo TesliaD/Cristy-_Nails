@@ -16,7 +16,7 @@ class Cita extends Model
         'fecha',
         'hora',
         'estado',
-        'notas', // ✅ agregado
+        'notas',
     ];
 
     public function cliente()
@@ -33,5 +33,4 @@ class Cita extends Model
     {
         return $this->belongsTo(Servicios::class, 'servicio_id');
     }
-
 }

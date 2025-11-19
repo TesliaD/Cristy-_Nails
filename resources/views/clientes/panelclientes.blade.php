@@ -11,65 +11,51 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-  <!-- Estilos personalizados -->
+  <!-- FullCalendar -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
+
+  <!-- Estilos -->
   <link rel="stylesheet" href="{{ asset('css/panelclientes.css') }}">
 </head>
 
 <body>
   <div class="d-flex" id="wrapper">
-    
 
-    <!-- Sidebar del Panel -->
+    <!-- Sidebar -->
     <div class="sidebar text-white p-3 sidebar">
-
-      <!--La imagen regresa a al landing page principal-->
-      <a href="{{ url('/') }}">
+      <a href="{{ url('/panel/dashboard') }}">
           <img src="{{ asset('img/nailslogo.jpg') }}" 
               alt="Cristy Nails and Beauty"
               class="img-fluid d-block mx-auto"
               style="max-height: 80px;">
       </a>
 
-      <!--Barra de navegación-->
-
       <ul class="nav flex-column mt-4">
-    
-        <!--Primer boton redirige a perfil-->
+
         <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('perfil')">
             <i class="bi bi-person-circle"></i> Mi Perfil
           </a>
         </li>
 
-        <!--Boton para actualizar el perfil del usuario-->
         <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('actualizar')">
             <i class="bi bi-pencil-square"></i> Actualizar Perfil
           </a>
         </li>
 
-        <!--Boton para ver las citas que tiene el cliente-->
         <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('citas')">
             <i class="bi bi-calendar-week"></i> Mis Citas
           </a>
         </li>
 
-        <!--Boton para registrar datos-->
         <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('registrar')">
             <i class="bi bi-journal-check"></i> Registrar Datos
           </a>
         </li>
 
-        <!--Boton para la configuracion del perfil-->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('configuracion')">
-            <i class="bi bi-gear-fill"></i> Configuración
-          </a>
-        </li>
-
-        <!--Boton para Cerrar la sesion del usuario-->
         <li class="nav-item mt-4">
           <form method="POST" action="{{ route('logout') }}">
             @csrf
@@ -81,7 +67,7 @@
       </ul>
     </div>
 
-    <!-- Contenido principal -->
+    <!-- Contenido -->
     <div id="page-content" class="p-4 flex-grow-1">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h1><i class="bi bi-person-fill-check"></i> Bienvenido, {{ Auth::user()->usuario ?? 'Cliente' }}</h1>
@@ -91,7 +77,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
       @endif
 
-      <!-- PERFIL: Solo muestra la información -->
+      <!-- PERFIL -->
       <section id="perfil" class="mb-5">
         <h4 class="mb-3">Mi Perfil</h4>
         <div class="card p-4 shadow-sm">
@@ -105,7 +91,7 @@
         </div>
       </section>
 
-      <!-- ACTUALIZAR PERFIL: Sección oculta al inicio -->
+      <!-- ACTUALIZAR PERFIL -->
       <section id="actualizar" class="mb-5" style="display:none;">
         <h4 class="mb-3">Actualizar mi perfil</h4>
         <form method="POST" action="{{ route('panelcliente.update') }}">
@@ -153,10 +139,11 @@
         </form>
       </section>
 
-      <!-- Citas -->
+      <!-- CITAS -->
       <section id="citas" class="mb-5" style="display:none;">
         <h4 class="mb-3">Mis Citas</h4>
-        <div class="alert alert-info"><i class="bi bi-calendar2-week"></i> Aún no tienes citas registradas.</div>
+
+        <div id="calendar"></div>
       </section>
 
       <!-- Registrar datos -->
@@ -165,24 +152,107 @@
         <button class="btn btn-success"><i class="bi bi-plus-circle"></i> Registrar información</button>
       </section>
 
-      <!-- Configuración -->
-      <section id="configuracion" style="display:none;">
-        <h4 class="mb-3">Configuración</h4>
-        <p>Opciones de personalización próximamente.</p>
-      </section>
-
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
+  <!-- 🎯 MODAL DETALLE DE CITA -->
+  <div class="modal fade" id="modalCita" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">Detalles de la Cita</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <p><strong>Servicio:</strong> <span id="modalServicio"></span></p>
+          <p><strong>Fecha:</strong> <span id="modalFecha"></span></p>
+          <p><strong>Hora:</strong> <span id="modalHora"></span></p>
+          <p><strong>Estado:</strong> <span id="modalEstado"></span></p>
+        </div>
+
+        <div class="modal-footer">
+          <form id="formCancelarCita" method="POST" action="">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Cancelar cita</button>
+          </form>
+
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JS GENERAL -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Script para alternar secciones -->
+  <!-- FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
   <script>
+    let calendar = null;
+
     function mostrarSeccion(id) {
       document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
       document.getElementById(id).style.display = 'block';
+
+      if (id === "citas") {
+        setTimeout(() => {
+          if (!calendar) {
+            iniciarCalendario();
+          } else {
+            calendar.render();
+          }
+        }, 100);
+      }
+    }
+
+    function iniciarCalendario() {
+      const calendarEl = document.getElementById('calendar');
+
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        height: "auto",
+
+        events: [
+          @foreach ($citas as $cita)
+          {
+            id: '{{ $cita->id }}',
+            title: '{{ $cita->servicio->nombre }}',
+            start: '{{ $cita->fecha }}T{{ $cita->hora }}',
+            extendedProps: {
+              servicio: '{{ $cita->servicio->nombre }}',
+              fecha: '{{ $cita->fecha }}',
+              hora: '{{ $cita->hora }}',
+              estado: '{{ $cita->estado ?? "Pendiente" }}',
+              cancelarUrl: '{{ route("citas.cancelar", $cita->id) }}'
+            },
+            color: '#ff79bc'
+          },
+          @endforeach
+        ],
+
+        eventClick: function(info) {
+          document.getElementById("modalServicio").innerText = info.event.extendedProps.servicio;
+          document.getElementById("modalFecha").innerText = info.event.extendedProps.fecha;
+          document.getElementById("modalHora").innerText = info.event.extendedProps.hora;
+          document.getElementById("modalEstado").innerText = info.event.extendedProps.estado;
+
+          document.getElementById("formCancelarCita").action =
+            info.event.extendedProps.cancelarUrl;
+
+          let modal = new bootstrap.Modal(document.getElementById('modalCita'));
+          modal.show();
+        }
+      });
+
+      calendar.render();
     }
   </script>
+
 </body>
 </html>
