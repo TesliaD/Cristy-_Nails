@@ -32,6 +32,6 @@ class User extends Authenticatable
 
     public function cliente()
     {
-        return $this->hasOne(Clientes::class, 'usuario_id'); // 👈 FIX
+        return $this->hasOne(Clientes::class, 'usuario_id'); 
     }
 }

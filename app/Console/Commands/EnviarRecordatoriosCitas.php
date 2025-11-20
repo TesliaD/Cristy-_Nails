@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 use App\Models\Cita;
 use Illuminate\Console\Command;
+use Carbon\Carbon;
 
 class EnviarRecordatoriosCitas extends Command
 {
@@ -27,7 +28,9 @@ class EnviarRecordatoriosCitas extends Command
      */
     public function handle()
     {
-        $manana = \Carbon\Carbon::tomorrow()->format('Y-m-d');
+        
+        $manana = Carbon::tomorrow('America/Phoenix')->format('Y-m-d');
+
 
         $citas = Cita::with(['cliente.usuario', 'servicio'])
             ->whereDate('fecha', $manana)

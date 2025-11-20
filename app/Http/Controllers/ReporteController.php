@@ -56,6 +56,11 @@ class ReporteController extends Controller
                 ->with(['cliente', 'empleado', 'servicio'])
                 ->get();
 
+            $citasArealizar = Cita::whereBetween('fecha', [$inicio, $fin])
+                ->where('estado', 'pendiente')
+                ->with(['cliente', 'empleado', 'servicio'])
+                ->get();
+
             $citasPorEstatus = Cita::selectRaw('estado, COUNT(*) as total')
                 ->whereBetween('fecha', [$inicio, $fin])
                 ->groupBy('estado')
@@ -67,19 +72,19 @@ class ReporteController extends Controller
                 ->with('empleado')
                 ->get();
 
-            $data = compact('inicio', 'fin', 'citasAtendidas', 'citasCanceladas', 'citasPorEstatus', 'citasPorEmpleado');
+            $data = compact('inicio', 'fin', 'citasAtendidas', 'citasCanceladas', 'citasPorEstatus', 'citasPorEmpleado', 'citasArealizar');
         }
 
-        // ---------------------------------------------------------------------
         // 📌 REPORTE DE SERVICIOS
         // ---------------------------------------------------------------------
         if ($tipo === 'servicios') {
 
             $serviciosRealizados = Cita::whereBetween('fecha', [$inicio, $fin])
                 ->where('estado', 'completada')
-                ->with('servicio')
+                ->with(['servicio', 'empleado'])
                 ->get();
 
+            // Servicios más hechos (igual que antes)
             $serviciosMasHechos = Cita::selectRaw('servicio_id, COUNT(*) as total')
                 ->whereBetween('fecha', [$inicio, $fin])
                 ->where('estado', 'completada')
@@ -88,16 +93,23 @@ class ReporteController extends Controller
                 ->with('servicio')
                 ->get();
 
-            $serviciosMenosHechos = Cita::selectRaw('servicio_id, COUNT(*) as total')
-                ->whereBetween('fecha', [$inicio, $fin])
-                ->where('estado', 'completada')
-                ->groupBy('servicio_id')
-                ->orderBy('total')
-                ->with('servicio')
-                ->get();
+            // Servicios menos hechos (incluye los que tienen 0)
+            $todosServicios = Servicios::all();
+            $serviciosMenosHechos = $todosServicios->map(function($servicio) use ($inicio, $fin) {
+                $servicio->total = Cita::where('servicio_id', $servicio->id)
+                    ->where('estado', 'completada')
+                    ->whereBetween('fecha', [$inicio, $fin])
+                    ->count();
+                return $servicio;
+            });
+
+            // Filtrar solo los que tienen el mínimo total
+            $minTotal = $serviciosMenosHechos->min('total');
+            $serviciosMenosHechos = $serviciosMenosHechos->filter(fn($s) => $s->total == $minTotal);
 
             $data = compact('inicio', 'fin', 'serviciosRealizados', 'serviciosMasHechos', 'serviciosMenosHechos');
         }
+
 
         // ---------------------------------------------------------------------
         // 📌 REPORTE DE INGRESOS
