@@ -23,7 +23,7 @@
 
     <!-- Sidebar -->
     <div class="sidebar text-white p-3 sidebar">
-      <a href="{{ url('/panel/dashboard') }}">
+      <a href="{{ route('dashboard') }}">
           <img src="{{ asset('img/nailslogo.jpg') }}" 
               alt="Cristy Nails and Beauty"
               class="img-fluid d-block mx-auto"

@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <!-- Sidebar del Panel -->
     <div class="sidebar text-white p-3 sidebar">
 
-      <a href="{{ url('/') }}">
+      <a href="{{ route('dashboard') }}">
           <img src="{{ asset('img/nailslogo.jpg') }}" 
               alt="Cristy Nails and Beauty"
               class="img-fluid d-block mx-auto"
@@ -897,358 +897,269 @@ document.addEventListener('DOMContentLoaded', () => {
 
     </style>
 
-              @php
-        if (isset($citasData)) {
-            $events = $citasData;
-        } elseif (isset($citas)) {
-            $events = $citas->map(function($cita) {
-                return [
-                    'id' => $cita->id,
-                    'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio') . ' - ' . ($cita->cliente->nombre ?? 'Sin cliente'),
-                    'start' => $cita->fecha . 'T' . $cita->hora,
-                    'backgroundColor' => $cita->estado == 'cancelada' ? '#ccc' : '#9ef5b0',
-                    'extendedProps' => [
-                        'fecha' => $cita->fecha,
-                        'hora' => $cita->hora,
-                        'cliente_id' => $cita->cliente_id,
-                        'servicio_id' => $cita->servicio_id,
-                        'empleado_id' => $cita->empleado_id,
-                        'notas' => $cita->notas ?? '',
-                    ],
-                ];
-            })->toArray();
-        } else {
-            $events = [];
-        }
-        @endphp
+    <!--Genera los eventos del calendario, no mover-->
+    @php
+    $events = $citas->map(function($cita) {
+        return [
+            'id' => $cita->id,
+            'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio').' - '.($cita->cliente->nombre ?? 'Sin cliente'),
+            'start' => $cita->fecha . 'T' . $cita->hora,
+            'backgroundColor' => '#9ef5b0',
+            'extendedProps' => [
+                'fecha' => $cita->fecha,
+                'hora' => $cita->hora,
+                'cliente_id' => $cita->cliente_id,
+                'servicio_id' => $cita->servicio_id,
+                'empleado_id' => $cita->empleado_id,
+                'notas' => $cita->notas,
+            ],
+        ];
+    })->toArray();
+    @endphp
 
 
-            <!-- ============================= -->
+      <!-- ============================= -->
       <!-- SCRIPT FULLCALENDAR -->
       <!-- ============================= -->
-     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const calendarEl = document.getElementById('calendar');
-        const modal = new bootstrap.Modal(document.getElementById('citaModal'));
-        const form = document.getElementById('formCita');
-
-        calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          selectable: true,
-          locale: 'es',
-          events: @json($events),
-
-          dateClick: function(info) {
-            form.reset();
-            document.getElementById('modalTitulo').innerText = 'Agregar Cita';
-            document.getElementById('btnEliminar').style.display = 'none';
-            document.getElementById('cita_id').value = '';
-            document.getElementById('fechaCita').value = info.dateStr;
-            modal.show();
-          },
-
-          eventClick: function(info) {
-            const cita = info.event.extendedProps;
-            console.log("📋 Datos del evento:", cita);
-
-            document.getElementById('modalTitulo').innerText = 'Editar Cita';
-            document.getElementById('btnEliminar').style.display = 'inline-block';
-
-            document.getElementById('cita_id').value = info.event.id;
-            document.getElementById('fechaCita').value = cita.fecha;
-            document.getElementById('horaCita').value = cita.hora;
-            document.getElementById('clienteCita').value = cita.cliente_id;
-            document.getElementById('servicioCita').value = cita.servicio_id;
-            document.getElementById('empleadoCita').value = cita.empleado_id;
-
-            //Mostrar las notas correctamente
-            const notasCampo = document.getElementById('notasCita');
-            notasCampo.value = cita.notas ? cita.notas : '';
-            console.log("🧾 Notas asignadas al campo:", notasCampo.value);
-
-            modal.show();
-          }
-
-        });
-
-        calendar.render();
-
-        // Guardar o actualizar cita
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-
-          const id = document.getElementById('cita_id').value;
-          const url = id ? `/citas/${id}` : '/citas';
-          const method = id ? 'PUT' : 'POST';
-
-          fetch(url, {
-            method: method,
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-              fecha: form.fecha.value,
-              hora: form.hora.value,
-              cliente_id: form.cliente_id.value,
-              servicio_id: form.servicio_id.value,
-              empleado_id: form.empleado_id.value,
-              notas: form.notas.value
-            })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              modal.hide();
-              location.reload();
-            }
-          });
-        });
-
-        // Eliminar cita
-        document.getElementById('btnEliminar').addEventListener('click', function() {
-          const id = document.getElementById('cita_id').value;
-          if (!confirm('¿Eliminar esta cita?')) return;
-
-          fetch(`/citas/${id}`, {
-            method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              modal.hide();
-              location.reload();
-            }
-          });
-        });
-      });
-      </script>
-
       <script>
-        let calendar; // la haremos global
+      document.addEventListener('DOMContentLoaded', function() {
 
-        function mostrarSeccion(id) {
-          const secciones = document.querySelectorAll('#page-content > section');
-          secciones.forEach(sec => sec.style.display = 'none');
+          const calendarEl = document.getElementById('calendar');
+          const modal = new bootstrap.Modal(document.getElementById('citaModal'));
+          const form = document.getElementById('formCita');
+          const btnEliminar = document.getElementById('btnEliminar');
+          let cita_id = null;
 
-          const activa = document.getElementById(id);
-          if (activa) {
-            activa.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
+          window.calendar = new FullCalendar.Calendar(calendarEl, {
+              initialView: 'dayGridMonth',
+              locale: 'es',
+              selectable: true,
+              events: @json($events),
 
-          // ✅ Si mostramos el calendario, volver a renderizarlo
-          if (id === 'citas' && calendar) {
-            setTimeout(() => calendar.render(), 200);
-          }
+              dateClick(info) {
+                  cita_id = null;
+                  form.reset();
+                  document.getElementById('modalTitulo').innerText = "Agregar Cita";
+                  btnEliminar.style.display = 'none';
 
-          document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.classList.remove('active', 'bg-light');
-            link.classList.add('text-white');
+                  document.getElementById('fechaCita').value = info.dateStr;
+
+                  modal.show();
+              },
+
+              eventClick(info) {
+                  const e = info.event;
+                  const data = e.extendedProps;
+
+                  cita_id = e.id;
+
+                  document.getElementById('modalTitulo').innerText = "Editar Cita";
+                  btnEliminar.style.display = 'inline-block';
+
+                  document.getElementById('cita_id').value = e.id;
+                  document.getElementById('fechaCita').value = data.fecha;
+                  document.getElementById('horaCita').value = data.hora;
+                  document.getElementById('clienteCita').value = data.cliente_id;
+                  document.getElementById('servicioCita').value = data.servicio_id;
+                  document.getElementById('empleadoCita').value = data.empleado_id;
+                  document.getElementById('notasCita').value = data.notas ?? '';
+
+                  modal.show();
+              }
           });
 
-          const activo = document.querySelector(`.sidebar .nav-link[onclick="mostrarSeccion('${id}')"]`);
-          if (activo) {
-            activo.classList.add('bg-light', 'text-dark');
-          }
-        }
+          window.calendar.render();
 
-        document.addEventListener('DOMContentLoaded', () => {
-          mostrarSeccion('dashboard');
-        });
+          const CSRF = '{{ csrf_token() }}';
+
+          // GUARDAR / ACTUALIZAR
+          form.addEventListener('submit', function(e) {
+              e.preventDefault();
+
+              const payload = {
+                  fecha: form.fechaCita.value,
+                  hora: form.horaCita.value,
+                  cliente_id: form.clienteCita.value,
+                  servicio_id: form.servicioCita.value,
+                  empleado_id: form.empleadoCita.value,
+                  notas: form.notasCita.value,
+              };
+
+              const url = cita_id
+                  ? `/admin/paneladmin/citas/${cita_id}`
+                  : `/admin/paneladmin/citas`;
+
+              const method = cita_id ? 'PUT' : 'POST';
+
+              fetch(url, {
+                  method: method,
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': CSRF,
+                      'Accept': 'application/json'
+                  },
+                  body: JSON.stringify(payload)
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                      modal.hide();
+                      location.reload();
+                  } else {
+                      console.error(data);
+                      alert("Error al guardar la cita");
+                  }
+              });
+          });
+
+          // ELIMINAR
+          btnEliminar.addEventListener('click', function() {
+              if (!confirm("¿Eliminar esta cita?")) return;
+
+              fetch(`/admin/paneladmin/citas/${cita_id}`, {
+                  method: 'DELETE',
+                  headers: {
+                      'X-CSRF-TOKEN': CSRF,
+                      'Accept': 'application/json'
+                  }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                      modal.hide();
+                      location.reload();
+                  } else {
+                      alert("No se pudo eliminar");
+                  }
+              });
+          });
+
+      });
       </script>
 
-<<<<<<< HEAD
-=======
+      <!--Scrip del renderizado del calendario-->
+      <script>
+          function mostrarSeccion(id) {
+              const secciones = document.querySelectorAll('#page-content > section');
+              secciones.forEach(sec => sec.style.display = 'none');
 
+              const activa = document.getElementById(id);
+              if (activa) {
+                  activa.style.display = 'block';
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
 
+              // 👉 Renderizar bien el calendario al abrir su sección
+              if (id === 'citas' && window.calendar) {
+                  setTimeout(() => window.calendar.render(), 200);
+              }
 
-
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-      // Detecta clic en tarjetas y abre modal de fechas
-      document.querySelectorAll(".tarjetareportes").forEach(t => {
-        t.addEventListener("click", function () {
-          const titulo = this.querySelector("h3").innerText.trim();
-          const texto = titulo.toLowerCase();
-
-          let tipo = "";
-          if (texto.includes("cliente")) tipo = "clientes";
-          else if (texto.includes("cita")) tipo = "citas";
-          else if (texto.includes("servicio")) tipo = "servicios";
-          else if (texto.includes("ingreso") || texto.includes("venta") || texto.includes("ganancia")) tipo = "ingresos";
-          if (!tipo) tipo = texto.replace(/\s+/g, "_");
-
-          document.getElementById("tituloModal").innerText = titulo;
-          document.getElementById("tipoReporte").value = tipo;
-
-          // show modal
-          new bootstrap.Modal(document.getElementById('modalReporte')).show();
-        });
-      });
-
-      // Submit del formulario: usar fetch para recibir JSON y mostrar modal resultado
-      const form = document.getElementById('formFechas');
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-
-        // Muestra un spinner simple en el botón (opcional)
-        const btn = this.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = 'Generando...';
-
-        try {
-          const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]').value;
-
-          const res = await fetch(this.action, {
-            method: 'POST',
-            headers: {
-              'X-CSRF-TOKEN': token,
-              'Accept': 'application/json'
-            },
-            body: formData
-          });
-
-          const data = await res.json();
-
-          if (data.success && data.url) {
-            const verBtn = document.getElementById('verReporteBtn');
-            const descargarBtn = document.getElementById('descargarReporteBtn');
-            const iframeContainer = document.getElementById('iframeContainer');
-
-            const url = data.url;
-
-            // Mostrar PDF en el modal con iframe
-            iframeContainer.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="border:none;"></iframe>`;
-
-            // Botón "Ver" abre en nueva pestaña
-            verBtn.setAttribute('href', url);
-            verBtn.setAttribute('target', '_blank');
-
-            // Botón "Descargar" fuerza la descarga
-            descargarBtn.setAttribute('href', url);
-            const filename = url.split('/').pop();
-            descargarBtn.setAttribute('download', filename);
-
-            // Cerrar modal de fechas y abrir modal resultado
-            bootstrap.Modal.getInstance(document.getElementById('modalReporte')).hide();
-            new bootstrap.Modal(document.getElementById('modalResultado')).show();
-          }
-          else {
-                    alert(data.mensaje || 'Error al generar el reporte');
-                  }
-                } catch (err) {
-                  console.error(err);
-                  alert('Error en la petición, revisa la consola.');
-                } finally {
-                  btn.disabled = false;
-                  btn.innerHTML = originalText;
-                }
+              // ---- Estilos del menú lateral ----
+              document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                  link.classList.remove('active', 'bg-light');
+                  link.classList.add('text-white');
               });
 
-          });
-  </script>
-
-
->>>>>>> f6e97fe (Muchos cambios)
-
-
-
-
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-      // Detecta clic en tarjetas y abre modal de fechas
-      document.querySelectorAll(".tarjetareportes").forEach(t => {
-        t.addEventListener("click", function () {
-          const titulo = this.querySelector("h3").innerText.trim();
-          const texto = titulo.toLowerCase();
-
-          let tipo = "";
-          if (texto.includes("cliente")) tipo = "clientes";
-          else if (texto.includes("cita")) tipo = "citas";
-          else if (texto.includes("servicio")) tipo = "servicios";
-          else if (texto.includes("ingreso") || texto.includes("venta") || texto.includes("ganancia")) tipo = "ingresos";
-          if (!tipo) tipo = texto.replace(/\s+/g, "_");
-
-          document.getElementById("tituloModal").innerText = titulo;
-          document.getElementById("tipoReporte").value = tipo;
-
-          // show modal
-          new bootstrap.Modal(document.getElementById('modalReporte')).show();
-        });
-      });
-
-      // Submit del formulario: usar fetch para recibir JSON y mostrar modal resultado
-      const form = document.getElementById('formFechas');
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-
-        // Muestra un spinner simple en el botón (opcional)
-        const btn = this.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = 'Generando...';
-
-        try {
-          const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]').value;
-
-          const res = await fetch(this.action, {
-            method: 'POST',
-            headers: {
-              'X-CSRF-TOKEN': token,
-              'Accept': 'application/json'
-            },
-            body: formData
-          });
-
-          const data = await res.json();
-
-          if (data.success && data.url) {
-            const verBtn = document.getElementById('verReporteBtn');
-            const descargarBtn = document.getElementById('descargarReporteBtn');
-            const iframeContainer = document.getElementById('iframeContainer');
-
-            const url = data.url;
-
-            // Mostrar PDF en el modal con iframe
-            iframeContainer.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="border:none;"></iframe>`;
-
-            // Botón "Ver" abre en nueva pestaña
-            verBtn.setAttribute('href', url);
-            verBtn.setAttribute('target', '_blank');
-
-            // Botón "Descargar" fuerza la descarga
-            descargarBtn.setAttribute('href', url);
-            const filename = url.split('/').pop();
-            descargarBtn.setAttribute('download', filename);
-
-            // Cerrar modal de fechas y abrir modal resultado
-            bootstrap.Modal.getInstance(document.getElementById('modalReporte')).hide();
-            new bootstrap.Modal(document.getElementById('modalResultado')).show();
+              const activo = document.querySelector(`.sidebar .nav-link[onclick="mostrarSeccion('${id}')"]`);
+              if (activo) {
+                  activo.classList.add('bg-light', 'text-dark');
+              }
           }
-          else {
-                    alert(data.mensaje || 'Error al generar el reporte');
-                  }
-                } catch (err) {
-                  console.error(err);
-                  alert('Error en la petición, revisa la consola.');
-                } finally {
-                  btn.disabled = false;
-                  btn.innerHTML = originalText;
-                }
+
+          document.addEventListener('DOMContentLoaded', () => {
+              mostrarSeccion('dashboard');
+          });
+      </script>
+
+
+      <!--script de los reportes-->
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+          // Detecta clic en tarjetas y abre modal de fechas
+          document.querySelectorAll(".tarjetareportes").forEach(t => {
+            t.addEventListener("click", function () {
+              const titulo = this.querySelector("h3").innerText.trim();
+              const texto = titulo.toLowerCase();
+
+              let tipo = "";
+              if (texto.includes("cliente")) tipo = "clientes";
+              else if (texto.includes("cita")) tipo = "citas";
+              else if (texto.includes("servicio")) tipo = "servicios";
+              else if (texto.includes("ingreso") || texto.includes("venta") || texto.includes("ganancia")) tipo = "ingresos";
+              if (!tipo) tipo = texto.replace(/\s+/g, "_");
+
+              document.getElementById("tituloModal").innerText = titulo;
+              document.getElementById("tipoReporte").value = tipo;
+
+              // show modal
+              new bootstrap.Modal(document.getElementById('modalReporte')).show();
+            });
+          });
+
+          // Submit del formulario: usar fetch para recibir JSON y mostrar modal resultado
+          const form = document.getElementById('formFechas');
+          form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            // Muestra un spinner simple en el botón (opcional)
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Generando...';
+
+            try {
+              const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]').value;
+
+              const res = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                  'X-CSRF-TOKEN': token,
+                  'Accept': 'application/json'
+                },
+                body: formData
               });
 
-          });
-  </script>
+              const data = await res.json();
+
+              if (data.success && data.url) {
+                const verBtn = document.getElementById('verReporteBtn');
+                const descargarBtn = document.getElementById('descargarReporteBtn');
+                const iframeContainer = document.getElementById('iframeContainer');
+
+                const url = data.url;
+
+                // Mostrar PDF en el modal con iframe
+                iframeContainer.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="border:none;"></iframe>`;
+
+                // Botón "Ver" abre en nueva pestaña
+                verBtn.setAttribute('href', url);
+                verBtn.setAttribute('target', '_blank');
+
+                // Botón "Descargar" fuerza la descarga
+                descargarBtn.setAttribute('href', url);
+                const filename = url.split('/').pop();
+                descargarBtn.setAttribute('download', filename);
+
+                // Cerrar modal de fechas y abrir modal resultado
+                bootstrap.Modal.getInstance(document.getElementById('modalReporte')).hide();
+                new bootstrap.Modal(document.getElementById('modalResultado')).show();
+              }
+              else {
+                        alert(data.mensaje || 'Error al generar el reporte');
+                      }
+                    } catch (err) {
+                      console.error(err);
+                      alert('Error en la petición, revisa la consola.');
+                    } finally {
+                      btn.disabled = false;
+                      btn.innerHTML = originalText;
+                    }
+                  });
+
+              });
+      </script>
 </body>
 </html>
