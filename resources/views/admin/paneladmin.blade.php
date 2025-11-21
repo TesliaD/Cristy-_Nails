@@ -904,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'id' => $cita->id,
             'title' => ($cita->servicio->Nom_Servicio ?? 'Sin servicio').' - '.($cita->cliente->nombre ?? 'Sin cliente'),
             'start' => $cita->fecha . 'T' . $cita->hora,
-            'backgroundColor' => '#9ef5b0',
+            'backgroundColor' => $cita->estado == 'cancelada' ? '#ff0000' : '#9ef5b0',
             'extendedProps' => [
                 'fecha' => $cita->fecha,
                 'hora' => $cita->hora,
@@ -1049,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
               }
 
-              // 👉 Renderizar bien el calendario al abrir su sección
+              // Renderizar bien el calendario al abrir su sección
               if (id === 'citas' && window.calendar) {
                   setTimeout(() => window.calendar.render(), 200);
               }
@@ -1064,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
               if (activo) {
                   activo.classList.add('bg-light', 'text-dark');
               }
+
           }
 
           document.addEventListener('DOMContentLoaded', () => {

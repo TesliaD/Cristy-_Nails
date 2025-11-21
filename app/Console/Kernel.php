@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Se ejecuta todos los días a las 8 AM
-        $schedule->command('citas:recordatorios')->dailyAt('8:00');
+        $schedule->command('citas:recordatorios')->dailyAt('08:00');
     }
 
 

@@ -28,7 +28,7 @@ class CitaController extends Controller
                 'servicio_id' => $cita->servicio_id,
                 'empleado_id' => $cita->empleado_id,
                 'notas' => $cita->notas,
-                'backgroundColor' => $cita->estado == 'cancelada' ? '#ccc' : '#9ef5b0',
+                'backgroundColor' => $cita->estado == 'cancelada' ? '#ff0000' : '#9ef5b0',
             ];
         });
 
