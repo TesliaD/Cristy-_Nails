@@ -109,3 +109,19 @@ body {
     }
 }
 
+.btn-pink {
+    background: linear-gradient(90deg, #ff7eb3, #ff758c);
+    color: white;
+    border: none;
+    transition: .3s;
+}
+
+.btn-pink:hover {
+    opacity: .85;
+    color: white;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    transition: .3s;
+}

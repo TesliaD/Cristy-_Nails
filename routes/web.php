@@ -109,6 +109,12 @@ Route::prefix('panel')->group(function () {
     Route::get('/sobrenosotros', function () {
         return view('layouts.sobrenosotros');
     })->name('sobrenosotros');
+
+
+     Route::get('/citas/horas-disponibles', [CitaController::class, 'getHorasDisponibles'])
+     ->name('citas.horas');
+
+
 });
 
 

@@ -42,7 +42,7 @@
                             <!-- Servicio -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Servicio</label>
-                                <select name="servicio" class="form-select rounded-pill" required>
+                                <select name="servicio" id="servicio" class="form-select rounded-pill" required>
                                     <option value="">-- Selecciona un servicio --</option>
 
                                     @foreach($servicios as $servicio)
@@ -56,13 +56,15 @@
                             <!-- Fecha -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Fecha</label>
-                                <input type="date" name="fecha" class="form-control rounded-pill" required>
+                                <input type="date" name="fecha" id="fecha" class="form-control rounded-pill" required>
                             </div>
 
-                            <!-- Hora -->
+                            <!-- Hora dinámica -->
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Hora</label>
-                                <input type="time" name="hora" class="form-control rounded-pill" required>
+                                <label class="form-label fw-bold">Horas disponibles</label>
+                                <select name="hora" id="hora" class="form-select rounded-pill" required>
+                                    <option value="">-- Selecciona fecha y servicio primero --</option>
+                                </select>
                             </div>
 
                             <!-- Notas -->
@@ -77,11 +79,51 @@
                             <div class="d-grid">
                                 <button type="submit" class="btn text-white fw-bold rounded-pill py-2"
                                         style="background: linear-gradient(90deg, #ff758c, #ff7eb3);">
-                                    💖 Agendar
+                                        <i class="bi bi-heart-fill"></i> Agendar
                                 </button>
                             </div>
 
                         </form>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+
+                                const fecha = document.getElementById('fecha');
+                                const servicio = document.getElementById('servicio');
+                                const hora = document.getElementById('hora');
+
+                                async function cargarHoras() {
+                                    if (!fecha.value || !servicio.value) {
+                                        hora.innerHTML = '<option>-- Selecciona fecha y servicio --</option>';
+                                        return;
+                                    }
+
+                                    const url = "{{ route('citas.horas') }}";
+                                    const params = new URLSearchParams({
+                                        fecha: fecha.value,
+                                        servicio_id: servicio.value
+                                    });
+
+                                    let response = await fetch(url + "?" + params);
+                                    let data = await response.json();
+
+                                    hora.innerHTML = "";
+
+                                    if (data.length === 0) {
+                                        hora.innerHTML = '<option value="">No hay horarios disponibles</option>';
+                                        return;
+                                    }
+
+                                    data.forEach(h => {
+                                        hora.innerHTML += `<option value="${h}">${h}</option>`;
+                                    });
+                                }
+
+                                fecha.addEventListener('change', cargarHoras);
+                                servicio.addEventListener('change', cargarHoras);
+
+                            });
+                        </script>
+
 
                     @endauth
 

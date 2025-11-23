@@ -28,6 +28,7 @@
     <script src="{{ asset('js/calendario.js') }}"></script>
 
 <div class="d-flex">
+  
   <!-- Sidebar -->
   <div class="sidebar p-3">
     <div class="text-center mb-4">

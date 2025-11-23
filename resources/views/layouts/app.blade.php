@@ -33,22 +33,23 @@
 
         <ul class="dropdown-menu dropdown-menu-end">
             @if(Auth::user()->rol === 'admin')
-                <!-- 🔹 Opciones del administrador -->
+                
+                <!--Opciones del administrador -->
                 <li><a class="dropdown-item" href="{{ route('paneladmin') }}">Panel de Administración</a></li>
                 <li><a class="dropdown-item" href="{{ route('login') }}">Gestión de Usuarios</a></li>
                 <li><a class="dropdown-item" href="{{ route('login') }}">Gestión de Citas</a></li>
                 <li><a class="dropdown-item" href="{{ route('login') }}">Reportes</a></li>
 
             @elseif(Auth::user()->rol === 'empleado')
-                <!-- 🔹 Opciones del empleado -->
+                <!--Opciones del empleado -->
                 <li><a class="dropdown-item" href="{{ route('panelempleado') }}">Panel del Empleado</a></li>
                 <li><a class="dropdown-item" href="{{ route('login') }}">Citas Asignadas</a></li>
 
             @elseif(Auth::user()->rol === 'cliente')
-                <!-- 🔹 Opciones del cliente -->
+                <!--Opciones del cliente -->
                 <li><a class="dropdown-item" href="{{ route('panelcliente.index') }}">Mi Panel</a></li>
                 <li><a class="dropdown-item" href="{{ route('agendar') }}">Agendar Cita</a></li>
-                <li><a class="dropdown-item" href="{{ route('login') }}">Mis Citas</a></li>
+                <li><a class="dropdown-item" href="{{ route('panelcliente.index') }}">Mis Citas</a></li>
             @endif
 
             <li><hr class="dropdown-divider"></li>

@@ -50,12 +50,6 @@
           </a>
         </li>
 
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('registrar')">
-            <i class="bi bi-journal-check"></i> Registrar Datos
-          </a>
-        </li>
-
         <li class="nav-item mt-4">
           <form method="POST" action="{{ route('logout') }}">
             @csrf
@@ -146,16 +140,10 @@
         <div id="calendar"></div>
       </section>
 
-      <!-- Registrar datos -->
-      <section id="registrar" class="mb-5" style="display:none;">
-        <h4 class="mb-3">Registrar Datos</h4>
-        <button class="btn btn-success"><i class="bi bi-plus-circle"></i> Registrar información</button>
-      </section>
-
     </div>
   </div>
 
-  <!-- 🎯 MODAL DETALLE DE CITA -->
+  <!--MODAL DETALLE DE CITA -->
   <div class="modal fade" id="modalCita" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">

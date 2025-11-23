@@ -586,10 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div>
               <h2 class="fw-bold text-primary mb-1">Gestión de Servicios</h2>
               <p class="text-muted">Administra los servicios ofrecidos por tu negocio.</p>
-            </div>
-            <button class="btn btn-success px-4 py-2 shadow-sm" onclick="document.getElementById('form-servicio').scrollIntoView({ behavior: 'smooth' })">
-              ➕ Agregar Servicio
-            </button>
+            </div>  
           </div>
 
           <!-- FORMULARIO -->
@@ -619,8 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="file" name="imagen" class="form-control" accept="image/*">
                   </div>
                   <div class="col-lg-3 col-md-6 mt-3">
-                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm">
-                      💅 Guardar Servicio
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm"><i class="bi bi-bookmark-heart-fill"></i> Guardar Servicio
                     </button>
                   </div>
                 </div>
@@ -667,11 +663,11 @@ document.addEventListener('DOMContentLoaded', () => {
                           <td><input type="number" name="Duracion" value="{{ $servicio->Duracion }}" class="form-control form-control-sm text-center"></td>
                           <td class="text-center"><input type="checkbox" name="Activo" value="1" {{ $servicio->Activo ? 'checked' : '' }}></td>
                           <td class="text-center">
-                            <button type="submit" class="btn btn-sm btn-primary me-1">💾</button>
+                            <button type="submit" class="btn btn-sm btn-primary me-1"><i class="bi bi-floppy-fill"></i></button>
                         </form>
                         <form action="{{ route('servicios.destroy', $servicio->id) }}" method="POST" style="display:inline;">
                           @csrf @method('DELETE')
-                          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este servicio?')">🗑️</button>
+                          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este servicio?')"><i class="bi bi-trash3-fill"></i></button>
                         </form>
                           </td>
                       </tr>
