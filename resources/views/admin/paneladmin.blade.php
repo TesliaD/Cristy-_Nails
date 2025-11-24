@@ -16,6 +16,10 @@
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="{{ asset('css/panelclientes.css') }}">
   <link rel="stylesheet" href="{{ asset('css/tarjetasdereporte.css') }}">
+
+  <!--Script de alertas-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -363,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="modal fade" id="nuevoClienteModal" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
-              <form action="{{ route('clientes.store') }}" method="POST">
+              <form id="formNuevoCliente" action="{{ route('clientes.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
                   <h5 class="modal-title">Agregar Cliente</h5>
@@ -460,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   </button>
 
                   <!-- ELIMINAR -->
-                  <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" class="d-inline">
+                  <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" class="d-inline formEliminarCliente">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger"
@@ -551,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.editarClienteBtn').forEach(btn => {
           btn.addEventListener('click', () => {
-            form.action = `/clientes/${btn.dataset.id}`;
+            form.action = `/admin/paneladmin/clientes/${btn.dataset.id}`;
             document.getElementById('edit_usuario').value = btn.dataset.usuario;
             document.getElementById('edit_nombre').value = btn.dataset.nombre;
             document.getElementById('edit_email').value = btn.dataset.email;
@@ -564,6 +568,69 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
       </script>
+      
+      <!--Alerta para eliminar Cliente-->
+      <script>
+      document.querySelectorAll('.formEliminarCliente').forEach(form => {
+          form.addEventListener('submit', function(e){
+              e.preventDefault();
+
+              Swal.fire({
+                  title: "¿Eliminar cliente?",
+                  text: "Esta acción no puede deshacerse.",
+                  icon: "error",
+                  showCancelButton: true,
+                  confirmButtonText: "Sí, eliminar",
+                  cancelButtonText: "Cancelar"
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      this.submit();
+                  }
+              });
+          });
+      });
+      </script>
+
+      <!--Alerta para Editar cliente-->
+      <script>
+      document.getElementById('editarClienteForm').addEventListener('submit', function(e){
+          e.preventDefault();
+
+          Swal.fire({
+              title: "¿Guardar cambios?",
+              text: "El cliente será actualizado.",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Sí, actualizar",
+              cancelButtonText: "Cancelar"
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  this.submit();
+              }
+          });
+      });
+      </script>
+
+      <!--Script para guuardar un cliente nuevo ALERTA-->
+      <script>
+      document.getElementById('formNuevoCliente').addEventListener('submit', function(e) {
+          e.preventDefault(); 
+
+          Swal.fire({
+              title: "¿Agregar cliente?",
+              text: "Se guardará un nuevo cliente en el sistema.",
+              icon: "question",
+              showCancelButton: true,
+              confirmButtonText: "Sí, guardar",
+              cancelButtonText: "Cancelar"
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  this.submit();
+              }
+          });
+      });
+      </script>
+
 
       <!-- SCRIPT BUSCAR CLIENTES -->
       <script>
@@ -724,7 +791,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="mb-3">
                   <label class="form-label">Hora</label>
-                  <input type="time" name="hora" id="horaCita" class="form-control" required>
+                  <!-- select dinámico -->
+                  <select name="hora" id="horaCita" class="form-select" required>
+                    <option value="">Selecciona fecha y servicio</option>
+                  </select>
+                  <div id="horaHelp" class="form-text">Las horas se calculan según la duración del servicio y disponibilidad del día.</div>
                 </div>
 
                 <div class="mb-3">
@@ -742,7 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <select name="servicio_id" id="servicioCita" class="form-select" required>
                     <option value="">Selecciona un servicio</option>
                     @foreach($servicios as $s)
-                      <option value="{{ $s->id }}">{{ $s->Nom_Servicio }}</option>
+                      <option value="{{ $s->id }}" data-duracion="{{ $s->Duracion }}">{{ $s->Nom_Servicio }}</option>
                     @endforeach
                   </select>
                 </div>
@@ -757,7 +828,6 @@ document.addEventListener('DOMContentLoaded', () => {
                   </select>
                 </div>
 
-                <!-- 📝 Campo de notas -->
                 <div class="mb-3">
                   <label class="form-label">Notas</label>
                   <textarea name="notas" id="notasCita" class="form-control" rows="3" placeholder="Detalles adicionales sobre la cita..."></textarea>
@@ -855,12 +925,6 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
 
-
-
-  </section>
-
-
-
       </section>
 
       <!-- CONFIGURACIÓN -->
@@ -917,15 +981,23 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- ============================= -->
       <!-- SCRIPT FULLCALENDAR -->
       <!-- ============================= -->
+            
+      <!-- SCRIPT para manejar calendario + modal + horas disponibles -->
       <script>
       document.addEventListener('DOMContentLoaded', function() {
-
           const calendarEl = document.getElementById('calendar');
           const modal = new bootstrap.Modal(document.getElementById('citaModal'));
           const form = document.getElementById('formCita');
           const btnEliminar = document.getElementById('btnEliminar');
           let cita_id = null;
 
+          const fechaInput = document.getElementById('fechaCita');
+          const servicioSelect = document.getElementById('servicioCita');
+          const horaSelect = document.getElementById('horaCita');
+
+          // ==========================
+          // FULLCALENDAR
+          // ==========================
           window.calendar = new FullCalendar.Calendar(calendarEl, {
               initialView: 'dayGridMonth',
               locale: 'es',
@@ -938,7 +1010,8 @@ document.addEventListener('DOMContentLoaded', () => {
                   document.getElementById('modalTitulo').innerText = "Agregar Cita";
                   btnEliminar.style.display = 'none';
 
-                  document.getElementById('fechaCita').value = info.dateStr;
+                  fechaInput.value = info.dateStr;
+                  horaSelect.innerHTML = '<option value="">Selecciona servicio</option>';
 
                   modal.show();
               },
@@ -948,15 +1021,26 @@ document.addEventListener('DOMContentLoaded', () => {
                   const data = e.extendedProps;
 
                   cita_id = e.id;
-
                   document.getElementById('modalTitulo').innerText = "Editar Cita";
                   btnEliminar.style.display = 'inline-block';
 
                   document.getElementById('cita_id').value = e.id;
-                  document.getElementById('fechaCita').value = data.fecha;
-                  document.getElementById('horaCita').value = data.hora;
+                  fechaInput.value = data.fecha;
+
+                  servicioSelect.value = data.servicio_id;
+                  cargarHorasDisponibles().then(() => {
+                      horaSelect.value = data.hora;
+
+                      if (!Array.from(horaSelect.options).some(o => o.value === data.hora)) {
+                          const opt = document.createElement('option');
+                          opt.value = data.hora;
+                          opt.text = data.hora;
+                          horaSelect.insertBefore(opt, horaSelect.firstChild);
+                          horaSelect.value = data.hora;
+                      }
+                  });
+
                   document.getElementById('clienteCita').value = data.cliente_id;
-                  document.getElementById('servicioCita').value = data.servicio_id;
                   document.getElementById('empleadoCita').value = data.empleado_id;
                   document.getElementById('notasCita').value = data.notas ?? '';
 
@@ -968,65 +1052,165 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const CSRF = '{{ csrf_token() }}';
 
-          // GUARDAR / ACTUALIZAR
-          form.addEventListener('submit', function(e) {
+          // ==========================
+          // CARGAR HORAS DISPONIBLES
+          // ==========================
+          async function cargarHorasDisponibles() {
+              horaSelect.innerHTML = '<option>Cargando...</option>';
+
+              const fecha = fechaInput.value;
+              const servicioId = servicioSelect.value;
+
+              if (!fecha || !servicioId) {
+                  horaSelect.innerHTML = '<option value="">Selecciona fecha y servicio</option>';
+                  return [];
+              }
+
+              try {
+                  const params = new URLSearchParams({ fecha, servicio_id: servicioId });
+                  const res = await fetch(`/admin/citas/horas-disponibles?${params}`, {
+                      headers: { 'Accept': 'application/json' }
+                  });
+
+                  if (!res.ok) {
+                      horaSelect.innerHTML = '<option>Error al cargar</option>';
+                      return [];
+                  }
+
+                  const data = await res.json();
+                  horaSelect.innerHTML = '';
+
+                  if (data.length === 0) {
+                      horaSelect.innerHTML = '<option value="">No hay horarios disponibles</option>';
+                      return [];
+                  }
+
+                  data.forEach(h => {
+                      let opt = document.createElement('option');
+                      opt.value = h;
+                      opt.text = h;
+                      horaSelect.appendChild(opt);
+                  });
+
+                  return data;
+
+              } catch (err) {
+                  console.error(err);
+                  horaSelect.innerHTML = '<option>Error de red</option>';
+                  return [];
+              }
+          }
+
+          fechaInput.addEventListener('change', cargarHorasDisponibles);
+          servicioSelect.addEventListener('change', cargarHorasDisponibles);
+
+          // ==========================
+          // GUARDAR / EDITAR CITA
+          // ==========================
+          form.addEventListener('submit', async function(e) {
               e.preventDefault();
 
               const payload = {
-                  fecha: form.fechaCita.value,
-                  hora: form.horaCita.value,
-                  cliente_id: form.clienteCita.value,
-                  servicio_id: form.servicioCita.value,
-                  empleado_id: form.empleadoCita.value,
-                  notas: form.notasCita.value,
+                  fecha: fechaInput.value,
+                  hora: horaSelect.value,
+                  cliente_id: document.getElementById('clienteCita').value,
+                  servicio_id: servicioSelect.value,
+                  empleado_id: document.getElementById('empleadoCita').value,
+                  notas: document.getElementById('notasCita').value
               };
 
-              const url = cita_id
-                  ? `/admin/paneladmin/citas/${cita_id}`
-                  : `/admin/paneladmin/citas`;
-
+              const url = cita_id ? `/admin/paneladmin/citas/${cita_id}` : `/admin/paneladmin/citas`;
               const method = cita_id ? 'PUT' : 'POST';
 
-              fetch(url, {
-                  method: method,
-                  headers: {
-                      'Content-Type': 'application/json',
-                      'X-CSRF-TOKEN': CSRF,
-                      'Accept': 'application/json'
-                  },
-                  body: JSON.stringify(payload)
-              })
-              .then(res => res.json())
-              .then(data => {
+              try {
+                  const res = await fetch(url, {
+                      method,
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'X-CSRF-TOKEN': CSRF,
+                          'Accept': 'application/json'
+                      },
+                      body: JSON.stringify(payload)
+                  });
+
+                  const data = await res.json();
+
+                  if (res.status === 422) {
+                      Swal.fire({
+                          icon: "warning",
+                          title: "Validación",
+                          text: Object.values(data.errors).flat().join("\n")
+                      });
+                      return;
+                  }
+
                   if (data.success) {
                       modal.hide();
-                      location.reload();
+
+                      Swal.fire({
+                          icon: "success",
+                          title: cita_id ? "Cita actualizada" : "Cita creada",
+                          timer: 1500,
+                          showConfirmButton: false
+                      }).then(() => location.reload());
                   } else {
-                      console.error(data);
-                      alert("Error al guardar la cita");
+                      Swal.fire({
+                          icon: "error",
+                          title: "Error",
+                          text: data.message ?? "No se pudo guardar la cita"
+                      });
                   }
-              });
+
+              } catch (err) {
+                  console.error(err);
+
+                  Swal.fire({
+                      icon: "error",
+                      title: "Error de servidor",
+                      text: "Revisa la consola"
+                  });
+              }
           });
 
-          // ELIMINAR
+          // ==========================
+          // ELIMINAR CITA
+          // ==========================
           btnEliminar.addEventListener('click', function() {
-              if (!confirm("¿Eliminar esta cita?")) return;
 
-              fetch(`/admin/paneladmin/citas/${cita_id}`, {
-                  method: 'DELETE',
-                  headers: {
-                      'X-CSRF-TOKEN': CSRF,
-                      'Accept': 'application/json'
-                  }
-              })
-              .then(res => res.json())
-              .then(data => {
-                  if (data.success) {
-                      modal.hide();
-                      location.reload();
-                  } else {
-                      alert("No se pudo eliminar");
-                  }
+              Swal.fire({
+                  title: "¿Eliminar esta cita?",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonText: "Sí, eliminar",
+                  cancelButtonText: "Cancelar"
+              }).then(resultado => {
+                  if (!resultado.isConfirmed) return;
+
+                  fetch(`/admin/paneladmin/citas/${cita_id}`, {
+                      method: 'DELETE',
+                      headers: {
+                          'X-CSRF-TOKEN': CSRF,
+                          'Accept': 'application/json'
+                      }
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                      if (data.success) {
+                          modal.hide();
+                          Swal.fire({
+                              icon: "success",
+                              title: "Cita eliminada",
+                              timer: 1500,
+                              showConfirmButton: false
+                          }).then(() => location.reload());
+                      } else {
+                          Swal.fire({
+                              icon: "error",
+                              title: "Error",
+                              text: "No se pudo eliminar"
+                          });
+                      }
+                  });
               });
           });
 

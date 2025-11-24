@@ -77,6 +77,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::put('/empleados/{id}', [EmpleadoController::class, 'update'])->name('empleados.update');
     Route::delete('/empleados/{id}', [EmpleadoController::class, 'destroy'])->name('empleados.destroy');
 
+    //Ruta para ver disponibilidad de clientes
+    Route::get('/citas/horas-disponibles', [CitaController::class, 'getHorasDisponibles'])->name('citas.horasDisponibles');
+
+
+
 });
 
 //Panel para Empleados

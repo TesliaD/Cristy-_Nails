@@ -7,10 +7,11 @@ use App\Models\Cita;
 use App\Models\Clientes;
 use App\Models\User;
 use App\Models\Servicios;
+use Illuminate\Validation\ValidationException;
 
 class CitaController extends Controller
 {
-    // Mostrar calendario con citas
+    // Mostrar calendario con citas (admin/empleado)
     public function index()
     {
         $citas = Cita::with(['cliente', 'empleado', 'servicio'])->get();
@@ -37,54 +38,188 @@ class CitaController extends Controller
         return view('admin.paneladmin', compact('citas', 'clientes', 'empleados', 'servicios', 'citasData'));
     }
 
-    // Guardar nueva cita desde administración
+    // --------------------------------
+    // Helper solapamiento
+    // --------------------------------
+    protected function haySolapamiento($fecha, $horaInicio, $horaFin, $empleadoId = null, $ignoreCitaId = null)
+    {
+        $query = Cita::where('fecha', $fecha);
+
+        if ($empleadoId !== null) {
+            $query->where('empleado_id', $empleadoId);
+        }
+
+        if ($ignoreCitaId !== null) {
+            $query->where('citas.id', '<>', $ignoreCitaId); // FIX ✔
+        }
+
+        $citas = $query->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
+                       ->get(['citas.id', 'citas.hora as inicio_cita', 'servicios.Duracion']);
+
+        foreach ($citas as $c) {
+            $inicioExistente = date('H:i:s', strtotime($c->inicio_cita));
+            $finExistente = date('H:i:s', strtotime($inicioExistente . " + {$c->Duracion} minutes"));
+
+            if ( ($horaInicio < $finExistente) && ($horaFin > $inicioExistente) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // --------------------------------
+    // Guardar nueva cita
+    // --------------------------------
     public function store(Request $request)
     {
         $request->validate([
-            'cliente_id' => 'required|exists:clientes,id',
-            'empleado_id' => 'required|exists:usuarios,id',
+            'cliente_id'  => 'required|exists:clientes,id',
+            'empleado_id' => 'nullable|exists:usuarios,id',
             'servicio_id' => 'required|exists:servicios,id',
-            'fecha' => 'required|date',
-            'hora' => 'required',
-            'notas' => 'nullable|string',
+            'fecha'       => 'required|date',
+            'hora'        => 'required',
+            'notas'       => 'nullable|string',
         ]);
 
-        Cita::create($request->all());
+        $servicio = Servicios::findOrFail($request->servicio_id);
+        if (!$servicio->Activo) {
+            return response()->json(['success' => false, 'message' => 'El servicio no está activo.'], 422);
+        }
 
-        return response()->json(['success' => true]);
+        $horaInicio = date('H:i:s', strtotime($request->hora));
+        $duracion = intval($servicio->Duracion) ?: 0;
+        $horaFin = date('H:i:s', strtotime($horaInicio . " + {$duracion} minutes"));
+
+        $horaInicioDia = "09:00:00";
+        $horaFinDia = "20:00:00";
+
+        if ($horaInicio < $horaInicioDia || $horaFin > $horaFinDia) {
+            return response()->json(['success'=>false, 'message' => 'La cita debe estar dentro del horario de atención.'], 422);
+        }
+
+        $fechaHora = date('Y-m-d H:i:s', strtotime($request->fecha . ' ' . $horaInicio));
+        if (strtotime($fechaHora) < time()) {
+            return response()->json(['success'=>false, 'message' => 'No puedes agendar en el pasado.'], 422);
+        }
+
+        // Empalme cliente
+        $empCliente = Cita::where('fecha', $request->fecha)
+            ->where('cliente_id', $request->cliente_id)
+            ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
+            ->get(['citas.hora as inicio_cita','servicios.Duracion'])
+            ->contains(function ($c) use ($horaInicio, $horaFin) {
+                $inicioExistente = date('H:i:s', strtotime($c->inicio_cita));
+                $finExistente = date('H:i:s', strtotime($inicioExistente . " + {$c->Duracion} minutes"));
+                return ($horaInicio < $finExistente) && ($horaFin > $inicioExistente);
+            });
+
+        if ($empCliente) {
+            return response()->json(['success' => false, 'message' => 'El cliente ya tiene una cita que se empalma.'], 422);
+        }
+
+        // Empalme empleado
+        if ($request->empleado_id) {
+            if ($this->haySolapamiento($request->fecha, $horaInicio, $horaFin, $request->empleado_id)) {
+                return response()->json(['success' => false, 'message' => 'El empleado tiene otra cita en ese horario.'], 422);
+            }
+        }
+
+        $cita = Cita::create([
+            'cliente_id'  => $request->cliente_id,
+            'empleado_id' => $request->empleado_id,
+            'servicio_id' => $request->servicio_id,
+            'fecha'       => $request->fecha,
+            'hora'        => $horaInicio,
+            'notas'       => $request->notas,
+            'estado'      => 'pendiente',
+        ]);
+
+        return response()->json(['success' => true, 'cita' => $cita]);
     }
 
-    // Actualizar cita desde administración
+    // --------------------------------
+    // Actualizar cita
+    // --------------------------------
     public function update(Request $request, $id)
     {
         $request->validate([
-            'cliente_id' => 'required|exists:clientes,id',
-            'empleado_id' => 'required|exists:usuarios,id',
+            'cliente_id'  => 'required|exists:clientes,id',
+            'empleado_id' => 'nullable|exists:usuarios,id',
             'servicio_id' => 'required|exists:servicios,id',
-            'fecha' => 'required|date',
-            'hora' => 'required',
-            'notas' => 'nullable|string',
+            'fecha'       => 'required|date',
+            'hora'        => 'required',
+            'notas'       => 'nullable|string',
         ]);
 
         $cita = Cita::findOrFail($id);
-        $cita->update($request->all());
+        $servicio = Servicios::findOrFail($request->servicio_id);
+
+        if (!$servicio->Activo) {
+            return response()->json(['success' => false, 'message' => 'El servicio no está activo.'], 422);
+        }
+
+        $horaInicio = date('H:i:s', strtotime($request->hora));
+        $duracion = intval($servicio->Duracion);
+        $horaFin = date('H:i:s', strtotime($horaInicio . " + {$duracion} minutes"));
+
+        // Horario
+        if ($horaInicio < "09:00:00" || $horaFin > "20:00:00") {
+            return response()->json(['success'=>false, 'message'=>'Fuera del horario de atención.'], 422);
+        }
+
+        // No pasado
+        $fechaHora = strtotime($request->fecha . ' ' . $horaInicio);
+        if ($fechaHora < time()) {
+            return response()->json(['success'=>false, 'message'=>'No puedes agendar en el pasado.'], 422);
+        }
+
+        // Empalme cliente (FIX ID AMBIGUO)
+        $empCliente = Cita::where('citas.fecha', $request->fecha)
+            ->where('citas.cliente_id', $request->cliente_id)
+            ->where('citas.id', '<>', $cita->id) // FIX ✔
+            ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
+            ->get(['citas.hora as inicio_cita','servicios.Duracion'])
+            ->contains(function ($c) use ($horaInicio, $horaFin) {
+                $inicioExistente = date('H:i:s', strtotime($c->inicio_cita));
+                $finExistente = date('H:i:s', strtotime($inicioExistente . " + {$c->Duracion} minutes"));
+                return ($horaInicio < $finExistente) && ($horaFin > $inicioExistente);
+            });
+
+        if ($empCliente) {
+            return response()->json(['success' => false, 'message' => 'El cliente tiene otra cita que se empalma.'], 422);
+        }
+
+        // Empalme empleado
+        if ($request->empleado_id) {
+            if ($this->haySolapamiento($request->fecha, $horaInicio, $horaFin, $request->empleado_id, $cita->id)) {
+                return response()->json(['success' => false, 'message' => 'El empleado tiene otra cita en ese horario.'], 422);
+            }
+        }
+
+        $cita->update([
+            'cliente_id'  => $request->cliente_id,
+            'empleado_id' => $request->empleado_id,
+            'servicio_id' => $request->servicio_id,
+            'fecha'       => $request->fecha,
+            'hora'        => $horaInicio,
+            'notas'       => $request->notas,
+        ]);
 
         return response()->json(['success' => true]);
     }
 
-    // Eliminar cita
+    // --------------------------------
     public function destroy($id)
     {
         $cita = Cita::findOrFail($id);
         $cita->delete();
-
         return response()->json(['success' => true]);
     }
 
-    // ============================================================
-    // --------- STORE DE CLIENTE (CON VALIDACIÓN DE EMPALMES) ----
-    // ============================================================
-
+    // --------------------------------
+    // STORE CLIENTE
+    // --------------------------------
     public function storeCliente(Request $request)
     {
         $request->validate([
@@ -94,40 +229,48 @@ class CitaController extends Controller
             'notas' => 'nullable|string',
         ]);
 
-        // Cliente del usuario autenticado
         $cliente = Clientes::where('usuario_id', auth()->user()->id)->first();
 
         if (!$cliente) {
-            return redirect()->back()->with('error', 'No se encontró el cliente asociado al usuario.');
+            return redirect()->back()->with('error', 'No se encontró el cliente asociado.');
         }
 
-        // Servicio elegido
         $servicio = Servicios::findOrFail($request->servicio);
-        $duracion = $servicio->Duracion; // minutos
 
-        // Calcular hora fin
-        $horaInicio = $request->hora;
-        $horaFin = date("H:i:s", strtotime($horaInicio . " + $duracion minutes"));
-
-        // Validación de empalme
-        $empalme = Cita::where('fecha', $request->fecha)
-            ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
-            ->where(function ($query) use ($horaInicio, $horaFin) {
-                $query->whereBetween('hora', [$horaInicio, $horaFin]) // Cita dentro del rango
-                      ->orWhereRaw("ADDTIME(citas.hora, SEC_TO_TIME(servicios.Duracion * 60)) > ?", [$horaInicio]);
-            })
-            ->exists();
-
-        if ($empalme) {
-            return redirect()->back()->withErrors([
-                'hora' => "⛔ Ya existe una cita que se empalma con este horario."
-            ])->withInput();
+        if (!$servicio->Activo) {
+            return redirect()->back()->withErrors(['servicio'=>'Servicio inactivo'])->withInput();
         }
 
-        // Crear la cita
+        $duracion = intval($servicio->Duracion);
+        $horaInicio = date('H:i:s', strtotime($request->hora));
+        $horaFin = date('H:i:s', strtotime($horaInicio . " + {$duracion} minutes"));
+
+        if ($horaInicio < "09:00:00" || $horaFin > "20:00:00") {
+            return redirect()->back()->withErrors(['hora' => 'Fuera del horario'])->withInput();
+        }
+
+        if (strtotime($request->fecha . ' ' . $horaInicio) < time()) {
+            return redirect()->back()->withErrors(['hora' => 'No puedes agendar en el pasado'])->withInput();
+        }
+
+        // Empalme cliente
+        $empCliente = Cita::where('fecha', $request->fecha)
+            ->where('cliente_id', $cliente->id)
+            ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
+            ->get(['citas.hora as inicio_cita','servicios.Duracion'])
+            ->contains(function ($c) use ($horaInicio, $horaFin) {
+                $inicioExistente = date('H:i:s', strtotime($c->inicio_cita));
+                $finExistente = date('H:i:s', strtotime($inicioExistente . " + {$c->Duracion} minutes"));
+                return ($horaInicio < $finExistente) && ($horaFin > $inicioExistente);
+            });
+
+        if ($empCliente) {
+            return redirect()->back()->withErrors(['hora'=>'Ya tienes una cita en ese horario'])->withInput();
+        }
+
         Cita::create([
             'cliente_id' => $cliente->id,
-            'empleado_id' => null, // o assignar después manualmente
+            'empleado_id' => null,
             'servicio_id' => $request->servicio,
             'fecha' => $request->fecha,
             'hora' => $horaInicio,
@@ -138,28 +281,25 @@ class CitaController extends Controller
         return redirect()->route('dashboard')->with('mensaje', '✨ Cita agendada con éxito.');
     }
 
-    // Cancelar cita del cliente
+    // --------------------------------
     public function cancelar($id)
     {
         $cita = Cita::findOrFail($id);
-
         $cliente = Clientes::where('usuario_id', auth()->id())->first();
 
         if (!$cliente || $cita->cliente_id != $cliente->id) {
-            return redirect()->back()->with('error', 'No tienes permiso para cancelar esta cita.');
+            return redirect()->back()->with('error', 'No tienes permiso para cancelar.');
         }
 
         $cita->estado = "cancelada";
         $cita->save();
 
-        return redirect()->back()->with('success', 'La cita ha sido cancelada correctamente.');
+        return redirect()->back()->with('success', 'Cita cancelada correctamente.');
     }
 
-    
-    // ============================================================
-    // ---------- OBTENER HORAS DISPONIBLES POR FECHA ------------
-    // ============================================================
-
+    // --------------------------------
+    // Horas disponibles
+    // --------------------------------
     public function getHorasDisponibles(Request $request)
     {
         $request->validate([
@@ -169,62 +309,57 @@ class CitaController extends Controller
 
         $fecha = $request->fecha;
         $servicio = Servicios::findOrFail($request->servicio_id);
-        $duracion = $servicio->Duracion; // minutos
 
-        // Horario del negocio
-        $horaInicio = "09:00";
-        $horaFin = "20:00";
+        if (!$servicio->Activo) {
+            return response()->json([], 200);
+        }
 
-        // Generar bloques de tiempo
+        $duracion = intval($servicio->Duracion);
+        $horaInicioDia = "09:00";
+        $horaFinDia = "20:00";
+        $paso = 30;
+
         $intervalos = [];
-        $horaActual = strtotime($horaInicio);
+        $horaActual = strtotime($horaInicioDia);
 
-        while ($horaActual < strtotime($horaFin)) {
+        while ($horaActual <= strtotime($horaFinDia)) {
             $inicio = date('H:i', $horaActual);
             $fin = date('H:i', strtotime("+{$duracion} minutes", $horaActual));
 
-            if (strtotime($fin) <= strtotime($horaFin)) {
-                $intervalos[] = [
-                    'inicio' => $inicio,
-                    'fin' => $fin
-                ];
+            if (strtotime($fin) <= strtotime($horaFinDia . ':00')) {
+                $intervalos[] = ['inicio' => $inicio, 'fin' => $fin];
             }
 
-            $horaActual = strtotime("+30 minutes", $horaActual);
+            $horaActual = strtotime("+{$paso} minutes", $horaActual);
         }
 
-        // Cargar citas ocupadas ese día
         $citas = Cita::where('fecha', $fecha)
             ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
-            ->get(['hora', 'servicios.Duracion']);
+            ->get(['citas.hora as inicio_cita', 'servicios.Duracion']);
 
-        // Filtrar horarios ocupados
         $disponibles = [];
 
         foreach ($intervalos as $bloque) {
-            $estaOcupado = false;
+            $ocupado = false;
 
             foreach ($citas as $cita) {
-                $inicioCita = $cita->hora;
-                $finCita = date("H:i", strtotime($inicioCita . " + {$cita->Duracion} minutes"));
+                $inicioExistente = date('H:i', strtotime($cita->inicio_cita));
+                $finExistente = date('H:i', strtotime($inicioExistente . " + {$cita->Duracion} minutes"));
 
-                // Si hay empalme, bloquear horario
-                if (
-                    ($bloque['inicio'] >= $inicioCita && $bloque['inicio'] < $finCita) ||
-                    ($bloque['fin'] > $inicioCita && $bloque['fin'] <= $finCita)
-                ) {
-                    $estaOcupado = true;
+                if ( ($bloque['inicio'] < $finExistente) && ($bloque['fin'] > $inicioExistente) ) {
+                    $ocupado = true;
                     break;
                 }
             }
 
-            if (!$estaOcupado) {
-                $disponibles[] = $bloque['inicio'];
+            if (!$ocupado) {
+                $fechaHora = strtotime($fecha . ' ' . $bloque['inicio']);
+                if ($fechaHora >= strtotime(date('Y-m-d H:i'))) {
+                    $disponibles[] = $bloque['inicio'];
+                }
             }
         }
 
         return response()->json($disponibles);
     }
-
-
 }

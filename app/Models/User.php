@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Clientes; 
+use App\Models\Clientes;
 
 class User extends Authenticatable
 {
@@ -30,8 +30,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    // Relación con cliente (si existe un cliente vinculado)
     public function cliente()
     {
-        return $this->hasOne(Clientes::class, 'usuario_id'); 
+        return $this->hasOne(Clientes::class, 'usuario_id');
     }
 }
