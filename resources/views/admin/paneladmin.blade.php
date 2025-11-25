@@ -203,15 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
                               </button>
 
                               <!-- Botón eliminar -->
-                              <form action="{{ route('empleados.destroy', $empleado->id) }}"
-                                    method="POST" class="d-inline">
-                                  @csrf
-                                  @method('DELETE')
-
-                                  <button onclick="return confirm('¿Eliminar empleado?')" class="btn btn-danger btn-sm">
-                                      <i class="bi bi-trash"></i>
-                                  </button>
-                              </form>
+                              <button class="btn btn-danger btn-sm eliminarEmpleadoBtn"
+                                      data-id="{{ $empleado->id }}">
+                                  <i class="bi bi-trash"></i>
+                              </button>
 
                           </td>
                       </tr>
@@ -225,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="modal fade" id="nuevoEmpleadoModal" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog">
               <div class="modal-content">
-                  <form action="{{ route('empleados.store') }}" method="POST">
+                  <form action="{{ route('empleados.store') }}" method="POST" id="formNuevoEmpleado">
                       @csrf
 
                       <div class="modal-header">
@@ -237,17 +232,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                           <div class="mb-3">
                               <label class="form-label">Usuario</label>
-                              <input name="usuario" class="form-control" required>
+                              <input name="usuario" class="form-control soloLetras" required>
                           </div>
 
                           <div class="mb-3">
                               <label class="form-label">Email</label>
-                              <input type="email" name="email" class="form-control" required>
+                              <input type="email" name="email" class="form-control validarEmail" required>
                           </div>
 
                           <div class="mb-3">
                               <label class="form-label">Contraseña</label>
-                              <input type="password" name="password" class="form-control" required>
+                              <input type="password" name="password" class="form-control" required minlength="6">
                           </div>
 
                           <div class="mb-3">
@@ -288,12 +283,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                           <div class="mb-3">
                               <label class="form-label">Usuario</label>
-                              <input name="usuario" id="edit_emp_usuario" class="form-control" required>
+                              <input name="usuario" id="edit_emp_usuario" class="form-control soloLetras" required>
                           </div>
 
                           <div class="mb-3">
                               <label class="form-label">Email</label>
-                              <input type="email" name="email" id="edit_emp_email" class="form-control" required>
+                              <input type="email" name="email" id="edit_emp_email" class="form-control validarEmail" required>
                           </div>
 
                           <div class="mb-3">
@@ -306,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                           <div class="mb-3">
                               <label class="form-label">Nueva contraseña (opcional)</label>
-                              <input type="password" name="password" class="form-control"
+                              <input type="password" name="password" class="form-control" minlength="6"
                                     placeholder="Dejar vacío para no cambiar">
                           </div>
 
@@ -323,7 +318,35 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
       </div>
 
-      <!-- SCRIPT MODAL EDICIÓN -->
+      <!--Alerta para el guuardado del modal-->
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+
+          const form = document.getElementById('editarEmpleadoForm');
+
+          form.addEventListener('submit', function(event) {
+              event.preventDefault();
+
+              Swal.fire({
+                  title: "Guardando cambios...",
+                  text: "Por favor espera",
+                  icon: "info",
+                  showConfirmButton: false,
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  timer: 1200
+              });
+
+              setTimeout(() => {
+                  form.submit(); 
+              }, 1200);
+          });
+
+      });
+      </script>
+
+
+      <!-- SCRIPT MODAL EDICIÓN CON SWEETALERT2 -->
       <script>
       document.addEventListener('DOMContentLoaded', () => {
 
@@ -333,18 +356,112 @@ document.addEventListener('DOMContentLoaded', () => {
           document.querySelectorAll('.editarEmpleadoBtn').forEach(btn => {
               btn.addEventListener('click', () => {
 
-                  form.action = `/empleados/${btn.dataset.id}`;
+                  Swal.fire({
+                      title: "Editar empleado",
+                      text: "¿Deseas editar la información de este empleado?",
+                      icon: "question",
+                      showCancelButton: true,
+                      confirmButtonText: "Sí, editar",
+                      cancelButtonText: "Cancelar"
+                  }).then(result => {
+                      if (result.isConfirmed) {
 
-                  document.getElementById('edit_emp_usuario').value = btn.dataset.usuario;
-                  document.getElementById('edit_emp_email').value = btn.dataset.email;
-                  document.getElementById('edit_emp_rol').value = btn.dataset.rol;
+                          // Establecer acción correcta
+                          form.action = `/admin/empleados/${btn.dataset.id}`;
 
-                  modal.show();
+                          // Rellenar datos
+                          document.getElementById('edit_emp_usuario').value = btn.dataset.usuario;
+                          document.getElementById('edit_emp_email').value = btn.dataset.email;
+                          document.getElementById('edit_emp_rol').value = btn.dataset.rol;
+
+                          // Mostrar modal
+                          modal.show();
+                      }
+                  });
+
               });
           });
 
       });
       </script>
+
+
+
+     <script>
+      document.querySelectorAll('.eliminarEmpleadoBtn').forEach(btn => {
+          btn.addEventListener('click', function () {
+
+              let id = this.dataset.id;
+
+              Swal.fire({
+                  title: "¿Eliminar empleado?",
+                  text: "Esta acción no se puede deshacer",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonText: "Sí, eliminar",
+                  cancelButtonText: "Cancelar"
+              }).then(result => {
+                  if (result.isConfirmed) {
+
+                      let form = document.createElement('form');
+                      form.method = 'POST';
+                      form.action = `/admin/empleados/${id}`; 
+
+                      let token = document.createElement('input');
+                      token.type = 'hidden';
+                      token.name = '_token';
+                      token.value = '{{ csrf_token() }}';
+
+                      let method = document.createElement('input');
+                      method.type = 'hidden';
+                      method.name = '_method';
+                      method.value = 'DELETE';
+
+                      form.appendChild(token);
+                      form.appendChild(method);
+
+                      document.body.appendChild(form);
+                      form.submit();
+                  }
+              });
+
+          });
+      });
+      </script>
+      <!-- VALIDACIONES -->
+      <script>
+      // Solo letras
+      document.querySelectorAll('.soloLetras').forEach(input => {
+          input.addEventListener('input', () => {
+              input.value = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+          });
+      });
+
+      // Validación email básica
+      document.querySelectorAll('.validarEmail').forEach(input => {
+          input.addEventListener('input', () => {
+              if (!input.value.includes("@")) {
+                  input.setCustomValidity("Debe ser un correo válido");
+              } else {
+                  input.setCustomValidity("");
+              }
+          });
+      });
+      </script>
+
+      <!-- BUSCADOR EMPLEADOS -->
+      <script>
+      document.getElementById('buscarEmpleado').addEventListener('keyup', function () {
+          let filtro = this.value.toLowerCase();
+          let filas = document.querySelectorAll('#tablaEmpleados tbody tr');
+
+          filas.forEach(fila => {
+              let texto = fila.innerText.toLowerCase();
+              fila.style.display = texto.includes(filtro) ? '' : 'none';
+          });
+      });
+      </script>
+
 
 
 
@@ -480,6 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <!-- Modal Editar Cliente -->
+        <!--CHECAR INPUTS PORQUE SON PARA VALIDAR DATOS, SE PUEDEN REUTILIZAR MAS ADELANTE EN LOS DEMAS MODALES-->
         <div class="modal fade" id="editarClienteModal" tabindex="-1">
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -494,35 +612,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="modal-body">
                   <div class="row">
+
+                    <!--El campo Usuario sin espacios, solo letras y números-->
                     <div class="col-md-6 mb-3">
                       <label class="form-label">Usuario</label>
-                      <input type="text" name="usuario" class="form-control" id="edit_usuario" required>
+                      <input type="text" name="usuario" id="edit_usuario" class="form-control" required oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g,'');">
                     </div>
+                    
+                    <!--El campo de nombre solo acepta letras y espacios-->
                     <div class="col-md-6 mb-3">
                       <label class="form-label">Nombre</label>
-                      <input type="text" name="nombre" class="form-control" id="edit_nombre" required>
+                      <input type="text" name="nombre" id="edit_nombre" class="form-control" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,'');">
                     </div>
                   </div>
-
                   <div class="row">
+                    <!--El campo Email el navegador valida automáticamente-->
                     <div class="col-md-6 mb-3">
                       <label class="form-label">Email</label>
-                      <input type="email" name="email" class="form-control" id="edit_email" required>
+                      <input type="email" name="email" id="edit_email" class="form-control" required>
                     </div>
+                    <!--Campo de Teléfono solo números, máximo 12-->
                     <div class="col-md-6 mb-3">
                       <label class="form-label">Teléfono</label>
-                      <input type="text" name="telefono" class="form-control" id="edit_telefono">
+                      <input type="text" name="telefono" id="edit_telefono" maxlength="12" class="form-control" oninput="this.value = this.value.replace(/[^0-9]/g,'');">
                     </div>
                   </div>
 
+                  <!--El campo de Dirección permitir letras, números, # , . , - , espacios-->
                   <div class="row">
                     <div class="col-md-6 mb-3">
                       <label class="form-label">Dirección</label>
-                      <input type="text" name="direccion" class="form-control" id="edit_direccion">
+                      <input type="text" name="direccion" id="edit_direccion" class="form-control" oninput="this.value = this.value.replace(/[^a-zA-Z0-9#\-\.\s]/g,'');">
                     </div>
+                    <!--No permitir fechas futuras-->
                     <div class="col-md-6 mb-3">
                       <label class="form-label">Fecha nacimiento</label>
-                      <input type="date" name="fecha_nacimiento" class="form-control" id="edit_fecha">
+                      <input type="date" name="fecha_nacimiento" id="edit_fecha" class="form-control" max="{{ date('Y-m-d') }}">
                     </div>
                   </div>
 
@@ -550,24 +675,52 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- SCRIPT EDITAR CLIENTE -->
       <script>
       document.addEventListener('DOMContentLoaded', () => {
-        const modal = new bootstrap.Modal(document.getElementById('editarClienteModal'));
-        const form = document.getElementById('editarClienteForm');
+          const modal = new bootstrap.Modal(document.getElementById('editarClienteModal'));
+          const form = document.getElementById('editarClienteForm');
 
-        document.querySelectorAll('.editarClienteBtn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            form.action = `/admin/paneladmin/clientes/${btn.dataset.id}`;
-            document.getElementById('edit_usuario').value = btn.dataset.usuario;
-            document.getElementById('edit_nombre').value = btn.dataset.nombre;
-            document.getElementById('edit_email').value = btn.dataset.email;
-            document.getElementById('edit_telefono').value = btn.dataset.telefono;
-            document.getElementById('edit_direccion').value = btn.dataset.direccion;
-            document.getElementById('edit_fecha').value = btn.dataset.fecha;
-            document.getElementById('edit_rol').value = btn.dataset.rol;
-            modal.show();
+          document.querySelectorAll('.editarClienteBtn').forEach(btn => {
+              btn.addEventListener('click', () => {
+
+                  form.action = `/admin/paneladmin/clientes/${btn.dataset.id}`;
+
+                  document.getElementById('edit_usuario').value = btn.dataset.usuario;
+                  document.getElementById('edit_nombre').value = btn.dataset.nombre;
+                  document.getElementById('edit_email').value = btn.dataset.email;
+                  document.getElementById('edit_telefono').value = btn.dataset.telefono;
+                  document.getElementById('edit_direccion').value = btn.dataset.direccion;
+                  document.getElementById('edit_fecha').value = btn.dataset.fecha;
+                  document.getElementById('edit_rol').value = btn.dataset.rol;
+
+                  modal.show();
+              });
           });
-        });
       });
       </script>
+
+
+      <!--Script de las validaciones-->
+      <script>
+      document.addEventListener("DOMContentLoaded", () => {
+
+          // Bloquea pegado inválido en teléfono
+          document.querySelectorAll("input[name='telefono']").forEach(input => {
+              input.addEventListener("paste", e => {
+                  let paste = (e.clipboardData || window.clipboardData).getData('text');
+                  if (!/^[0-9]+$/.test(paste)) e.preventDefault();
+              });
+          });
+
+          // Evita caracteres inválidos en usuario
+          document.querySelectorAll("input[name='usuario']").forEach(input => {
+              input.addEventListener("paste", e => {
+                  let paste = (e.clipboardData || window.clipboardData).getData('text');
+                  if (!/^[a-zA-Z0-9]+$/.test(paste)) e.preventDefault();
+              });
+          });
+
+      });
+      </script>
+
       
       <!--Alerta para eliminar Cliente-->
       <script>
@@ -1342,5 +1495,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
               });
       </script>
+
+      <!--ALERTA DE ÉXITO AL REGRESAR DEL CONTROLADOR-->
+      @if(session('success'))
+      <script>
+      Swal.fire({
+          title: "¡Éxito!",
+          text: "{{ session('success') }}",
+          icon: "success",
+          confirmButtonText: "Aceptar"
+      });
+      </script>
+      @endif
+
 </body>
 </html>

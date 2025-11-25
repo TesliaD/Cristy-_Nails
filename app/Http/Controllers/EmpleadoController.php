@@ -49,7 +49,7 @@ class EmpleadoController extends Controller
 
         $request->validate([
             'usuario' => 'required|string|max:255',
-            'email'   => 'required|email|unique:users,email,' . $empleado->id,
+            'email'   => 'required|email|unique:usuarios,email,' . $empleado->id,
             'rol'     => 'required|string',
         ]);
 
