@@ -20,6 +20,8 @@
   <!--Script de alertas-->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
 </head>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -1025,6 +1027,12 @@ document.addEventListener('DOMContentLoaded', () => {
               <h3>Reporte de Ingresos</h3>
           </a>
 
+          <a class="tarjetareportes card-btn" data-tipo="backup">
+            <div class="icono"><i class="fa-solid fa-database"></i></div>
+            <h3>Respaldo (Backup)</h3>
+          </a>
+
+
       </div>
 
       <!-- MODAL -->
@@ -1056,6 +1064,53 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
   </div>
+
+
+  <!-- MODAL BACKUP -->
+  <div class="modal fade" id="modalBackup" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+
+              <div class="modal-header bg-dark text-white">
+                  <h5 class="modal-title">Gestión de Backups</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+
+              <div class="modal-body">
+
+                  <!-- Lista de backups -->
+                  <h6 class="fw-bold mb-2">Backups disponibles</h6>
+
+                  <div id="lista-backups"
+                      style="border: 1px solid #ddd; border-radius: 6px; padding: 10px; max-height: 250px; overflow-y: auto;">
+                      <p class="text-center text-muted">Cargando backups...</p>
+                  </div>
+
+                  <!-- Acciones -->
+                  <div class="mt-4">
+                      <button id="btnGenerarBackup" type="button" class="btn btn-success w-100 mb-2">
+                          <i class="fa-solid fa-plus"></i> Generar Backup
+                      </button>
+
+                      <button id="btnDescargarBackup" type="button" class="btn btn-primary w-100 mb-2">
+                        <i class="fa-solid fa-download"></i> Descargar Backup
+                      </button>
+
+                      <button id="btnRestaurarBackup" type="button" class="btn btn-warning w-100 mb-2" disabled>
+                          <i class="fa-solid fa-rotate-left"></i> Restablecer Backup Seleccionado
+                      </button>
+
+                      <button id="btnEliminarBackup" type="button" class="btn btn-danger w-100" disabled>
+                          <i class="fa-solid fa-trash"></i> Eliminar Backup Seleccionado
+                      </button>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+  </div>
+
+
 
 
   <!-- Modal Resultado (Ver / Descargar) -->
@@ -1406,95 +1461,314 @@ document.addEventListener('DOMContentLoaded', () => {
       </script>
 
 
-      <!--script de los reportes-->
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        <!--script de los reportes-->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-          // Detecta clic en tarjetas y abre modal de fechas
-          document.querySelectorAll(".tarjetareportes").forEach(t => {
-            t.addEventListener("click", function () {
-              const titulo = this.querySelector("h3").innerText.trim();
-              const texto = titulo.toLowerCase();
+      // Detecta clic en tarjetas y abre modal correspondiente
+      document.querySelectorAll(".tarjetareportes").forEach(t => {
+        t.addEventListener("click", function () {
 
-              let tipo = "";
-              if (texto.includes("cliente")) tipo = "clientes";
-              else if (texto.includes("cita")) tipo = "citas";
-              else if (texto.includes("servicio")) tipo = "servicios";
-              else if (texto.includes("ingreso") || texto.includes("venta") || texto.includes("ganancia")) tipo = "ingresos";
-              if (!tipo) tipo = texto.replace(/\s+/g, "_");
+          const titulo = this.querySelector("h3").innerText.trim();
+          const texto = titulo.toLowerCase();
 
-              document.getElementById("tituloModal").innerText = titulo;
-              document.getElementById("tipoReporte").value = tipo;
+          // 🔥 PRIORIDAD: usar data-tipo si existe
+          let tipo = this.dataset.tipo || "";
 
-              // show modal
-              new bootstrap.Modal(document.getElementById('modalReporte')).show();
-            });
+          // Si no trae data-tipo, detectar por texto
+          if (!tipo) {
+            if (texto.includes("cliente")) tipo = "clientes";
+            else if (texto.includes("cita")) tipo = "citas";
+            else if (texto.includes("servicio")) tipo = "servicios";
+            else if (texto.includes("ingreso") || texto.includes("venta") || texto.includes("ganancia"))
+              tipo = "ingresos";
+            else if (texto.includes("backup") || texto.includes("respaldo"))
+              tipo = "backup";
+            else
+              tipo = texto.replace(/\s+/g, "_");
+          }
+
+          // 🔥 Si es backup, abrir modal especial
+          if (tipo === "backup") {
+            new bootstrap.Modal(document.getElementById('modalBackup')).show();
+            return; // OBLIGATORIO
+          }
+
+          // Modo normal de reportes
+          document.getElementById("tituloModal").innerText = titulo;
+          document.getElementById("tipoReporte").value = tipo;
+
+          new bootstrap.Modal(document.getElementById('modalReporte')).show();
+        });
+      });
+
+
+      // Submit del formulario → fetch → mostrar modal resultado
+      const form = document.getElementById('formFechas');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Spinner en botón
+        const btn = this.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'Generando...';
+
+        try {
+          const token =
+            document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+            document.querySelector('input[name="_token"]').value;
+
+          const res = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': token,
+              'Accept': 'application/json'
+            },
+            body: formData
           });
 
-          // Submit del formulario: usar fetch para recibir JSON y mostrar modal resultado
-          const form = document.getElementById('formFechas');
-          form.addEventListener('submit', async function (e) {
-            e.preventDefault();
+          const data = await res.json();
 
-            const formData = new FormData(this);
+          if (data.success && data.url) {
+            const verBtn = document.getElementById('verReporteBtn');
+            const descargarBtn = document.getElementById('descargarReporteBtn');
+            const iframeContainer = document.getElementById('iframeContainer');
 
-            // Muestra un spinner simple en el botón (opcional)
-            const btn = this.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = 'Generando...';
+            const url = data.url;
 
-            try {
-              const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]').value;
+            // Mostrar PDF en iframe
+            iframeContainer.innerHTML =
+              `<iframe src="${url}" width="100%" height="100%" style="border:none;"></iframe>`;
 
-              const res = await fetch(this.action, {
-                method: 'POST',
-                headers: {
-                  'X-CSRF-TOKEN': token,
-                  'Accept': 'application/json'
-                },
-                body: formData
-              });
+            // Botón Ver
+            verBtn.setAttribute('href', url);
+            verBtn.setAttribute('target', '_blank');
 
-              const data = await res.json();
+            // Botón Descargar
+            const filename = url.split('/').pop();
+            descargarBtn.setAttribute('href', url);
+            descargarBtn.setAttribute('download', filename);
 
-              if (data.success && data.url) {
-                const verBtn = document.getElementById('verReporteBtn');
-                const descargarBtn = document.getElementById('descargarReporteBtn');
-                const iframeContainer = document.getElementById('iframeContainer');
+            // Cerrar modal de fechas y abrir modal de resultado
+            bootstrap.Modal.getInstance(document.getElementById('modalReporte')).hide();
+            new bootstrap.Modal(document.getElementById('modalResultado')).show();
+          } else {
+            alert(data.mensaje || 'Error al generar el reporte');
+          }
 
-                const url = data.url;
+        } catch (err) {
+          console.error(err);
+          alert('Error en la petición, revisa la consola.');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
 
-                // Mostrar PDF en el modal con iframe
-                iframeContainer.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="border:none;"></iframe>`;
 
-                // Botón "Ver" abre en nueva pestaña
-                verBtn.setAttribute('href', url);
-                verBtn.setAttribute('target', '_blank');
+      // ---- SISTEMA DE BACKUPS ----
 
-                // Botón "Descargar" fuerza la descarga
-                descargarBtn.setAttribute('href', url);
-                const filename = url.split('/').pop();
-                descargarBtn.setAttribute('download', filename);
+      // Cuando se abre el modalBackup, cargar la lista
+      document.getElementById("modalBackup").addEventListener("shown.bs.modal", cargarBackups);
 
-                // Cerrar modal de fechas y abrir modal resultado
-                bootstrap.Modal.getInstance(document.getElementById('modalReporte')).hide();
-                new bootstrap.Modal(document.getElementById('modalResultado')).show();
-              }
-              else {
-                        alert(data.mensaje || 'Error al generar el reporte');
-                      }
-                    } catch (err) {
-                      console.error(err);
-                      alert('Error en la petición, revisa la consola.');
-                    } finally {
-                      btn.disabled = false;
-                      btn.innerHTML = originalText;
-                    }
+      let backupSeleccionado = null;
+
+      function cargarBackups() {
+          const contenedor = document.getElementById("lista-backups");
+          contenedor.innerHTML = `<p class="text-center text-muted">Cargando backups...</p>`;
+
+          fetch("/admin/backup/lista")
+              .then(res => res.json())
+              .then(data => {
+                  if (!data || data.length === 0) {
+                      contenedor.innerHTML = `<p class="text-center text-muted">No hay backups disponibles.</p>`;
+                      return;
+                  }
+
+                  contenedor.innerHTML = "";
+
+                  data.forEach(nombre => {
+                      const item = document.createElement("div");
+                      item.className = "backup-item p-2 mb-2 border rounded";
+                      item.style.cursor = "pointer";
+                      item.innerText = nombre;
+
+                      item.addEventListener("click", function () {
+                          document.querySelectorAll(".backup-item").forEach(i => {
+                              i.classList.remove("bg-primary", "text-white");
+                          });
+
+                          this.classList.add("bg-primary", "text-white");
+                          backupSeleccionado = nombre;
+
+                          document.getElementById("btnRestaurarBackup").disabled = false;
+                          document.getElementById("btnEliminarBackup").disabled = false;
+                      });
+
+                      contenedor.appendChild(item);
                   });
-
               });
-      </script>
+      }
+
+
+      // --- Generar Backup ---
+      document.getElementById("btnGenerarBackup").addEventListener("click", function () {
+
+          confirmarAccion("¿Generar un nuevo backup?", () => {
+
+              fetch('/admin/backup/generar')
+              .then(res => res.json())
+              .then(data => {
+                  if (!data.success) {
+                      mostrarAlerta("Error: " + data.error, "error");
+                      return;
+                  }
+
+                  mostrarAlerta(data.message);
+                  cargarBackups();
+              })
+
+          });
+
+      });
+
+      // --- Descargar Backup ---
+      document.getElementById("btnDescargarBackup").addEventListener("click", function () {
+      if (!backupSeleccionado) return mostrarAlerta("Selecciona un backup", "error");
+
+      // Asegurarnos que solo sea el nombre del archivo
+      let archivo = backupSeleccionado.split("/").pop();
+
+      window.location.href = "/admin/backup/descargar/" + archivo;
+    });
+
+
+
+
+      // --- Restaurar Backup ---
+      document.getElementById("btnRestaurarBackup").addEventListener("click", function () {
+
+          if (!backupSeleccionado) return mostrarAlerta("Selecciona un backup", "error");
+
+          confirmarAccion(
+              "¿Restaurar este backup? Esto reemplazará toda la base de datos.",
+              () => {
+                  fetch("/admin/backup/restaurar", {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                  },
+                  body: JSON.stringify({ archivo: backupSeleccionado })
+              })
+              .then(async res => {
+                  const data = await res.json().catch(() => null);
+
+                  if (!data) {
+                      mostrarAlerta("Error inesperado (el servidor devolvió HTML).", "error");
+                      return;
+                  }
+
+                  if (!data.success) {
+                      mostrarAlerta("Error: " + data.error, "error");
+                      return;
+                  }
+
+                  mostrarAlerta(data.message);
+              });
+
+
+              }
+          );
+      });
+
+
+      // --- Eliminar Backup ---
+      document.getElementById("btnEliminarBackup").addEventListener("click", function () {
+
+          if (!backupSeleccionado) return mostrarAlerta("Selecciona un backup", "error");
+
+          confirmarAccion(
+              "¿Eliminar este backup? Esta acción no se puede deshacer.",
+              () => {
+                  fetch("/admin/backup/eliminar", {
+                  method: "DELETE",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                      "X-Requested-With": "XMLHttpRequest"
+                  },
+                  body: JSON.stringify({ archivo: backupSeleccionado })
+              })
+              .then(res => res.text()) // ← CAMBIO
+              .then(() => {
+                  mostrarAlerta("Backup eliminado.");
+                  cargarBackups();
+              })
+              .catch(err => {
+                  mostrarAlerta("Error: " + err.message, "error");
+              });
+
+
+              }
+          );
+      });
+
+
+      // ===== Función simple y bonita para confirmar acciones =====
+    function confirmarAccion(mensaje, callback) {
+        const modal = document.createElement("div");
+        modal.className = "mini-confirm";
+
+        modal.innerHTML = `
+            <div class="mini-confirm-box">
+                <p>${mensaje}</p>
+                <div class="mini-confirm-btns">
+                    <button class="btn-si">Sí</button>
+                    <button class="btn-no">No</button>
+                </div>
+            </div>
+        `;
+
+      document.body.appendChild(modal);
+
+        modal.querySelector(".btn-si").onclick = () => {
+            modal.remove();
+            if (callback) callback();
+        };
+
+        modal.querySelector(".btn-no").onclick = () => {
+            modal.remove();
+        };
+    }
+
+    // ===== Alerta simple =====
+    function mostrarAlerta(mensaje, tipo = "ok") {
+        const div = document.createElement("div");
+        div.className = `mini-alert mini-${tipo}`;
+        div.textContent = mensaje;
+
+        document.body.appendChild(div);
+
+        setTimeout(() => div.classList.add("show"), 10);
+
+        setTimeout(() => {
+            div.classList.remove("show");
+            setTimeout(() => div.remove(), 300);
+        }, 2500);
+    }
+
+
+
+
+
+    });
+  </script>
+
+
 
       <!--ALERTA DE ÉXITO AL REGRESAR DEL CONTROLADOR-->
       @if(session('success'))
@@ -1507,6 +1781,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       </script>
       @endif
+
 
 </body>
 </html>

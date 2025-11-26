@@ -20,7 +20,7 @@ class ReporteController extends Controller
         $tipo = $request->tipo;
 
         // ---------------------------------------------------------------------
-        // 📌 REPORTE DE CLIENTES
+        // REPORTE DE CLIENTES
         // ---------------------------------------------------------------------
         if ($tipo === 'clientes') {
 
@@ -42,7 +42,7 @@ class ReporteController extends Controller
         }
 
         // ---------------------------------------------------------------------
-        // 📌 REPORTE DE CITAS
+        // REPORTE DE CITAS
         // ---------------------------------------------------------------------
         if ($tipo === 'citas') {
 
@@ -75,7 +75,7 @@ class ReporteController extends Controller
             $data = compact('inicio', 'fin', 'citasAtendidas', 'citasCanceladas', 'citasPorEstatus', 'citasPorEmpleado', 'citasArealizar');
         }
 
-        // 📌 REPORTE DE SERVICIOS
+        // REPORTE DE SERVICIOS
         // ---------------------------------------------------------------------
         if ($tipo === 'servicios') {
 
@@ -112,7 +112,7 @@ class ReporteController extends Controller
 
 
         // ---------------------------------------------------------------------
-        // 📌 REPORTE DE INGRESOS
+        // REPORTE DE INGRESOS
         // ---------------------------------------------------------------------
         if ($tipo === 'ingresos') {
 
@@ -144,7 +144,7 @@ class ReporteController extends Controller
         }
 
         // ---------------------------------------------------------------------
-        // 📌 Renderizar PDF
+        // Renderizar PDF
         // ---------------------------------------------------------------------
         $nombrePDF = "reporte_{$tipo}_" . time() . ".pdf";
         $ruta = "reportes/$nombrePDF";

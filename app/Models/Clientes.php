@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User; // ✅ Importación necesaria
+use App\Models\User;
 
 class Clientes extends Model
 {

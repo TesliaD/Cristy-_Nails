@@ -9,6 +9,7 @@ use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\AdminPanelController;
 use App\Http\Controllers\CitaController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\BackupController;
 
 use function PHPUnit\Framework\callback;
 
@@ -52,6 +53,14 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     // Ruta para los reportes
     Route::post('/paneladmin/reporte', [ReporteController::class, 'generarReporte'])->name('reportes.generar');
+
+    // BACKUPS
+    Route::get('/backup/generar', [BackupController::class, 'generar'])->name('backup.generar');
+    Route::post('/backup/restaurar', [BackupController::class, 'restaurar'])->name('backup.restaurar');
+    Route::delete('/backup/eliminar', [BackupController::class, 'eliminar'])->name('backup.eliminar');
+    Route::get('/backup/lista', [BackupController::class, 'lista'])->name('backup.lista');
+    Route::get('/backup/descargar/{archivo}', [BackupController::class, 'descargar'])->name('backup.descargar');
+
 
     //Rutas para servicios en el Panel de administrador
     Route::get('/paneladmin/servicios', [ServicioController::class, 'index'])->name('servicios.index');
