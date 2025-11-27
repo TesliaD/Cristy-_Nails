@@ -1035,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       </div>
 
-      <!-- MODAL -->
+      <!-- MODAL REPORTES -->
   <div class="modal fade" id="modalReporte" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1465,6 +1465,40 @@ document.addEventListener('DOMContentLoaded', () => {
   <script>
     document.addEventListener('DOMContentLoaded', function () {
 
+      // VALIDACION FECHA
+    const inicio = document.querySelector('input[name="inicio"]');
+    const fin = document.querySelector('input[name="fin"]');
+
+    // Cuando cambia la fecha inicial → actualizar min en la final
+    inicio.addEventListener('change', () => {
+        fin.min = inicio.value;
+    });
+
+    // Cuando cambia la fecha final → actualizar max en la inicial
+    fin.addEventListener('change', () => {
+        inicio.max = fin.value;
+    });
+
+    // Validación antes de enviar (sin borrar valores)
+    document.getElementById('formFechas').addEventListener('submit', function (e) {
+
+        // Si falta alguna fecha
+        if (!inicio.value || !fin.value) {
+            e.preventDefault();
+            alert("Debes seleccionar ambas fechas.");
+            return;
+        }
+
+        // Validar que inicio <= fin
+        if (inicio.value > fin.value) {
+            e.preventDefault();
+            alert("La fecha inicial no puede ser mayor que la fecha final.");
+            return;
+        }
+    });
+
+
+
       // Detecta clic en tarjetas y abre modal correspondiente
       document.querySelectorAll(".tarjetareportes").forEach(t => {
         t.addEventListener("click", function () {
@@ -1472,7 +1506,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const titulo = this.querySelector("h3").innerText.trim();
           const texto = titulo.toLowerCase();
 
-          // 🔥 PRIORIDAD: usar data-tipo si existe
+          // PRIORIDAD: usar data-tipo si existe
           let tipo = this.dataset.tipo || "";
 
           // Si no trae data-tipo, detectar por texto
@@ -1488,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', () => {
               tipo = texto.replace(/\s+/g, "_");
           }
 
-          // 🔥 Si es backup, abrir modal especial
+          // MODAL DEL BACKUN
           if (tipo === "backup") {
             new bootstrap.Modal(document.getElementById('modalBackup')).show();
             return; // OBLIGATORIO

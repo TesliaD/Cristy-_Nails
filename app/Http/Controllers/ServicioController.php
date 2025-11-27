@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Servicios;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ServicioController extends Controller
 {
@@ -17,14 +18,11 @@ class ServicioController extends Controller
     // Mostrar servicios en la página pública del cliente (DASHBOARD)
     public function mostrarServicios()
     {
-        // obtiene los servicios activos
         $servicios = Servicios::where('Activo', 1)->get();
-
-        // devuelve la vista dashboard y le pasa los servicios
         return view('layouts.dashboard', ['servicios' => $servicios]);
     }
 
-    // 👉 NUEVO MÉTODO: Mostrar servicios en la vista AGENDAR
+    // Mostrar servicios en AGENDAR
     public function mostrarAgendar()
     {
         $servicios = Servicios::where('Activo', 1)->get();
@@ -42,13 +40,11 @@ class ServicioController extends Controller
             'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('imagen');
 
+        // Guardar imagen si existe
         if ($request->hasFile('imagen')) {
-            $imagen = $request->file('imagen');
-            $nombreArchivo = time() . '_' . $imagen->getClientOriginalName();
-            $ruta = $imagen->storeAs('servicios', $nombreArchivo, 'public');
-            $data['imagen'] = $ruta;
+            $data['imagen'] = $request->file('imagen')->store('imagenes_servicios', 'public');
         }
 
         Servicios::create($data);
@@ -66,18 +62,26 @@ class ServicioController extends Controller
             'Descripcion'  => 'nullable|string',
             'Precio'       => 'required|numeric|min:0',
             'Duracion'     => 'nullable|integer|min:0',
-            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'imagen'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
+        // Datos normales
         $servicio->Nom_Servicio = $request->Nom_Servicio;
         $servicio->Descripcion  = $request->Descripcion;
         $servicio->Precio       = $request->Precio;
         $servicio->Duracion     = $request->Duracion;
         $servicio->Activo       = $request->has('Activo');
 
+        // Si viene una nueva imagen...
         if ($request->hasFile('imagen')) {
-            $path = $request->file('imagen')->store('servicios', 'public');
-            $servicio->imagen = $path;
+
+            // borrar imagen anterior
+            if ($servicio->imagen && Storage::disk('public')->exists($servicio->imagen)) {
+                Storage::disk('public')->delete($servicio->imagen);
+            }
+
+            // subir nueva
+            $servicio->imagen = $request->file('imagen')->store('imagenes_servicios', 'public');
         }
 
         $servicio->save();
@@ -89,6 +93,12 @@ class ServicioController extends Controller
     public function destroy($id)
     {
         $servicio = Servicios::findOrFail($id);
+
+        // borrar imagen también
+        if ($servicio->imagen && Storage::disk('public')->exists($servicio->imagen)) {
+            Storage::disk('public')->delete($servicio->imagen);
+        }
+
         $servicio->delete();
 
         return redirect()->back()->with('success', 'Servicio eliminado correctamente.');
