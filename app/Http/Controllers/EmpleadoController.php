@@ -83,13 +83,11 @@ class EmpleadoController extends Controller
         $eventos = [];
 
         foreach ($citas as $cita) {
-            // valores calculados antes de construir el array (sin usar ?? dentro de la interpolación)
             $cliente = isset($cita->cliente->nombre) ? $cita->cliente->nombre : 'Sin cliente';
             $fecha   = $cita->fecha;
             $hora    = isset($cita->hora) ? $cita->hora : '';
             $servicio = isset($cita->servicio->Nom_Servicio) ? $cita->servicio->Nom_Servicio : 'Sin servicio';
 
-            // notas: primero la nota de la cita, si no existe, la del servicio, si no, texto por defecto
             if (isset($cita->notas) && $cita->notas !== '') {
                 $notas = $cita->notas;
             } elseif (isset($cita->servicio->Descripcion) && $cita->servicio->Descripcion !== '') {
@@ -104,11 +102,13 @@ class EmpleadoController extends Controller
                 'hora'     => $hora,
                 'servicio' => $servicio,
                 'notas'    => $notas,
+                'estado'   => strtolower($cita->estado ?? 'pendiente'), // <-- Agregar esta línea
             ];
         }
 
         return response()->json($eventos);
     }
+
 
     public function panelMisCitas()
     {

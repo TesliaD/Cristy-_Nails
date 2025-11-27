@@ -137,6 +137,10 @@
       <section id="citas" class="mb-5" style="display:none;">
         <h4 class="mb-3">Mis Citas</h4>
 
+        <div id="alertaCitas" class="mini-alert center-alert">
+        ¡RECUERDA QUE DEBES DE TENER 2 DÍAS DE ANTICIPACIÓN PARA PODER CANCELAR UNA CITA!
+        </div>
+
         <div id="calendar"></div>
       </section>
 
@@ -172,6 +176,8 @@
 
       </div>
     </div>
+
+
   </div>
 
   <!-- JS GENERAL -->
@@ -188,12 +194,14 @@
       document.getElementById(id).style.display = 'block';
 
       if (id === "citas") {
+        mostrarAlertaCitas();
+
         setTimeout(() => {
-          if (!calendar) {
-            iniciarCalendario();
-          } else {
-            calendar.render();
-          }
+            if (!calendar) {
+                iniciarCalendario();
+            } else {
+                calendar.render();
+            }
         }, 100);
       }
     }
@@ -217,8 +225,12 @@
               fecha: '{{ $cita->fecha }}',
               hora: '{{ $cita->hora }}',
               estado: '{{ $cita->estado ?? "Pendiente" }}',
-              cancelarUrl: '{{ route("citas.cancelar", $cita->id) }}'
-            },
+              cancelarUrl: '{{ route("citas.cancelar", $cita->id) }}',
+              isPast: '{{ \Carbon\Carbon::parse($cita->fecha . " " . $cita->hora)->isPast() ? "1" : "0" }}',
+              bloqueadoPorFecha: '{{ \Carbon\Carbon::parse($cita->fecha)->subDays(2)->startOfDay()->lessThan(now()->startOfDay()) ? "1" : "0" }}',
+              estadoCancelado: '{{ $cita->estado === "cancelada" ? "1" : "0" }}',
+          },
+
             color: '#ff79bc'
           },
           @endforeach
@@ -230,17 +242,48 @@
           document.getElementById("modalHora").innerText = info.event.extendedProps.hora;
           document.getElementById("modalEstado").innerText = info.event.extendedProps.estado;
 
+          const btnCancelar = document.querySelector("#formCancelarCita button.btn-danger");
+
+          // Si la cita es del pasado → deshabilita cancelar
+          if (
+            info.event.extendedProps.isPast === "1" ||
+            info.event.extendedProps.estadoCancelado === "1" ||
+            info.event.extendedProps.bloqueadoPorFecha === "1"
+        ) {
+            btnCancelar.disabled = true;
+            btnCancelar.innerText = "No disponible";
+        } else {
+            btnCancelar.disabled = false;
+            btnCancelar.innerText = "Cancelar cita";
+        }
+
           document.getElementById("formCancelarCita").action =
             info.event.extendedProps.cancelarUrl;
 
           let modal = new bootstrap.Modal(document.getElementById('modalCita'));
           modal.show();
         }
+
       });
 
       calendar.render();
     }
   </script>
 
+  
+  <script>
+    // Mostrar alerta
+    function mostrarAlertaCitas() {
+        const alerta = document.getElementById("alertaCitas");
+        if (!alerta) return;
+
+        alerta.classList.add("show");
+
+        setTimeout(() => {
+            alerta.classList.remove("show");
+        }, 5000); // La alerta dura 5 segundos
+    }
+    </script>
+    
 </body>
 </html>

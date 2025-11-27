@@ -27,6 +27,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
     <script src="{{ asset('js/calendario.js') }}"></script>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          mostrarAlertaCitas();
+      });
+    </script>
+
+
 <div class="d-flex">
   
   <!-- Sidebar -->
@@ -73,6 +80,15 @@
     <section id="inicio">
       <div class="alert alert-info">
         <strong>¡Buen día!</strong> Aquí puedes consultar tus citas, clientes y servicios del día.
+
+        <div id="alertaCitas" class="mini-alert center-alert">
+          @if($totalCitas > 0)
+              Tienes {{ $totalCitas ?? 0 }} cita(s) pendiente(s) para hoy
+          @else
+              No tienes citas para el día de hoy
+          @endif
+        </div>
+
       </div>
     </section>
 
@@ -99,7 +115,9 @@
             </div>
           </div>
         </div> 
+
       </section>
+
 
     <!-- CALENDARIO -->
     <section id="calendario">
@@ -222,6 +240,7 @@ function mostrarSeccion(id) {
 
   if (id === 'inicio') {
     document.getElementById('inicio').style.display = 'block';
+    mostrarAlertaCitas();
     document.getElementById('dashboard').style.display = 'block';
     document.getElementById('calendario').style.display = 'block';
   } else {
@@ -229,7 +248,22 @@ function mostrarSeccion(id) {
     if (seccionActual) seccionActual.style.display = 'block';
   }
 }
-
 </script>
+
+  
+  <script>
+    // Mostrar alerta
+    function mostrarAlertaCitas() {
+        const alerta = document.getElementById("alertaCitas");
+        if (!alerta) return;
+
+        alerta.classList.add("show");
+
+        setTimeout(() => {
+            alerta.classList.remove("show");
+        }, 5000); // La alerta dura 5 segundos
+    }
+    </script>
+
 </body>
 </html>

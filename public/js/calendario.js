@@ -418,7 +418,18 @@ $(function () {
 			var fechaClave = `${dateProperties.year}-${month}-${day}`;
 
 			// 🔹 Filtrar las citas de esa fecha
+			// 🔹 Filtrar solo por fecha
 			var citasDelDia = eventos.filter(e => e.fecha === fechaClave);
+			citasDelDia = citasDelDia.filter(e => e.estado.trim().toLowerCase() !== "cancelada" && e.estado.trim().toLowerCase() !== "completada");
+
+			var hoy = new Date();
+			var fechaSeleccionada = new Date(dateProperties.year, dateProperties.month - 1, dateProperties.day); // mes 0-index
+
+			// Si la fecha es anterior a hoy, no abrir modal
+			if (fechaSeleccionada.getTime() < hoy.setHours(0,0,0,0)) {
+				return; // sale de la función
+			}
+
 
 			// 🔹 Ordenarlas por hora (ascendente)
 			citasDelDia.sort((a, b) => {

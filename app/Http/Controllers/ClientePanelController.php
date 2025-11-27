@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Clientes;
 use App\Models\Cita;
 use App\Models\Servicios;
+use Carbon\Carbon;
 
 class ClientePanelController extends Controller
 {
@@ -151,6 +152,8 @@ class ClientePanelController extends Controller
     // --------------------------------------------------------------------
     // Cancelar cita
     // --------------------------------------------------------------------
+
+
     public function borrarCita($id)
     {
         $cliente = Auth::user()->cliente;
@@ -159,8 +162,24 @@ class ClientePanelController extends Controller
                     ->where('cliente_id', $cliente->id)
                     ->firstOrFail();
 
+        // Convertimos todo a FECHAS SIN HORAS
+        $fechaCita = Carbon::parse($cita->fecha)->startOfDay();  
+        $hoy = now()->startOfDay();
+
+        // Restamos 2 días completos
+        $limite = $fechaCita->copy()->subDays(2)->startOfDay();
+
+        // Si HOY es después del límite → NO se puede cancelar
+        if ($hoy->greaterThan($limite)) {
+            return back()->with('error', 'Mi rey, ya está muy cerca la fecha. Dos días antes mínimo.');
+        }
+
+        // Si sí cumple → cancelar
         $cita->delete();
 
-        return redirect()->back()->with('success', 'Cita cancelada.');
+        return back()->with('success', 'Cita cancelada correctamente.');
     }
+
+
+
 }
