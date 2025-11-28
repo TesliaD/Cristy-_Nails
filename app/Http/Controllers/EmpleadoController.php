@@ -122,6 +122,7 @@ class EmpleadoController extends Controller
     // Traer las citas del día
     $citas = Cita::with(['cliente.usuario', 'servicio'])
                 ->where('empleado_id', $empleadoId)
+                ->where('estado', 'pendiente')
                 ->whereBetween('fecha', [$inicio, $fin])
                 ->orderBy('hora', 'asc')
                 ->get();
