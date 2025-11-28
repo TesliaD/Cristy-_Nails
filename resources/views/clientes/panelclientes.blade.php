@@ -16,6 +16,9 @@
 
   <!-- Estilos -->
   <link rel="stylesheet" href="{{ asset('css/panelclientes.css') }}">
+
+  <<!--Script de las alertas-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -68,8 +71,27 @@
       </div>
 
       @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+      <script>
+      Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "{{ session('success') }}",
+          confirmButtonColor: "#d63384"
+      });
+      </script>
       @endif
+
+      @if(session('error'))
+      <script>
+      Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "{{ session('error') }}",
+          confirmButtonColor: "#d63384"
+      });
+      </script>
+      @endif
+
 
       <!-- PERFIL -->
       <section id="perfil" class="mb-5">
@@ -88,7 +110,7 @@
       <!-- ACTUALIZAR PERFIL -->
       <section id="actualizar" class="mb-5" style="display:none;">
         <h4 class="mb-3">Actualizar mi perfil</h4>
-        <form method="POST" action="{{ route('panelcliente.update') }}">
+        <form id="formPerfil" method="POST" action="{{ route('panelcliente.update') }}">
           @csrf
           <div class="mb-3">
             <label class="form-label">Nombre</label>
@@ -168,7 +190,7 @@
           <form id="formCancelarCita" method="POST" action="">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-danger">Cancelar cita</button>
+            <button type="button" class="btn btn-danger" onclick="confirmarCancelacion()">Cancelar cita</button>
           </form>
 
           <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -284,6 +306,170 @@
         }, 5000); // La alerta dura 5 segundos
     }
     </script>
+
+    <!--Alerta de las validaciones-->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        /* ------------------------- VALIDACIONES ------------------------- */
+
+        const formUpdate = document.querySelector('form[action="{{ route("panelcliente.update") }}"]');
+
+        if (formUpdate) {
+            formUpdate.addEventListener("submit", function(e) {
+                e.preventDefault(); // Evitar envío hasta validar
+
+                let nombre = formUpdate.nombre.value.trim();
+                let email = formUpdate.email.value.trim();
+                let telefono = formUpdate.telefono.value.trim();
+                let pass = formUpdate.password.value.trim();
+                let pass2 = formUpdate.password_confirmation.value.trim();
+
+                // Validación Nombre (solo letras)
+                if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$/.test(nombre) || nombre.length < 3) {
+                    return Swal.fire({
+                        icon: "error",
+                        title: "Nombre inválido",
+                        text: "El nombre solo debe contener letras y tener al menos 3 caracteres."
+                    });
+                }
+
+                // Validación Email
+                let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regexEmail.test(email)) {
+                    return Swal.fire({
+                        icon: "error",
+                        title: "Correo inválido",
+                        text: "Ingresa un correo electrónico válido."
+                    });
+                }
+
+                // Validación Teléfono (solo números)
+                if (!/^[0-9]+$/.test(telefono) || telefono.length < 10) {
+                    return Swal.fire({
+                        icon: "error",
+                        title: "Teléfono inválido",
+                        text: "El teléfono debe contener solo números y al menos 10 dígitos."
+                    });
+                }
+
+                // Validación Contraseñas
+                if (pass.length > 0 || pass2.length > 0) {
+                    if (pass.length < 6) {
+                        return Swal.fire({
+                            icon: "error",
+                            title: "Contraseña muy corta",
+                            text: "La contraseña debe tener al menos 6 caracteres."
+                        });
+                    }
+
+                    if (pass !== pass2) {
+                        return Swal.fire({
+                            icon: "error",
+                            title: "Contraseñas no coinciden",
+                            text: "Debes escribir la misma contraseña en ambos campos."
+                        });
+                    }
+                }
+
+                /* ----------------- SI PASA TODO, CONFIRMA ENVÍO ----------------- */
+                Swal.fire({
+                    title: "Guardar cambios",
+                    text: "¿Deseas actualizar tus datos?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, actualizar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        formUpdate.submit(); // Enviar formulario
+                    }
+                });
+
+            });
+        }
+
+        /* ------------------------- ALERTA DESPUÉS DE ACTUALIZAR ------------------------- */
+
+        @if(session('success'))
+            Swal.fire({
+                icon: "success",
+                title: "¡Actualizado!",
+                text: "{{ session('success') }}",
+                confirmButtonText: "Ok"
+            });
+        @endif
+
+    });
+    </script>
+
+    <!--Alerta para cancelar una cita-->
+    <script>
+    function confirmarCancelacion() {
+        Swal.fire({
+            title: "¿Cancelar cita?",
+            text: "Esta acción no se puede deshacer",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, cancelar",
+            cancelButtonText: "No, volver",
+            confirmButtonColor: "#d63384"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('formCancelarCita').submit();
+            }
+        });
+    }
+    </script>
+
+    <!--Alertas para actualizar el perfil-->
+    <script>
+    document.getElementById("formPerfil").addEventListener("submit", function(e) {
+
+        let email = document.querySelector("input[name='email']").value;
+        let nombre = document.querySelector("input[name='nombre']").value;
+
+        // Validaciones básicas
+        if(nombre.trim().length < 3){
+            e.preventDefault();
+            Swal.fire({
+                icon: "error",
+                title: "Nombre demasiado corto",
+                text: "Debes escribir al menos 3 caracteres."
+            });
+            return;
+        }
+
+        if(!email.includes("@")){
+            e.preventDefault();
+            Swal.fire({
+                icon: "error",
+                title: "Email inválido",
+                text: "Ingresa un email válido."
+            });
+            return;
+        }
+
+        e.preventDefault(); // detener envío
+
+        Swal.fire({
+            title: "¿Guardar cambios?",
+            text: "Se actualizará tu información.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Guardar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#0d6efd"
+        }).then(result => {
+            if(result.isConfirmed){
+                document.getElementById("formPerfil").submit();
+            }
+        });
+
+    });
+    </script>
+
+
     
 </body>
 </html>

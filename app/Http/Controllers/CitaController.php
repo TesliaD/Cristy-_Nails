@@ -69,7 +69,7 @@ class CitaController extends Controller
     }
 
     // --------------------------------
-    // Guardar nueva cita
+    // Guardar nueva cita Admin
     // --------------------------------
     public function store(Request $request)
     {
@@ -232,13 +232,19 @@ class CitaController extends Controller
         $cliente = Clientes::where('usuario_id', auth()->user()->id)->first();
 
         if (!$cliente) {
-            return redirect()->back()->with('error', 'No se encontró el cliente asociado.');
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró el cliente asociado.'
+            ], 400);
         }
 
         $servicio = Servicios::findOrFail($request->servicio);
 
         if (!$servicio->Activo) {
-            return redirect()->back()->withErrors(['servicio'=>'Servicio inactivo'])->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'El servicio está inactivo.'
+            ], 400);
         }
 
         $duracion = intval($servicio->Duracion);
@@ -246,11 +252,17 @@ class CitaController extends Controller
         $horaFin = date('H:i:s', strtotime($horaInicio . " + {$duracion} minutes"));
 
         if ($horaInicio < "09:00:00" || $horaFin > "20:00:00") {
-            return redirect()->back()->withErrors(['hora' => 'Fuera del horario'])->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Horario fuera del rango permitido.'
+            ], 400);
         }
 
         if (strtotime($request->fecha . ' ' . $horaInicio) < time()) {
-            return redirect()->back()->withErrors(['hora' => 'No puedes agendar en el pasado'])->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'No puedes agendar en el pasado.'
+            ], 400);
         }
 
         // Empalme cliente
@@ -265,9 +277,13 @@ class CitaController extends Controller
             });
 
         if ($empCliente) {
-            return redirect()->back()->withErrors(['hora'=>'Ya tienes una cita en ese horario'])->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Ya tienes una cita en ese horario.'
+            ], 400);
         }
 
+        // Crear cita
         Cita::create([
             'cliente_id' => $cliente->id,
             'empleado_id' => null,
@@ -278,7 +294,10 @@ class CitaController extends Controller
             'estado' => 'pendiente'
         ]);
 
-        return redirect()->route('dashboard')->with('mensaje', '✨ Cita agendada con éxito.');
+        return response()->json([
+            'success' => true,
+            'message' => '✨ Cita agendada con éxito.'
+        ]);
     }
 
     // --------------------------------
