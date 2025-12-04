@@ -58,7 +58,7 @@
                         <ul class="navbar-nav mx-auto">
 
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url('/') }}">Inicio</a>
+                                <a class="nav-link" href="{{ route('dashboard') }}">Inicio</a>
                             </li>
 
                             <li class="nav-item">
@@ -88,7 +88,7 @@
                                         @endif
 
                                         @if(Auth::user()->rol === 'cliente')
-                                            <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Mi Panel</a></li>
+                                            <li><a class="dropdown-item" href="{{ route('panelcliente.index') }}">Mi Panel</a></li>
                                         @endif
 
                                         <li><hr class="dropdown-divider"></li>

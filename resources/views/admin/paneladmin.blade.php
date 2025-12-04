@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <!-- Sidebar del Panel -->
     <div class="sidebar text-white p-3 sidebar">
 
-      <a href="{{ url('/') }}">
+      <a href="{{ route('dashboard') }}">
   <img src="{{ asset('img/nailslogo1.png') }}" 
        alt="Cristy Nails and Beauty"
        class="d-block mx-auto"
@@ -110,13 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white" onclick="mostrarSeccion('reportes')">
             <i class="bi bi-bar-chart-line"></i> Reportes
-          </a>
-        </li>
-
-        <!-- Configuración -->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('configuracion')">
-            <i class="bi bi-gear-fill"></i> Configuración
           </a>
         </li>
 

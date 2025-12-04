@@ -89,7 +89,7 @@
     <!-- Sidebar -->
     <div class="sidebar text-white p-3 sidebar">
 
-      <a href="{{ url('/') }}">
+      <a href="{{ route('dashboard') }}">
   <img src="{{ asset('img/nailslogo1.png') }}" 
        alt="Cristy Nails and Beauty"
        class="d-block mx-auto"

@@ -27,7 +27,7 @@
     <!-- Sidebar -->
     <div class="sidebar text-white p-3 sidebar">
       <a href="{{ route('dashboard') }}">
-          <img src="{{ asset('img/nailslogo.jpg') }}" 
+          <img src="{{ asset('img/main-logo.png') }}"
               alt="Cristy Nails and Beauty"
               class="img-fluid d-block mx-auto"
               style="max-height: 80px;">
