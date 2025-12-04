@@ -22,6 +22,15 @@
 
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
+ <!-- Fuentes de Google -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Marcellus&display=swap"
+  rel="stylesheet">
+
+
+
 </head>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,54 +61,62 @@ document.addEventListener('DOMContentLoaded', () => {
     <!-- Sidebar del Panel -->
     <div class="sidebar text-white p-3 sidebar">
 
-      <a href="{{ route('dashboard') }}">
-          <img src="{{ asset('img/nailslogo.jpg') }}" 
-              alt="Cristy Nails and Beauty"
-              class="img-fluid d-block mx-auto"
-              style="max-height: 80px;">
-      </a>
+      <a href="{{ url('/') }}">
+  <img src="{{ asset('img/nailslogo1.png') }}" 
+       alt="Cristy Nails and Beauty"
+       class="d-block mx-auto"
+       style="width: 160px; height: auto;">
+</a>
+
 
       <ul class="nav flex-column mt-4">
 
         <!-- Dashboard / Inicio -->
         <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('dashboard')">
+          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('dashboard')">
             <i class="bi bi-speedometer2"></i> Dashboard
           </a>
         </li>
 
         <!--Gestion de Empleados-->
         <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('empleados')">
+          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('empleados')">
               <i class="bi bi-person-raised-hand"></i> Empleados
           </a>
         </li>
 
         <!-- Gestión de clientes -->
         <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('clientes')">
+          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('clientes')">
             <i class="bi bi-people-fill"></i> Clientes
           </a>
         </li>
 
         <!-- Gestión de citas -->
         <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('citas')">
+          <a href="#" class="nav-link text-white" onclick="mostrarSeccion('citas')">
             <i class="bi bi-calendar-week"></i> Citas
           </a>
         </li>
 
         <!-- Gestión de servicios -->
         <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-black fw-bold" onclick="mostrarSeccion('servicios')">
+          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('servicios')">
             <i class="bi bi-scissors"></i> Servicios
           </a>
         </li>
 
         <!-- Reportes -->
         <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('reportes')">
+          <a href="#" class="nav-link text-white" onclick="mostrarSeccion('reportes')">
             <i class="bi bi-bar-chart-line"></i> Reportes
+          </a>
+        </li>
+
+        <!-- Configuración -->
+        <li class="nav-item mb-2">
+          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('configuracion')">
+            <i class="bi bi-gear-fill"></i> Configuración
           </a>
         </li>
 
@@ -170,9 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <!-- Botón agregar -->
-          <a href="#" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#nuevoEmpleadoModal">
+         <a href="#" 
+            class="btn mb-3" 
+            style="background-color: #d57474; border-color: #d57474; color: white;" 
+            data-bs-toggle="modal" 
+            data-bs-target="#nuevoEmpleadoModal">
               <i class="bi bi-plus-circle"></i> Nuevo Empleado
           </a>
+
 
           <div class="table-responsive">
               <table class="table table-striped align-middle" id="tablaEmpleados">
@@ -478,9 +500,15 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <!-- Botón para agregar cliente -->
-        <a href="#" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#nuevoClienteModal">
+        <a 
+          href="#" 
+          class="btn mb-3 text-white" 
+          style="background-color: #d57474; border-color: #d57474;"
+          data-bs-toggle="modal" 
+          data-bs-target="#nuevoClienteModal">
           <i class="bi bi-plus-circle"></i> Nuevo Cliente
         </a>
+
 
         <!-- Modal para nuevo cliente -->
         <div class="modal fade" id="nuevoClienteModal" tabindex="-1" aria-hidden="true">
@@ -533,8 +561,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="submit" class="btn btn-primary">Guardar</button>
+                 <!-- Botón Cancelar -->
+                  <button 
+                    type="button" 
+                    class="btn fw-semibold text-white" 
+                    style="background-color: #dc3545; border-color: #dc3545;" 
+                    data-bs-dismiss="modal">
+                    Cancelar
+                  </button>
+
+                  <!-- Botón Guardar -->
+                  <button 
+                    type="submit" 
+                    class="btn fw-semibold text-white" 
+                    style="background-color: #d57474; border-color: #d57474;">
+                    Guardar
+                  </button>
+
                 </div>
               </form>
             </div>
@@ -664,8 +707,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="submit" class="btn btn-success">Guardar cambios</button>
+                  <!-- Botón Cancelar -->
+                <button 
+                  type="button" 
+                  class="btn fw-semibold text-white" 
+                  style="background-color: #dc3545; border-color: #dc3545;" 
+                  data-bs-dismiss="modal">
+                  Cancelar
+                </button>
+
+                <!-- Botón Guardar -->
+                <button 
+                  type="submit" 
+                  class="btn fw-semibold text-white" 
+                  style="background-color: #d57474; border-color: #d57474;">
+                  Guardar
+                </button>
+
                 </div>
               </form>
             </div>
@@ -806,9 +864,17 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="container-fluid">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h2 class="fw-bold text-primary mb-1">Gestión de Servicios</h2>
+             <h2 class="fw-bold mb-1" style="color: #d57474;">Gestión de Servicios</h2>
+
               <p class="text-muted">Administra los servicios ofrecidos por tu negocio.</p>
-            </div>  
+            </div>
+            <button 
+            class="btn px-4 py-2 shadow-sm text-white" 
+            style="background-color: #5c381c; border-color: #5c381c;"
+            onclick="document.getElementById('form-servicio').scrollIntoView({ behavior: 'smooth' })">
+            Agregar Servicio
+          </button>
+
           </div>
 
           <!-- FORMULARIO -->
@@ -818,28 +884,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 @csrf
                 <div class="row g-4 align-items-end">
                   <div class="col-lg-3 col-md-6">
-                    <label class="form-label fw-semibold">Nombre del servicio</label>
+                    <label class="form-label ">Nombre del servicio</label>
                     <input type="text" name="Nom_Servicio" class="form-control" placeholder="Ej. Uñas acrílicas" required>
                   </div>
                   <div class="col-lg-2 col-md-4">
-                    <label class="form-label fw-semibold">Precio ($)</label>
+                    <label class="form-label ">Precio ($)</label>
                     <input type="number" step="0.01" name="Precio" class="form-control" required>
                   </div>
                   <div class="col-lg-2 col-md-4">
-                    <label class="form-label fw-semibold">Duración (min)</label>
+                    <label class="form-label ">Duración (min)</label>
                     <input type="number" name="Duracion" class="form-control" required>
                   </div>
                   <div class="col-lg-5 col-md-8">
-                    <label class="form-label fw-semibold">Descripción</label>
+                    <label class="form-label ">Descripción</label>
                     <textarea name="Descripcion" class="form-control" rows="2" placeholder="Describe el servicio..."></textarea>
                   </div>
                   <div class="col-lg-5 col-md-6">
-                    <label class="form-label fw-semibold">Imagen del servicio</label>
+                    <label class="form-label ">Imagen del servicio</label>
                     <input type="file" name="imagen" class="form-control" accept="image/*">
                   </div>
                   <div class="col-lg-3 col-md-6 mt-3">
-                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm"><i class="bi bi-bookmark-heart-fill"></i> Guardar Servicio
-                    </button>
+                  <button 
+                    type="submit" 
+                    class="btn w-100 py-2  shadow-sm text-white" 
+                    style="background-color: #5c381c; border-color: #5c381c;">
+                    Guardar Servicio
+                  </button>
                   </div>
                 </div>
               </form>
@@ -890,6 +960,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <form action="{{ route('servicios.destroy', $servicio->id) }}" method="POST" style="display:inline;">
                           @csrf @method('DELETE')
                           <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este servicio?')"><i class="bi bi-trash3-fill"></i></button>
+                            
+
+
+                        </form>
+                        <form action="{{ route('servicios.destroy', $servicio->id) }}" method="POST" style="display:inline;">
+                          @csrf @method('DELETE')
                         </form>
                           </td>
                       </tr>
@@ -1152,6 +1228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <style>
       #calendar {
         min-height: 700px;
+        
       }
       .fc-event { 
         cursor: pointer;

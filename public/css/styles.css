@@ -1,11 +1,30 @@
 /* Fuente */
-body {
-    font-family: 'Krub', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f82061;
-    color: #333;
+
+:root {
+  --bs-body-font-family: "Jost", Roboto, sans-serif;
 }
+
+body {
+  font-family: 'Jost', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Títulos con estilo elegante */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Marcellus', serif;
+  color: #333; /* Puedes cambiarlo según tu fondo */
+  letter-spacing: 1px;
+}
+
+/* Texto general */
+p, a, button, li, span {
+  font-family: 'Jost', Roboto, sans-serif;
+}
+
+
 
 /* HEADER */
 .header {
@@ -95,7 +114,7 @@ body {
 
 /* Login específico */
 .login-body {
-    background-color: #f82061;
+    background-color: #b08e6b;
 }
 
 .login-image {

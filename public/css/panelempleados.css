@@ -178,11 +178,11 @@
 }
 
 .calendariojoto .custom-header {
-  background: #ff5bad;
+  background: #d57474;
   padding: 5px 10px 10px 20px;
   height: 70px;
   position: relative;
-  border-top: 5px solid #ff5bad;
+  border-top: 5px solid #d57474;
   border-bottom: 1px solid #ddd;
 }
 
@@ -240,7 +240,7 @@
 
 .calendariojoto .fc-head {
   background: transparent;
-  color: #ff5bad;
+  color: #d57474;
   font-weight: bold;
   text-transform: uppercase;
   font-size: 12px;
@@ -266,7 +266,7 @@
 }
 
 .calendariojoto .fc-calendar .fc-row > div.fc-today {
-  background-color: #ff5bad !important;
+  background-color: #d57474 !important;
   box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
 }
@@ -291,7 +291,7 @@
   bottom: 3px;
 }
 
-.calendariojoto .fc-today.fc-content:after { color: #b02c42; }
+.calendariojoto .fc-today.fc-content:after { color: #d57474; }
 .calendariojoto .fc-content:hover:after { color: #ef4f69; }
 .calendariojoto .fc-today.fc-content:hover:after { color: #fff; }
 
@@ -344,4 +344,126 @@
 .center-alert.show {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+/* Tabla personalizada con tipografía y color rosado */
+.table-custom thead {
+  background-color: #d57474 !important; /* Color rosa */
+  color: #fff !important; /* Texto blanco */
+  font-family: "Marcellus", serif;
+  letter-spacing: 0.5px;
+}
+
+.table-custom tbody {
+  font-family: "Jost", sans-serif;
+  color: #333;
+}
+
+/* Efecto hover opcional */
+.table-custom tbody tr:hover {
+  background-color: #f8dada;
+  transition: background-color 0.3s ease;
+}
+
+/* === APLICAR MISMO ESTILO AL SIDEBAR QUE YA TIENES === */
+
+.sidebar { 
+  background-color: #b08e6b !important;
+  width: 250px;
+  min-height: 100vh;
+  font-family: 'Jost', Roboto, sans-serif;
+  color: #fff !important;
+}
+
+/* Enlaces del menú */
+.sidebar .nav-link {
+  background: transparent !important;
+  color: #fff !important;
+  font-weight: bold;
+  font-family: 'Jost', sans-serif !important;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+/* Hover */
+.sidebar .nav-link:hover {
+  background-color: #c49a79 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* Activo */
+.sidebar .nav-link.active,
+.sidebar .nav-link:active,
+.sidebar .nav-link.show {
+  background-color: #d5b08c !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+/* Evitar highlight extraño de Bootstrap */
+.sidebar .nav-link.active::before {
+  content: none !important;
+}
+
+
+/* Alert rosa */
+.alert-info {
+    background-color: #d57474 !important;
+    color: #fff !important;
+    border: none !important;
+    font-family: "Jost", sans-serif !important;
+}
+
+
+/* TABLAS BONITAS EN ROSA */
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
+  background: white;
+}
+
+/* Encabezado */
+.table thead th {
+  background-color: #d57474 !important;
+  color: white !important;
+  font-weight: 600;
+  text-align: center;
+  border: none !important;
+  padding: 12px;
+}
+
+/* Filas */
+.table tbody tr {
+  transition: background 0.2s ease-in-out;
+}
+
+.table tbody tr:hover {
+  background-color: #ffe3f2 !important; /* rosa suave */
+}
+
+/* Celdas */
+.table td {
+  vertical-align: middle;
+  padding: 12px;
+  font-size: 15px;
+}
+
+/* Bordes suaves */
+.table-bordered > :not(caption) > * > * {
+  border-width: 0 !important;
+  border-bottom: 1px solid #ffd0e6 !important;
+}
+
+/* Última fila sin borde */
+.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Texto centrado en todo */
+.table th, .table td {
+  text-align: center;
 }

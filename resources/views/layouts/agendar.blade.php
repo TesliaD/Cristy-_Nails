@@ -18,8 +18,8 @@
 
             <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
                 <div class="card-header text-white text-center py-4"
-                     style="background: linear-gradient(90deg, #ff7eb3, #ff758c);">
-                    <h3 class="mb-0">✨ Agendar tu Cita</h3>
+                     style="background: linear-gradient(90deg, #d57474, #d57474);">
+                    <h3 class="mb-0"> Agendar tu Cita</h3>
                     <small class="d-block mt-1">Verifica servicio, fecha y hora antes de confirmar</small>
                 </div>
 
@@ -82,8 +82,8 @@
                             <!-- Botón -->
                             <div class="d-grid">
                                 <button id="btnEnviar" type="submit" class="btn text-white fw-bold rounded-pill py-2"
-                                        style="background: linear-gradient(90deg, #ff758c, #ff7eb3);">
-                                    <i class="bi bi-heart-fill"></i> Agendar
+                                        style="background: linear-gradient(90deg, #d57474, #da7676);">
+                                    Agendar
                                 </button>
                             </div>
                         </form>

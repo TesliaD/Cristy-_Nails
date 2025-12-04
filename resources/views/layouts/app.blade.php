@@ -1,106 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Cristy Nails</title>
+  <title>Cristy Nails</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" 
+        rel="stylesheet">
 
-    <!-- Iconos de Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Tus CSS pero con asset() -->
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/vendor.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/styleP.css') }}">
 
-    <!--Carpeta de CSS con archivo styles.css-->
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700&family=Marcellus&display=swap"
+    rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 </head>
 <body class="bg-light">
 <!-- HEADER -->
-<header class="bg-white shadow-sm">
-    <div class="container d-flex justify-content-between align-items-center py-3">
-        <!-- Logo -->
-        <a href="{{ url('/') }}">
-            <img class="img-fluid" src="{{ asset('img/nailslogo.jpg') }}" alt="Cristy Nails and Beauty" style="max-height: 80px;">
-        </a>
-
-        <!-- Ícono de usuario -->
-        <div class="dropdown">
-    @auth
-        <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle fs-4 me-2 text-danger"></i>
-            <span>{{ Auth::user()->usuario }}</span>
-        </button>
-
-        <ul class="dropdown-menu dropdown-menu-end">
-            @if(Auth::user()->rol === 'admin')
-                
-                <!--Opciones del administrador -->
-                <li><a class="dropdown-item" href="{{ route('paneladmin') }}">Panel de Administración</a></li>
-
-            @elseif(Auth::user()->rol === 'empleado')
-                <!--Opciones del empleado -->
-                <li><a class="dropdown-item" href="{{ route('panelempleado') }}">Panel del Empleado</a></li>
-
-            @elseif(Auth::user()->rol === 'cliente')
-                <!--Opciones del cliente -->
-                <li><a class="dropdown-item" href="{{ route('panelcliente.index') }}">Mi Panel</a></li>
-                <li><a class="dropdown-item" href="{{ route('agendar') }}">Agendar Cita</a></li>
-            @endif
-
-            <li><hr class="dropdown-divider"></li>
-            <li>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button class="dropdown-item text-danger" type="submit">Cerrar sesión</button>
-                </form>
-            </li>
-        </ul>
-
-    @else
-        <a href="{{ route('login') }}" class="btn btn-outline-danger d-flex align-items-center">
-            <i class="bi bi-person fs-4 me-2"></i> Iniciar Sesión
-        </a>
-    @endauth
-</div>
-</header>
 
 
-    <!-- NAV -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, #ff7eb3, #ff758c);">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url('/') }}">Cristy Nails 💅</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route('dashboard') }}">Inicio</a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route('sobrenosotros') }}">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link text-white fw-semibold" href="{{ route('agendar') }}">Agendar Cita</a>
-                    </li>
-                </ul>
+<body class="homepage">
+
+    <!-- ========================= NAVBAR ========================= -->
+    <nav class="navbar navbar-expand-lg bg-light text-uppercase fs-6 p-3 border-bottom align-items-center">
+        <div class="container-fluid">
+
+            <!-- LOGO -->
+            <div class="col-auto">
+                <a class="navbar-brand" href="{{ url('/') }}">
+                    <img src="{{ asset('img/main-logo.png') }}" alt="logo">
+                </a>
+            </div>
+
+            <!-- MENU RESPONSIVE -->
+            <div class="col-auto">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="menuNav">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">Menú</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+
+                    <div class="offcanvas-body text-center">
+
+                        <ul class="navbar-nav mx-auto">
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url('/') }}">Inicio</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('agendar') }}">Agendar Cita</a>
+                            </li>
+
+                            @guest
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('login') }}">Iniciar Sesión</a>
+                                </li>
+                            @endguest
+
+                            @auth
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                        {{ Auth::user()->usuario }}
+                                    </a>
+
+                                    <ul class="dropdown-menu">
+
+                                        @if(Auth::user()->rol === 'admin')
+                                            <li><a class="dropdown-item" href="{{ route('paneladmin') }}">Panel Admin</a></li>
+                                        @endif
+
+                                        @if(Auth::user()->rol === 'empleado')
+                                            <li><a class="dropdown-item" href="{{ route('panelempleado') }}">Panel Empleado</a></li>
+                                        @endif
+
+                                        @if(Auth::user()->rol === 'cliente')
+                                            <li><a class="dropdown-item" href="{{ route('panelclientes') }}">Mi Panel</a></li>
+                                        @endif
+
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <button class="dropdown-item text-danger">Cerrar Sesión</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endauth
+
+                        </ul>
+
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN -->
-    <main class="container my-5">
+    <!-- ========================= CONTENIDO ========================= -->
+    <main class="py-4">
         @yield('content')
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-dark text-white text-center py-3 mt-6">
-        <p class="mb-0">
-            Cristy Nails and Beauty - &copy; {{ date('Y') }} Todos los derechos reservados
-        </p>
-    </footer>
+   <!-- ========================= FOOTER ========================= -->
+<footer id="footer" class="mt-5">
+    <div class="container">
+        <div class="row justify-content-between py-5">
 
-    <!-- Bootstrap 5 JS (con Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <div class="col-md-3">
+                <a href="{{ url('/') }}">
+                    <img src="{{ asset('img/main-logo.png') }}" alt="logo">
+                </a>
+
+                <div class="social-links mt-3">
+                    <ul class="list-unstyled d-flex gap-3">
+
+                        <li>
+                            <a href="https://www.facebook.com/cristysnailsandbeauty/?locale=es_LA" target="_blank" class="text-secondary">
+                                <i class="bi bi-facebook fs-4"></i>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="https://www.instagram.com/cristys_nails_and_beauty/" target="_blank" class="text-secondary">
+                                <i class="bi bi-instagram fs-4"></i>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <h5 class="text-uppercase">Ubicación</h5>
+                <a href="https://maps.app.goo.gl/cusgs7mrAf1jf2Fa8" target="_blank">
+                    Abrir en Google Maps
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <h5 class="text-uppercase">Contacto</h5>
+                <p><a href="tel:+14803632904">+1 (480) 363-2904</a></p>
+            </div>
+
+        </div>
+    </div>
+</footer>
+
+
+    <!-- Scripts -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/plugins.js') }}"></script>
+    <script src="{{ asset('js/SmoothScroll.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+
+
+    <script src="{{ asset('js/script.min.js') }}"></script>
+    <script>
+    new Swiper(".main-swiper", {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        loop: true,
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        },
+        breakpoints: {
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 }
+        }
+    });
+</script>
+
+<script>
+  new Swiper(".main-swiper", {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      loop: true,
+      pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+      },
+      navigation: {
+          nextEl: ".icon-arrow.icon-arrow-right",
+          prevEl: ".icon-arrow.icon-arrow-left",
+      },
+      breakpoints: {
+          768: { slidesPerView: 2 },
+          1024: { slidesPerView: 3 }
+      }
+  });
+</script>
+
+
 </body>
+
 </html>

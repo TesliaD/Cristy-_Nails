@@ -1,19 +1,89 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f8f9fa;
+/* ============================
+   FUENTES PRINCIPALES DEL SITIO
+   ============================ */
+@import url('https://fonts.googleapis.com/css?family=Lato:300,400,700');
+
+:root {
+  --bs-body-font-family: "Jost", Roboto, sans-serif;
 }
 
+body {
+  font-family: 'Jost', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #b08e6b;
+  color: #333;
+}
+
+/* Títulos elegantes */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Marcellus', serif;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.titulo-blanco {
+  color: white !important;
+}
+
+body {
+  font-family: 'Jost', sans-serif;
+}
+
+
+p, a, button, li, span {
+  font-family: 'Jost', Roboto, sans-serif;
+}
+
+.text-primary {
+  color: #333 !important;
+}
+
+/* ==========================================
+   SIDEBAR ESTILOS ELEGANTES
+   ========================================== */
+
+.sidebar { 
+  width: 250px; 
+  min-height: 100vh; 
+  position: fixed; 
+  left: 0; 
+  top: 0; 
+  background-color: #b08e6b !important; 
+  font-family: 'Jost', sans-serif;
+  color: #fff !important;
+}
+
+.sidebar .nav-link {
+  background: transparent !important;
+  color: #fff !important;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #c49a79 !important;
+  color: #fff !important;
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:active,
+.sidebar .nav-link.show {
+  background-color: #d5b08c !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.sidebar .nav-link.active::before {
+  content: none !important;
+}
+
+/* ==========================================
+   CONTENIDO PRINCIPAL
+   ========================================== */
 #wrapper {
   min-height: 100vh;
-}
-
-.sidebar {
-  width: 250px;
-  min-height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-   background-color: #f82061; 
 }
 
 #page-content {
@@ -22,24 +92,217 @@ body {
   border-radius: 10px;
 }
 
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  transition: all 0.3s;
-}
-
+/* Botones */
 .btn {
   border-radius: 10px;
 }
 
-.boton_datos{
-   background-color: green; 
+.boton_datos {
+  background-color: green;
 }
 
-.fc-event {
-      cursor: pointer !important;
+.btn-outline-danger-custom {
+  border: 2px solid #dc3545;
+  color: #dc3545;
+  background-color: transparent;
 }
 
+.btn-outline-danger-custom:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-outline-custom {
+  border: 2px solid #d57474;
+  color: #d57474;
+}
+
+.btn-outline-custom:hover {
+  background-color: #d57474;
+  color: #fff;
+}
+
+/* Botón primario rosa */
+.btn-primary {
+  background-color: #d57474 !important;
+  border-color: #d57474 !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background-color: #b85f5f !important;
+  border-color: #b85f5f !important;
+}
+
+/* ==========================================
+   TABLAS ROSA ESTÉTICAS
+   ========================================== */
+
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
+}
+
+.table thead th {
+  background-color: #d57474 !important;
+  color: white !important;
+  font-family: "Marcellus", serif;
+  padding: 12px;
+  border: none !important;
+}
+
+.table tbody tr:hover {
+  background-color: #ffe3f2 !important;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 12px;
+  font-size: 15px;
+}
+
+.table th, .table td {
+  text-align: center;
+}
+
+/* Borders suaves */
+.table-bordered > :not(caption) > * > * {
+  border-width: 0 !important;
+  border-bottom: 1px solid #ffd0e6 !important;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* ==========================================
+   FULLCALENDAR PREMIUM — ELIMINAR AZUL
+   ========================================== */
+
+.fc-col-header-cell-cushion,
+.fc-scrollgrid-sync-inner a {
+  color: #d57474 !important;
+  font-family: "Marcellus", serif !important;
+}
+
+.fc-daygrid-day-number,
+.fc-daygrid-day-number a {
+  color: #d57474 !important;
+  font-family: "Jost", sans-serif !important;
+}
+
+.fc-event-title,
+.fc-event-time {
+  color: #d57474 !important;
+}
+
+.fc a {
+  color: #d57474 !important;
+  text-decoration: none !important;
+}
+
+.fc .fc-toolbar button {
+  background-color: #d57474 !important;
+  border-color: #d57474 !important;
+  color: #fff !important;
+}
+
+.fc .fc-toolbar button:hover {
+  background-color: #b85f5f !important;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #ffe6e6 !important;
+}
+
+/* ==========================================
+   CALENDARIOJOTO — AISLADO
+   ========================================== */
+
+.calendariojoto {
+  font-family: 'Lato', sans-serif !important;
+}
+
+/* Reset exclusivo dentro */
+.calendariojoto *, 
+.calendariojoto *:after, 
+.calendariojoto *:before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* Texto */
+.calendariojoto body {
+  background: transparent;
+  font-size: 15px;
+  color: #333;
+}
+
+/* Header */
+.calendariojoto .custom-header {
+  background: #d57474;
+  padding: 10px;
+  border-top: 5px solid #d57474;
+  text-align: center;
+}
+
+.calendariojoto .custom-header h2,
+.calendariojoto .custom-header h3 {
+  color: #fff;
+  text-transform: uppercase;
+}
+
+/* Calendario estructura */
+.calendariojoto .fc-calendar-container {
+  height: 400px;
+  padding: 30px;
+  background: #f4fdff;
+  box-shadow: inset 0 1px rgba(255,255,255,0.8);
+  border-radius: 5px;
+}
+
+/* Día de hoy */
+.calendariojoto .fc-calendar .fc-row > div.fc-today {
+  background-color: #d57474 !important;
+}
+
+.calendariojoto .fc-calendar .fc-row > div.fc-today > .fc-date {
+  color: #fff !important;
+}
+
+/* Tamaño celular */
+@media screen and (max-width: 400px) {
+  .calendariojoto .fc-calendar-container { height: 300px; }
+  .calendariojoto .fc-date { font-size: 15px; }
+}
+
+/* ==========================================
+   MODAL AJUSTADO A SIDEBAR
+   ========================================== */
+
+#modalEvento .modal-dialog {
+  position: fixed;
+  left: calc(230px + (100vw - 230px) / 2);
+  top: 35%;
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 768px) {
+  #modalEvento .modal-dialog {
+    left: 50%;
+  }
+}
+
+#modalEvento .modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 1rem;
+}
+
+/* Notificación */
 .mini-alert {
   position: fixed;
   padding: 15px 25px;
@@ -52,15 +315,3 @@ body {
   opacity: 0;
   transition: all .4s ease;
 }
-
-.center-alert {
-  left: calc(230px + (100vw - 230px) / 2);
-  top: 35%;
-  transform: translate(-50%, -50%);
-}
-
-.center-alert.show {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-

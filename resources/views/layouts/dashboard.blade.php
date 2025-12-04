@@ -4,48 +4,94 @@
 
 @section('content')
 
-<h1 class="text-center fw-bold mb-5" style="font-size: 2.8rem;">
-    Nuestros Servicios
-</h1>
 
-<div class="row justify-content-center g-4">
-    @forelse($servicios as $servicio)
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3 d-flex">
-            <div class="card shadow-sm border-0 rounded-4 w-100" style="overflow: hidden;">
-                
-                <!-- Imagen -->
-                <a href="{{ route('agendar', ['servicio' => $servicio->Nom_Servicio]) }}">
-                    <img src="{{ $servicio->imagen ? asset('storage/' . $servicio->imagen) : asset('img/default-servicio.jpg') }}"
-                         class="card-img-top"
-                         alt="{{ $servicio->Nom_Servicio }}"
-                         style="height: 220px; object-fit: cover;">
-                </a>
 
-                <div class="card-body text-center">
 
-                    <h5 class="card-title fw-bold">
-                        💅 {{ $servicio->Nom_Servicio }}
-                    </h5>
+{{-- SECCIÓN DEL CARRUSEL DE SERVICIOS --}}
+<section id="billboard" class="py-5 mt-3" style="background:#f1f1f0;">
+    <div class="container">
 
-                    <p class="text-primary fw-semibold" style="font-size: 1.1rem;">
-                        ${{ number_format($servicio->Precio, 2) }} MXN
-                    </p>
-
-                    @if($servicio->Descripcion)
-                        <p class="text-muted small">{{ $servicio->Descripcion }}</p>
-                    @endif
-
-                    <a href="{{ route('agendar', ['servicio' => $servicio->Nom_Servicio]) }}"
-                       class="btn btn-pink mt-2 px-4 py-2 rounded-pill">
-                        Agendar
-                    </a>
-
-                </div>
+        {{-- Encabezado --}}
+        <div class="row justify-content-center">
+            <h1 class="section-title text-center mt-4">Nuestros Servicios</h1>
+            <div class="col-md-6 text-center">
+                <p>Nuestro compromiso es realzar tu confianza y bienestar, brindándote servicios de belleza con pasión, precisión y creatividad.</p>
             </div>
         </div>
-    @empty
-        <p class="text-center">No hay servicios disponibles por el momento.</p>
-    @endforelse
-</div>
+
+        {{-- CARRUSEL --}}
+        <div class="row">
+            <div class="swiper main-swiper py-4">
+
+                <div class="swiper-wrapper d-flex border-animation-left">
+
+                    {{-- RECORRER SERVICIOS DINÁMICAMENTE --}}
+                    @forelse($servicios as $servicio)
+
+                        <div class="swiper-slide">
+                            <div class="banner-item image-zoom-effect">
+
+                                {{-- Imagen --}}
+                                <div class="image-holder">
+                                    <a href="{{ route('agendar', ['servicio' => $servicio->Nom_Servicio]) }}">
+                                        <img src="{{ $servicio->imagen ? asset('storage/' . $servicio->imagen) : asset('img/default-servicio.jpg') }}"
+                                             class="img-fluid"
+                                             alt="{{ $servicio->Nom_Servicio }}">
+                                    </a>
+                                </div>
+
+                                {{-- Contenido --}}
+                                <div class="banner-content py-4">
+                                    <h5 class="element-title text-uppercase">
+                                        <a class="item-anchor">{{ $servicio->Nom_Servicio }}</a>
+                                    </h5>
+
+                                    <p class="fw-semibold text-primary">
+                                        ${{ number_format($servicio->Precio, 2) }} MXN
+                                    </p>
+
+                                    @if($servicio->Descripcion)
+                                        <p>{{ $servicio->Descripcion }}</p>
+                                    @endif
+
+                                    <div class="btn-left">
+                                        <a href="{{ route('agendar', ['servicio' => $servicio->Nom_Servicio]) }}"
+                                           class="btn-link fs-6 text-uppercase item-anchor text-decoration-none">
+                                            Agenda ahora
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    @empty
+                        <p class="text-center text-muted">No hay servicios registrados.</p>
+                    @endforelse
+
+                </div>
+
+                {{-- PAGINACIÓN --}}
+                <div class="swiper-pagination"></div>
+
+                {{-- FLECHAS --}}
+                <div class="icon-arrow icon-arrow-left" role="button" aria-label="Anterior">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <div class="icon-arrow icon-arrow-right" role="button" aria-label="Siguiente">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
 
 @endsection

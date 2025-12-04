@@ -23,7 +23,7 @@
             <!-- Columna izquierda (formulario) -->
             <div class="col-md-6 bg-white p-5 d-flex flex-column justify-content-center">
                 <div class="text-center mb-4">
-                    <img src="{{ asset('img/nailslogo.jpg') }}" alt="Logo" width="100">
+                    <img src="{{ asset('img/nailslogo.png') }}" alt="Logo" width="100">
                     <h4 class="mt-3">Cristy Nails and Beauty</h4>
                     <p class="text-muted">Inicia sesión en tu cuenta</p>
                 </div>
