@@ -1,0 +1,83 @@
+/* ================================
+   ESTILO ESPECIAL PARA AGENDAR
+================================== */
+
+:root {
+    --rosa: #e7b4c9;
+    --rosa-claro: #f6dce7;
+    --rosa-oscuro: #c97da3;
+    --gris-texto: #555;
+}
+
+/* Contenedor */
+.card-agendar {
+    border-radius: 22px;
+    overflow: hidden;
+    border: none;
+    background: white;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.10);
+}
+
+/* Header */
+.card-agendar .card-header {
+    background: linear-gradient(90deg, var(--rosa-oscuro), var(--rosa));
+    color: white;
+    text-align: center;
+    padding: 35px 20px;
+}
+
+.card-agendar h3 {
+    font-weight: 700;
+    font-size: 1.6rem;
+}
+
+/* Labels */
+.form-label {
+    color: var(--rosa-oscuro);
+    font-weight: 600;
+}
+
+/* Inputs */
+.form-control,
+.form-select {
+    border-radius: 30px;
+    padding: 12px 18px;
+    border: 2px solid var(--rosa-claro);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--rosa-oscuro);
+    box-shadow: 0 0 0 0.15rem rgba(201, 125, 163, 0.25);
+}
+
+/* Textarea */
+textarea.form-control {
+    border-radius: 18px;
+}
+
+/* Botón principal */
+.btn-agendar {
+    background: linear-gradient(90deg, var(--rosa-oscuro), var(--rosa));
+    border: none;
+    border-radius: 30px;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: .2s;
+}
+
+.btn-agendar:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* Alertas */
+.alert {
+    border-radius: 14px;
+}
+
+/* SweetAlert personalizado */
+.swal2-popup {
+    border-radius: 20px !important;
+}

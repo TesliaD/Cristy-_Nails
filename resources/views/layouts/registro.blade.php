@@ -4,37 +4,72 @@
 
 @section('content')
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registro - Cristy Nails and Beauty</title>
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    /* Contenedor principal */
+    .register-card {
+        max-width: 1200px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        background: #fff;
+        margin-top: 40px;
+        margin-bottom: 40px;
+        animation: fadeIn 0.8s forwards;
+    }
 
-    <!-- Tus estilos -->
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    /* Inputs más grandes y elegantes */
+    .form-control {
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
 
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+    /* Hover */
+    .form-control:focus {
+        border-color: #d63384;
+        box-shadow: 0 0 5px rgba(214, 51, 132, 0.4);
+    }
 
-<body class="login-body d-flex align-items-center vh-100">
-    <div class="container">
-        <div class="row shadow-lg rounded overflow-hidden">
+    /* Botón principal */
+    .btn-primary {
+        background-color: #d63384;
+        border: none;
+        padding: 12px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
 
-            <!-- Columna izquierda (formulario) -->
-            <div class="col-md-6 bg-white p-5 d-flex flex-column justify-content-center">
+    .btn-primary:hover {
+        background-color: #b3296e;
+    }
 
-                <div class="text-center mb-4">
-                    <img src="{{ asset('img/nailslogo.jpg') }}" alt="Logo" width="100">
-                    <h4 class="mt-3">Crear cuenta</h4>
-                    <p class="text-muted">Regístrate para continuar</p>
-                </div>
+    /* Animación */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 
-                <!-- ALERTA SWEETALERT DE ERRORES -->
-                @if ($errors->any())
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="row register-card w-100">
+
+        <!-- FORMULARIO -->
+        <div class="col-md-6 p-5">
+
+            <div class="text-center mb-4">
+                <img src="{{ asset('img/nailslogo.jpg') }}" alt="Logo" width="110" class="rounded-circle shadow-sm">
+                <h3 class="mt-3">Crear cuenta</h3>
+                <p class="text-muted">Regístrate para continuar</p>
+            </div>
+
+            <!-- ALERTA ERRORES -->
+            @if ($errors->any())
                 <script>
                     Swal.fire({
                         icon: 'error',
@@ -43,10 +78,10 @@
                         confirmButtonColor: '#d33'
                     });
                 </script>
-                @endif
+            @endif
 
-                <!-- ALERTA SWEETALERT DE ÉXITO -->
-                @if (session('success'))
+            <!-- ALERTA ÉXITO -->
+            @if (session('success'))
                 <script>
                     Swal.fire({
                         icon: 'success',
@@ -55,127 +90,104 @@
                         confirmButtonColor: '#3085d6'
                     });
                 </script>
-                @endif
+            @endif
 
-                <form method="POST" action="{{ route('registro.guardar') }}">
-                    @csrf
+            <form method="POST" action="{{ route('registro.guardar') }}">
+                @csrf
 
-                    <div class="mb-3">
-                        <label for="usuario" class="form-label">Usuario</label>
-                        <input type="text" 
-                               class="form-control @error('usuario') is-invalid @enderror" 
-                               name="usuario" 
-                               id="usuario" 
-                               value="{{ old('usuario') }}" 
-                               required>
-                        
-                        @error('usuario')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Correo electrónico</label>
-                        <input type="email" 
-                               class="form-control @error('email') is-invalid @enderror"
-                               name="email" id="email" 
-                               value="{{ old('email') }}" 
-                               required>
-
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre Completo</label>
-                        <input type="text" 
-                               class="form-control @error('nombre') is-invalid @enderror"
-                               name="nombre" id="nombre" 
-                               value="{{ old('nombre') }}">
-
-                        @error('nombre')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Teléfono</label>
-                        <input type="text" 
-                               class="form-control @error('telefono') is-invalid @enderror"
-                               name="telefono" id="telefono" 
-                               value="{{ old('telefono') }}">
-
-                        @error('telefono')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="direccion" class="form-label">Dirección</label>
-                        <input type="text" 
-                               class="form-control @error('direccion') is-invalid @enderror"
-                               name="direccion" id="direccion" 
-                               value="{{ old('direccion') }}">
-
-                        @error('direccion')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
-                        <input type="date" 
-                               class="form-control @error('fecha_nacimiento') is-invalid @enderror"
-                               name="fecha_nacimiento" id="fecha_nacimiento" 
-                               value="{{ old('fecha_nacimiento') }}">
-
-                        @error('fecha_nacimiento')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" 
-                               class="form-control @error('password') is-invalid @enderror"
-                               name="password" id="password"
-                               required>
-
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
-                        <input type="password" 
-                               class="form-control"
-                               name="password_confirmation" 
-                               id="password_confirmation"
-                               required>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Registrarse</button>
-                    </div>
-                </form>
-
-                <div class="text-center mt-3">
-                    <small>¿Ya tienes cuenta? 
-                        <a href="{{ route('login') }}">Inicia sesión</a>
-                    </small>
+                <div class="mb-3">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" name="usuario" class="form-control @error('usuario') is-invalid @enderror"
+                           value="{{ old('usuario') }}" required>
+                    @error('usuario')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-            </div>
 
-            <!-- Columna derecha (imagen) -->
-            <div class="col-md-6 p-0">
-                <img src="{{ asset('img/iniciosesion.jpg') }}" alt="Imagen" class="w-100 h-100" style="object-fit: cover;">
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">Correo electrónico</label>
+                    <input type="email" name="email"
+                           class="form-control @error('email') is-invalid @enderror"
+                           value="{{ old('email') }}" required>
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
+                <div class="mb-3">
+                    <label class="form-label">Nombre Completo</label>
+                    <input type="text" name="nombre"
+                           class="form-control @error('nombre') is-invalid @enderror"
+                           value="{{ old('nombre') }}">
+                    @error('nombre')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Teléfono</label>
+                    <input type="text" name="telefono"
+                           class="form-control @error('telefono') is-invalid @enderror"
+                           value="{{ old('telefono') }}">
+                    @error('telefono')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Dirección</label>
+                    <input type="text" name="direccion"
+                           class="form-control @error('direccion') is-invalid @enderror"
+                           value="{{ old('direccion') }}">
+                    @error('direccion')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Fecha de nacimiento</label>
+                    <input type="date" name="fecha_nacimiento"
+                           class="form-control @error('fecha_nacimiento') is-invalid @enderror"
+                           value="{{ old('fecha_nacimiento') }}">
+                    @error('fecha_nacimiento')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" name="password"
+                           class="form-control @error('password') is-invalid @enderror" required>
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Confirmar contraseña</label>
+                    <input type="password" name="password_confirmation" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Registrarse
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <small>¿Ya tienes cuenta?
+                    <a href="{{ route('login') }}" class="text-decoration-none">Inicia sesión</a>
+                </small>
+            </div>
         </div>
+
+        <!-- IMAGEN DERECHA -->
+        <div class="col-md-6 p-0">
+            <img src="{{ asset('img/iniciosesion.jpg') }}"
+                 class="w-100 h-100"
+                 style="object-fit: cover;">
+        </div>
+
     </div>
-</body>
-</html>
+</div>
 
 @endsection

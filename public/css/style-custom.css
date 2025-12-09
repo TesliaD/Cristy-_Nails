@@ -1,0 +1,63 @@
+body {
+    font-family: 'Jost', sans-serif;
+}
+
+/* Navbar */
+.navbar-brand span {
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: .3s;
+}
+
+.nav-link:hover {
+    color: #d63384 !important;
+}
+
+/* Footer */
+.footer-area {
+    border-top: 1px solid #eee;
+}
+
+.social-link {
+    font-size: 1.6rem;
+    color: #d63384;
+    transition: .3s;
+}
+
+.social-link:hover {
+    color: #a21860;
+}
+
+/* Cards de servicios */
+.service-card {
+    border-radius: 18px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.1);
+    transition: .3s;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.service-card img {
+    height: 240px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.service-title {
+    font-weight: 600;
+    color: #d63384;
+}
+
+/* Botón */
+.btn-primary, .btn-outline-primary {
+    border-radius: 30px;
+}
