@@ -1,97 +1,83 @@
 @extends('layouts.app')
-
 @section('title', 'Nuestros Servicios')
 
 @section('content')
 
+<section class="container">
 
+    <div class="text-center mb-4">
+        <h1 class="fw-bold" style="color: var(--rosa-oscuro);">Nuestros Servicios</h1>
+        <p class="text-muted">Realzamos tu belleza con pasión y precisión.</p>
+    </div>
 
+    <!-- CARRUSEL SWIPER -->
+    <div class="swiper main-swiper">
 
-{{-- SECCIÓN DEL CARRUSEL DE SERVICIOS --}}
-<section id="billboard" class="py-5 mt-3" style="background:#f1f1f0;">
-    <div class="container">
+        <div class="swiper-wrapper">
 
-        {{-- Encabezado --}}
-        <div class="row justify-content-center">
-            <h1 class="section-title text-center mt-4">Nuestros Servicios</h1>
-            <div class="col-md-6 text-center">
-                <p>Nuestro compromiso es realzar tu confianza y bienestar, brindándote servicios de belleza con pasión, precisión y creatividad.</p>
-            </div>
-        </div>
+            @foreach($servicios as $servicio)
+                <div class="swiper-slide p-0">
 
-        {{-- CARRUSEL --}}
-        <div class="row">
-            <div class="swiper main-swiper py-4">
+                    <div class="service-card">
 
-                <div class="swiper-wrapper d-flex border-animation-left">
+                        <img src="{{ $servicio->imagen ? asset('storage/'.$servicio->imagen) : asset('img/default-servicio.jpg') }}">
 
-                    {{-- RECORRER SERVICIOS DINÁMICAMENTE --}}
-                    @forelse($servicios as $servicio)
+                        <div class="p-3">
+                            <h5 class="service-title">{{ $servicio->Nom_Servicio }}</h5>
 
-                        <div class="swiper-slide">
-                            <div class="banner-item image-zoom-effect">
+                            <p class="fw-bold text-dark">
+                                ${{ number_format($servicio->Precio, 2) }} MXN
+                            </p>
 
-                                {{-- Imagen --}}
-                                <div class="image-holder">
-                                    <a href="{{ route('agendar', ['servicio' => $servicio->Nom_Servicio]) }}">
-                                        <img src="{{ $servicio->imagen ? asset('storage/' . $servicio->imagen) : asset('img/default-servicio.jpg') }}"
-                                             class="img-fluid"
-                                             alt="{{ $servicio->Nom_Servicio }}">
-                                    </a>
-                                </div>
+                            @if($servicio->Descripcion)
+                                <p class="text-muted small">{{ $servicio->Descripcion }}</p>
+                            @endif
 
-                                {{-- Contenido --}}
-                                <div class="banner-content py-4">
-                                    <h5 class="element-title text-uppercase">
-                                        <a class="item-anchor">{{ $servicio->Nom_Servicio }}</a>
-                                    </h5>
+                            <a href="{{ route('agendar', ['servicio'=>$servicio->Nom_Servicio]) }}" 
+                               class="btn btn-primary w-100 mt-2">
+                               Agendar ahora
+                            </a>
 
-                                    <p class="fw-semibold text-primary">
-                                        ${{ number_format($servicio->Precio, 2) }} MXN
-                                    </p>
-
-                                    @if($servicio->Descripcion)
-                                        <p>{{ $servicio->Descripcion }}</p>
-                                    @endif
-
-                                    <div class="btn-left">
-                                        <a href="{{ route('agendar', ['servicio' => $servicio->Nom_Servicio]) }}"
-                                           class="btn-link fs-6 text-uppercase item-anchor text-decoration-none">
-                                            Agenda ahora
-                                        </a>
-                                    </div>
-                                </div>
-
-                            </div>
                         </div>
 
-                    @empty
-                        <p class="text-center text-muted">No hay servicios registrados.</p>
-                    @endforelse
+                    </div>
 
                 </div>
+            @endforeach
 
-                {{-- PAGINACIÓN --}}
-                <div class="swiper-pagination"></div>
-
-                {{-- FLECHAS --}}
-                <div class="icon-arrow icon-arrow-left" role="button" aria-label="Anterior">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-                <div class="icon-arrow icon-arrow-right" role="button" aria-label="Siguiente">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-            </div>
         </div>
 
+        <!-- Indicadores -->
+        <div class="swiper-pagination"></div>
+
+        <!-- FLECHAS -->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+
     </div>
+
 </section>
 
-
 @endsection
+
+@push('scripts')
+<script>
+new Swiper(".main-swiper", {
+    slidesPerView: 1,
+    loop: true,
+    spaceBetween: 20,
+    pagination: {
+        el: ".swiper-pagination",
+        clickable: true
+    },
+    navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev"
+    },
+    breakpoints: {
+        768: { slidesPerView: 2 },
+        992: { slidesPerView: 3 }
+    }
+});
+</script>
+@endpush

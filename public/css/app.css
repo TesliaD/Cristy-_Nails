@@ -1,0 +1,100 @@
+       /* ------------------------------
+    FUENTES Y BASE
+    --------------------------------*/
+    body { 
+    font-family: 'Jost', sans-serif; 
+    background: #faf7f8;
+    }
+
+    /* Paleta rosada */
+    :root {
+    --rosa: #e7b4c9;
+    --rosa-claro: #f6dce7;
+    --rosa-oscuro: #c97da3;
+    --gris-texto: #555;
+    }
+
+    /* ------------------------------
+    NAVBAR
+    --------------------------------*/
+    .nav-background{
+        background: var(--rosa-oscuro);
+    }
+
+    .nav-link { 
+    color: var(--gris-texto) !important; 
+    font-weight: 500; 
+    }
+    .nav-link:hover { color: var(--rosa-oscuro) !important; }
+
+    .btn-primary {
+    background: var(--rosa-oscuro);
+    border: none;
+    }
+    .btn-primary:hover { background: var(--rosa); }
+
+    /* ------------------------------
+    SWIPER CARRUSEL
+    --------------------------------*/
+    .swiper-slide {
+    border-radius: 22px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.12);
+    transition: transform .3s;
+    }
+    .swiper-slide:hover {
+    transform: translateY(-8px);
+    }
+
+    .swiper-button-prev, 
+    .swiper-button-next {
+    color: var(--rosa-oscuro);
+    font-weight: bold;
+    }
+
+    /* ------------------------------
+    TARJETAS DE SERVICIO
+    --------------------------------*/
+
+    /* Contenedor general de la tarjeta */
+    .service-card {
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    transition: transform .3s ease;
+    }
+
+    .service-card:hover {
+    transform: translateY(-6px);
+    }
+
+    /* Imagen MÁS GRANDE */
+    .service-card img {
+    width: 100%;
+    height: 350px;      /* ⬆⬆  Aumentado de 200px a 300px */
+    object-fit: cover;
+    border-bottom: 4px solid var(--rosa-claro);
+    }
+
+    /* Título */
+    .service-title {
+    font-weight: 700;
+    color: var(--rosa-oscuro);
+    margin-bottom: 6px;
+    }
+
+    /* ------------------------------
+    FOOTER
+    --------------------------------*/
+    .footer-area {
+    background: #ffffff;
+    margin-top: auto;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    border-top: 4px solid var(--rosa-claro);
+    }
+
+    .footer-area a { color: var(--gris-texto); }
+    .footer-area a:hover { color: var(--rosa-oscuro); }
