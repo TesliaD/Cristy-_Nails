@@ -1,110 +1,162 @@
 /* ============================
-   FUENTES PRINCIPALES DEL SITIO
+   FUENTES PRINCIPALES
    ============================ */
-@import url('https://fonts.googleapis.com/css?family=Lato:300,400,700');
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Marcellus&display=swap');
 
 :root {
-  --bs-body-font-family: "Jost", Roboto, sans-serif;
+  --color-rosa: #d57497;
+  --color-rosa-hover: #c45c80;
+  --color-rosa-claro: #fce6f0;
+  --color-fondo: #c97da3;
+  --color-dorado: #e4c9a8;
+  --color-texto: #333;
+  --sombra-suave: 0 4px 14px rgba(0,0,0,0.15);
 }
 
+/* Animaciones globales */
+.fade-in {
+  animation: fadeIn .6s ease-out forwards;
+}
+
+.scale-in {
+  animation: scaleIn .4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ============================
+   BODY
+   ============================ */
 body {
   font-family: 'Jost', sans-serif;
   margin: 0;
-  padding: 0;
-  background-color: #c97da3 ;
-  color: #333;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
 }
 
-/* Títulos elegantes */
+/* ============================
+   TITULOS
+   ============================ */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Marcellus', serif;
-  color: #333;
   letter-spacing: 1px;
+  color: var(--color-texto);
 }
 
 .titulo-blanco {
   color: white !important;
 }
 
-body {
-  font-family: 'Jost', sans-serif;
-}
-
-
-p, a, button, li, span {
-  font-family: 'Jost', Roboto, sans-serif;
-}
-
-.text-primary {
-  color: #333 !important;
-}
-
-/* ==========================================
-   SIDEBAR ESTILOS ELEGANTES
-   ========================================== */
-
+/* ============================
+   SIDEBAR
+   ============================ */
 .sidebar { 
   width: 250px; 
   min-height: 100vh; 
   position: fixed; 
   left: 0; 
   top: 0; 
-  background-color: #c97da3 !important; 
-  font-family: 'Jost', sans-serif;
+  background: var(--color-rosa) !important;
   color: #fff !important;
+  padding-top: 20px;
+  box-shadow: var(--sombra-suave);
+  animation: slideSidebar .6s ease;
+}
+
+@keyframes slideSidebar {
+  from { transform: translateX(-40px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
 }
 
 .sidebar .nav-link {
-  background: transparent !important;
-  color: #fff !important;
-  font-weight: bold;
-  border-radius: 6px;
-  padding: 8px 12px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: .3s ease;
 }
 
-.sidebar .nav-link:hover {
-  background-color: #e7b4c9 !important;
-  color: #fff !important;
+/* TEXTO NEGRO DEL MENU */
+.sidebar .nav-link,
+.sidebar .nav-link i {
+  color: #000 !important;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:hover i {
+  color: #000 !important;
+  background-color: var(--color-rosa-hover) !important;
+  transform: translateX(5px);
 }
 
 .sidebar .nav-link.active,
-.sidebar .nav-link:active,
-.sidebar .nav-link.show {
-  background-color: #d5b08c !important;
-  color: #fff !important;
-  box-shadow: none !important;
+.sidebar .nav-link.active i {
+  background-color: var(--color-dorado) !important;
+  color: #000 !important;
 }
 
-.sidebar .nav-link.active::before {
-  content: none !important;
-}
-
-/* ==========================================
+/* ============================
    CONTENIDO PRINCIPAL
-   ========================================== */
-#wrapper {
-  min-height: 100vh;
-}
-
+   ============================ */
 #page-content {
   margin-left: 250px;
-  background-color: #fff;
-  border-radius: 10px;
+  padding: 20px;
+  background: white;
+  border-radius: 14px;
+  min-height: 100vh;
+  animation: fadeIn .7s ease-out;
 }
 
-/* Botones */
+/* ============================
+   BOTONES
+   ============================ */
 .btn {
-  border-radius: 10px;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 600;
+  transition: .25s ease;
 }
 
-.boton_datos {
-  background-color: green;
+/*Boton para cerrar sesion*/
+.btn-cerrarsesion{
+  background-color: #FA3F3C;
 }
 
+/* Primario rosa */
+.btn-primary {
+  background-color: var(--color-rosa) !important;
+  border-color: var(--color-rosa) !important;
+  color: #fff !important;
+  box-shadow: var(--sombra-suave);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-rosa-hover) !important;
+  transform: scale(1.03);
+}
+
+/* Botón Outline Rosa */
+.btn-outline-custom {
+  border: 2px solid var(--color-rosa);
+  color: var(--color-rosa);
+}
+
+.btn-outline-custom:hover {
+  background-color: var(--color-rosa);
+  color: #fff;
+}
+
+/* Eliminar */
 .btn-outline-danger-custom {
   border: 2px solid #dc3545;
   color: #dc3545;
-  background-color: transparent;
 }
 
 .btn-outline-danger-custom:hover {
@@ -112,206 +164,89 @@ p, a, button, li, span {
   color: #fff;
 }
 
-.btn-outline-custom {
-  border: 2px solid #d57474;
-  color: #d57474;
-}
-
-.btn-outline-custom:hover {
-  background-color: #d57474;
-  color: #fff;
-}
-
-/* Botón primario rosa */
-.btn-primary {
-  background-color: #d57474 !important;
-  border-color: #d57474 !important;
-  color: #fff !important;
-}
-
-.btn-primary:hover {
-  background-color: #b85f5f !important;
-  border-color: #b85f5f !important;
-}
-
-/* ==========================================
-   TABLAS ROSA ESTÉTICAS
-   ========================================== */
-
+/* ============================
+   TABLAS ESTÉTICAS
+   ============================ */
 .table {
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
   background: white;
-  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
+  box-shadow: var(--sombra-suave);
+  animation: fadeIn .5s ease-out;
 }
 
 .table thead th {
-  background-color: #d57474 !important;
-  color: white !important;
+  background-color: var(--color-rosa);
+  color: white;
+  padding: 14px;
   font-family: "Marcellus", serif;
-  padding: 12px;
-  border: none !important;
+  font-size: 17px;
 }
 
 .table tbody tr:hover {
-  background-color: #ffe3f2 !important;
+  background-color: var(--color-rosa-claro);
 }
 
 .table td {
-  vertical-align: middle;
-  padding: 12px;
+  padding: 14px;
   font-size: 15px;
 }
 
-.table th, .table td {
-  text-align: center;
+.card-headerServicios{
+  background-color: #c45c80;
 }
 
-/* Borders suaves */
-.table-bordered > :not(caption) > * > * {
-  border-width: 0 !important;
-  border-bottom: 1px solid #ffd0e6 !important;
-}
-
-.table tbody tr:last-child td {
-  border-bottom: none !important;
-}
-
-/* ==========================================
-   FULLCALENDAR PREMIUM — ELIMINAR AZUL
-   ========================================== */
-
+/* ============================
+   FULLCALENDAR ROSA PREMIUM
+   ============================ */
 .fc-col-header-cell-cushion,
-.fc-scrollgrid-sync-inner a {
-  color: #d57474 !important;
-  font-family: "Marcellus", serif !important;
-}
-
+.fc-scrollgrid-sync-inner a,
 .fc-daygrid-day-number,
 .fc-daygrid-day-number a {
-  color: #d57474 !important;
-  font-family: "Jost", sans-serif !important;
+  color: var(--color-rosa) !important;
+  font-family: "Marcellus", serif !important;
 }
 
 .fc-event-title,
 .fc-event-time {
-  color: #d57474 !important;
-}
-
-.fc a {
-  color: #d57474 !important;
-  text-decoration: none !important;
+  color: var(--color-rosa) !important;
 }
 
 .fc .fc-toolbar button {
-  background-color: #d57474 !important;
-  border-color: #d57474 !important;
+  background-color: var(--color-rosa) !important;
+  border-color: var(--color-rosa) !important;
   color: #fff !important;
 }
 
 .fc .fc-toolbar button:hover {
-  background-color: #b85f5f !important;
+  background-color: var(--color-rosa-hover) !important;
 }
 
-.fc-daygrid-day:hover {
-  background-color: #ffe6e6 !important;
-}
-
-/* ==========================================
-   CALENDARIOJOTO — AISLADO
-   ========================================== */
-
-.calendariojoto {
-  font-family: 'Lato', sans-serif !important;
-}
-
-/* Reset exclusivo dentro */
-.calendariojoto *, 
-.calendariojoto *:after, 
-.calendariojoto *:before {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-/* Texto */
-.calendariojoto body {
-  background: transparent;
-  font-size: 15px;
-  color: #333;
-}
-
-/* Header */
-.calendariojoto .custom-header {
-  background: #d57474;
-  padding: 10px;
-  border-top: 5px solid #d57474;
-  text-align: center;
-}
-
-.calendariojoto .custom-header h2,
-.calendariojoto .custom-header h3 {
-  color: #fff;
-  text-transform: uppercase;
-}
-
-/* Calendario estructura */
-.calendariojoto .fc-calendar-container {
-  height: 400px;
-  padding: 30px;
-  background: #f4fdff;
-  box-shadow: inset 0 1px rgba(255,255,255,0.8);
-  border-radius: 5px;
-}
-
-/* Día de hoy */
-.calendariojoto .fc-calendar .fc-row > div.fc-today {
-  background-color: #d57474 !important;
-}
-
-.calendariojoto .fc-calendar .fc-row > div.fc-today > .fc-date {
-  color: #fff !important;
-}
-
-/* Tamaño celular */
-@media screen and (max-width: 400px) {
-  .calendariojoto .fc-calendar-container { height: 300px; }
-  .calendariojoto .fc-date { font-size: 15px; }
-}
-
-/* ==========================================
-   MODAL AJUSTADO A SIDEBAR
-   ========================================== */
-
+/* ============================
+   MODAL ADAPTADO
+   ============================ */
 #modalEvento .modal-dialog {
-  position: fixed;
-  left: calc(230px + (100vw - 230px) / 2);
-  top: 35%;
-  transform: translate(-50%, -50%);
-}
-
-@media (max-width: 768px) {
-  #modalEvento .modal-dialog {
-    left: 50%;
-  }
+  animation: scaleIn .3s ease-out;
 }
 
 #modalEvento .modal-body {
   max-height: 60vh;
   overflow-y: auto;
-  padding-right: 1rem;
 }
 
-/* Notificación */
+/* ============================
+   ALERTA MINI
+   ============================ */
 .mini-alert {
   position: fixed;
   padding: 15px 25px;
-  background: #f369ff;
+  background: var(--color-rosa);
   color: #fff;
   font-weight: bold;
   border-radius: 10px;
-  box-shadow: 0 4px 10px #0004;
+  box-shadow: var(--sombra-suave);
   z-index: 99999;
   opacity: 0;
+  transform: translateY(-20px);
   transition: all .4s ease;
 }

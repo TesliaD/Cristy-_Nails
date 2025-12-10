@@ -25,10 +25,7 @@
  <!-- Fuentes de Google -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-  href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Marcellus&display=swap"
-  rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Marcellus&display=swap" rel="stylesheet">
 
 
 </head>
@@ -56,75 +53,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 <body>
-  <div class="d-flex" id="wrapper">
 
-    <!-- Sidebar del Panel -->
-    <div class="sidebar text-white p-3 sidebar">
+<div id="wrapper" class="d-flex">
 
-      <a href="{{ route('dashboard') }}">
-  <img src="{{ asset('img/main-logo.png') }}" 
-       alt="Cristy Nails and Beauty"
-       class="d-block mx-auto"
-       style="width: 160px; height: auto;">
-</a>
+    <!-- SIDEBAR -->
+    <div class="sidebar text-white">
 
+        <a href="{{ route('dashboard') }}" class="text-center d-block mb-4">
+            <img src="{{ asset('img/main-logo.png') }}"
+                 alt="Cristy Nails and Beauty"
+                 class="mx-auto d-block"
+                 style="width: 150px;">
+        </a>
 
-      <ul class="nav flex-column mt-4">
+        <ul class="nav flex-column px-3">
 
-        <!-- Dashboard / Inicio -->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('dashboard')">
-            <i class="bi bi-speedometer2"></i> Dashboard
-          </a>
-        </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" onclick="mostrarSeccion('dashboard')">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
 
-        <!--Gestion de Empleados-->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('empleados')">
-              <i class="bi bi-person-raised-hand"></i> Empleados
-          </a>
-        </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" onclick="mostrarSeccion('empleados')">
+                    <i class="bi bi-person-raised-hand"></i> Empleados
+                </a>
+            </li>
 
-        <!-- Gestión de clientes -->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('clientes')">
-            <i class="bi bi-people-fill"></i> Clientes
-          </a>
-        </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" onclick="mostrarSeccion('clientes')">
+                    <i class="bi bi-people-fill"></i> Clientes
+                </a>
+            </li>
 
-        <!-- Gestión de citas -->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white" onclick="mostrarSeccion('citas')">
-            <i class="bi bi-calendar-week"></i> Citas
-          </a>
-        </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" onclick="mostrarSeccion('citas')">
+                    <i class="bi bi-calendar-week"></i> Citas
+                </a>
+            </li>
 
-        <!-- Gestión de servicios -->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white " onclick="mostrarSeccion('servicios')">
-            <i class="bi bi-scissors"></i> Servicios
-          </a>
-        </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" onclick="mostrarSeccion('servicios')">
+                    <i class="bi bi-scissors"></i> Servicios
+                </a>
+            </li>
 
-        <!-- Reportes -->
-        <li class="nav-item mb-2">
-          <a href="#" class="nav-link text-white" onclick="mostrarSeccion('reportes')">
-            <i class="bi bi-bar-chart-line"></i> Reportes
-          </a>
-        </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" onclick="mostrarSeccion('reportes')">
+                    <i class="bi bi-bar-chart-line"></i> Reportes
+                </a>
+            </li>
 
-        <!-- Cerrar sesión -->
-        <li class="nav-item mt-4">
-          <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="btn btn-light w-100 fw-bold">
-              <i class="bi bi-box-arrow-left"></i> Cerrar sesión
-            </button>
-          </form>
-        </li>
+            <li class="nav-item mt-4">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button class="btn logout-btn w-100 btn-cerrarsesion">
+                        <i class="bi bi-box-arrow-left"></i> Cerrar sesión
+                    </button>
+                </form>
+            </li>
 
-      </ul>
-    </div> <!--Fin del sidebar-->
+        </ul>
+
+    </div>
 
 
     <!-- Contenido principal -->
@@ -854,66 +845,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
        <!-- SERVICIOS -->
       <section id="servicios" class="mb-5" style="display:none; min-height:100vh;">
-        <div class="container-fluid">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-             <h2 class="fw-bold mb-1" style="color: #d57474;">Gestión de Servicios</h2>
+          <div class="container-fluid">
 
-              <p class="text-muted">Administra los servicios ofrecidos por tu negocio.</p>
-            </div>
-            <button 
-            class="btn px-4 py-2 shadow-sm text-white" 
-            style="background-color: #5c381c; border-color: #5c381c;"
-            onclick="document.getElementById('form-servicio').scrollIntoView({ behavior: 'smooth' })">
-            Agregar Servicio
-          </button>
+              <!-- Título + Botón -->
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                      <h2 class="fw-bold mb-1" style="color: #d57474;">Gestión de Servicios</h2>
+                      <p class="text-muted">Administra los servicios ofrecidos por tu negocio.</p>
+                  </div>
+              </div>
 
-          </div>
+              <!-- FORMULARIO -->
+              <div class="card shadow-lg border-0 mb-5" id="form-servicio" style="border-radius: 18px;">
+                  <div class="card-body p-4">
 
-          <!-- FORMULARIO -->
-          <div class="card shadow-sm border-0 mb-5" id="form-servicio">
-            <div class="card-body">
-              <form action="{{ route('servicios.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="row g-4 align-items-end">
-                  <div class="col-lg-3 col-md-6">
-                    <label class="form-label ">Nombre del servicio</label>
-                    <input type="text" name="Nom_Servicio" class="form-control" placeholder="Ej. Uñas acrílicas" required>
+                      <h4 class="fw-bold mb-4" style="color:#d57474;">Registrar nuevo servicio</h4>
+
+                      <form action="{{ route('servicios.store') }}" method="POST" enctype="multipart/form-data">
+                          @csrf
+
+                          <div class="row g-4">
+
+                              <!-- Nombre -->
+                              <div class="col-lg-4 col-md-6">
+                                  <label class="form-label fw-semibold">Nombre del servicio</label>
+                                  <input type="text" name="Nom_Servicio" class="form-control shadow-sm" placeholder="Ej. Uñas acrílicas" style="border-radius: 10px;" required>
+                              </div>
+
+                              <!-- Precio -->
+                              <div class="col-lg-2 col-md-4">
+                                  <label class="form-label fw-semibold">Precio ($)</label>
+                                  <input type="number" step="0.01" name="Precio" class="form-control shadow-sm" style="border-radius: 10px;" required>
+                              </div>
+
+                              <!-- Duración -->
+                              <div class="col-lg-2 col-md-4">
+                                  <label class="form-label fw-semibold">Duración (min)</label>
+                                  <input type="number" name="Duracion" class="form-control shadow-sm" style="border-radius: 10px;" required>
+                              </div>
+
+                              <!-- Descripción -->
+                              <div class="col-lg-4 col-md-8">
+                                  <label class="form-label fw-semibold">Descripción</label>
+                                  <textarea name="Descripcion" class="form-control shadow-sm" rows="2" placeholder="Describe el servicio..." style="border-radius: 10px;"></textarea>
+                              </div>
+
+                              <!-- Imagen -->
+                              <div class="col-lg-6 col-md-6">
+                                  <label class="form-label fw-semibold">Imagen del servicio</label>
+                                  <input type="file" name="imagen" class="form-control shadow-sm" accept="image/*" style="border-radius: 10px;">
+                              </div>
+
+                              <!-- Botón -->
+                              <div class="col-lg-3 col-md-6 mt-3">
+                                  <button 
+                                      type="submit"
+                                      class="btn w-100 py-2 shadow-sm text-white"
+                                      style="background-color: #5c381c; border-color: #5c381c; border-radius: 12px;">
+                                      Guardar Servicio
+                                  </button>
+                              </div>
+
+                          </div>
+                      </form>
                   </div>
-                  <div class="col-lg-2 col-md-4">
-                    <label class="form-label ">Precio ($)</label>
-                    <input type="number" step="0.01" name="Precio" class="form-control" required>
-                  </div>
-                  <div class="col-lg-2 col-md-4">
-                    <label class="form-label ">Duración (min)</label>
-                    <input type="number" name="Duracion" class="form-control" required>
-                  </div>
-                  <div class="col-lg-5 col-md-8">
-                    <label class="form-label ">Descripción</label>
-                    <textarea name="Descripcion" class="form-control" rows="2" placeholder="Describe el servicio..."></textarea>
-                  </div>
-                  <div class="col-lg-5 col-md-6">
-                    <label class="form-label ">Imagen del servicio</label>
-                    <input type="file" name="imagen" class="form-control" accept="image/*">
-                  </div>
-                  <div class="col-lg-3 col-md-6 mt-3">
-                  <button 
-                    type="submit" 
-                    class="btn w-100 py-2  shadow-sm text-white" 
-                    style="background-color: #5c381c; border-color: #5c381c;">
-                    Guardar Servicio
-                  </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
+              </div>
 
           <!-- TABLA -->
           <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white fw-semibold">
-              Lista de Servicios
-            </div>
             <div class="card-body p-0">
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
