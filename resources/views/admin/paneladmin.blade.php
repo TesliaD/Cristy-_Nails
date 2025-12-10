@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="sidebar text-white p-3 sidebar">
 
       <a href="{{ route('dashboard') }}">
-  <img src="{{ asset('img/nailslogo1.png') }}" 
+  <img src="{{ asset('img/main-logo.png') }}" 
        alt="Cristy Nails and Beauty"
        class="d-block mx-auto"
        style="width: 160px; height: auto;">
