@@ -4,7 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Marcellus&display=swap');
 
 :root {
-  --color-rosa: #d57497;
+  --color-rosa: #e7b4c9;
   --color-rosa-hover: #c45c80;
   --color-rosa-claro: #fce6f0;
   --color-fondo: #c97da3;
@@ -89,6 +89,11 @@ h1, h2, h3, h4, h5, h6 {
   color: #000 !important;
 }
 
+/*Texto en descripcion*/
+.textodescrip{
+  color: #c45c80;
+}
+
 .sidebar .nav-link:hover,
 .sidebar .nav-link:hover i {
   color: #000 !important;
@@ -126,7 +131,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /*Boton para cerrar sesion*/
 .btn-cerrarsesion{
-  background-color: #FA3F3C;
+  background-color: #c45c80;
 }
 
 /* Primario rosa */
@@ -203,13 +208,13 @@ h1, h2, h3, h4, h5, h6 {
 .fc-scrollgrid-sync-inner a,
 .fc-daygrid-day-number,
 .fc-daygrid-day-number a {
-  color: var(--color-rosa) !important;
+  color: var(--color-rosa-hover) !important;
   font-family: "Marcellus", serif !important;
 }
 
 .fc-event-title,
 .fc-event-time {
-  color: var(--color-rosa) !important;
+  color: var(--color-rosa-hover) !important;
 }
 
 .fc .fc-toolbar button {

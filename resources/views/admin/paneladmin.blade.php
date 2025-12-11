@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Botón agregar -->
          <a href="#" 
             class="btn mb-3" 
-            style="background-color: #d57474; border-color: #d57474; color: white;" 
+            style="background-color: #c45c80; border-color: #c45c80; color: white;" 
             data-bs-toggle="modal" 
             data-bs-target="#nuevoEmpleadoModal">
               <i class="bi bi-plus-circle"></i> Nuevo Empleado
@@ -487,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <a 
           href="#" 
           class="btn mb-3 text-white" 
-          style="background-color: #d57474; border-color: #d57474;"
+          style="background-color: #c45c80; border-color: #c45c80;"
           data-bs-toggle="modal" 
           data-bs-target="#nuevoClienteModal">
           <i class="bi bi-plus-circle"></i> Nuevo Cliente
@@ -558,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <button 
                     type="submit" 
                     class="btn fw-semibold text-white" 
-                    style="background-color: #d57474; border-color: #d57474;">
+                    style="background-color: #c45c80; border-color: #c45c80;">
                     Guardar
                   </button>
 
@@ -901,7 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                   <button 
                                       type="submit"
                                       class="btn w-100 py-2 shadow-sm text-white"
-                                      style="background-color: #5c381c; border-color: #5c381c; border-radius: 12px;">
+                                      style="background-color: #c45c80; border-color: #c45c80; border-radius: 12px;">
                                       Guardar Servicio
                                   </button>
                               </div>
@@ -979,7 +979,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="container-fluid">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h2 class="fw-bold text-primary mb-1">Citas que Atender</h2>
+              <h2 class="fw-bold textodescri mb-1">Citas que Atender</h2>
               <p class="text-muted">Agenda y gestiona las citas de los clientes.</p>
             </div>
           </div>
