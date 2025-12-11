@@ -81,9 +81,10 @@
 
 <body>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script src="{{ asset('js/calendario.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+    <script src="{{ asset('js/calendario.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <div class="d-flex">
     <!-- Sidebar -->
@@ -95,6 +96,19 @@
        class="d-block mx-auto"
        style="width: 200px; height: auto;">
 </a>
+        @if(session('success'))
+    <script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Completado!',
+        text: '{{ session('success') }}',
+        timer: 2000,
+        showConfirmButton: false
+    });
+    </script>
+    @endif
+
+
 
       <ul class="nav flex-column">
         <li class="nav-item mb-2">
@@ -207,34 +221,131 @@
         </div>
       </section>
 
-      <!-- CITAS -->
-      <section id="citas" style="display:none;">
-        <h4><i class="bi bi-calendar-week"></i> Mis Citas de Hoy</h4>
-        <table class="table table-bordered table-striped mt-3">
-          <thead class="">
-            <tr>
-              <th>Cliente</th>
-              <th>Servicio</th>
-              <th>Hora</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse($citas as $cita)
-              <tr>
-                <td>{{ $cita->cliente->nombre ?? 'Sin cliente' }}</td>
-                <td>{{ $cita->servicio->Nom_Servicio ?? 'Sin servicio' }}</td>
-                <td>{{ $cita->hora }}</td>
-                <td>{{ $cita->estado ?? 'Pendiente' }}</td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="5" class="text-center">No tienes citas</td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
-      </section>
+    </section>
+
+
+    <!-- CITAS -->
+    <section id="citas" style="display:none;">
+      <h4><i class="bi bi-calendar-week"></i> Mis Citas de Hoy</h4>
+      <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+          <tr>
+            <th>Cliente</th>
+            <th>Servicio</th>
+            <th>Hora</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+      <tbody>
+        @forelse($citas as $cita)
+          <tr>
+            <td>{{ $cita->cliente->nombre ?? 'Sin cliente' }}</td>
+            <td>{{ $cita->servicio->Nom_Servicio ?? 'Sin servicio' }}</td>
+            <td>{{ $cita->hora }}</td>
+            <td>
+                <button 
+                  class="btn-soft btn-edit"
+                  data-id="{{ $cita->id }}"
+                  data-fecha="{{ $cita->fecha }}"
+                  data-hora="{{ $cita->hora }}"
+                  data-servicio="{{ $cita->servicio->Nom_Servicio }}"
+                  data-notas="{{ $cita->notas }}"
+                  data-costoextra="{{ $cita->costo_extra }}"
+                >
+                  Modificar Orden
+                </button>
+
+
+                <form action="{{ route('empleado.citas.completar', $cita->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button class="btn-soft btn-complete">Completar</button>
+                </form>
+            </td>
+
+          </tr>
+        @empty
+          <tr>
+            <td colspan="5" class="text-center">No tienes citas</td>
+          </tr>
+        @endforelse
+      </tbody>
+
+      </table>
+
+
+
+      <!-- ============================= -->
+      <!-- MODAL PARA EMPLEADO -->
+      <!-- ============================= -->
+      <div class="modal fade" id="citaEmpleadoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <form id="formCitaEmpleado" onsubmit="event.preventDefault();">
+              @csrf
+              <div class="modal-header">
+                <h5 class="modal-title">Detalles de la Cita</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+
+              <div class="modal-body">
+                <input type="hidden" id="cita_id_empleado" name="cita_id">
+
+                <!-- Solo lectura (difuminado) -->
+                <div class="mb-3">
+                  <label class="form-label">Fecha</label>
+                  <div class="bloqueado-wrapper">
+                    <input type="text" id="fechaCitaEmpleado" class="form-control" readonly>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Hora</label>
+                  <div class="bloqueado-wrapper">
+                    <input type="text" id="horaCitaEmpleado" class="form-control" readonly>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Servicio</label>
+                  <div class="bloqueado-wrapper">
+                    <input type="text" id="servicioCitaEmpleado" class="form-control" readonly>
+                  </div>
+                </div>
+
+                                <!-- NUEVO: costo extra por servicio adicional -->
+                <div class="mb-3">
+                  <label class="form-label">Costo extra</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="costoExtra" 
+                    name="costo_extra" 
+                    placeholder="Ejemplo: 50">
+                  <div class="form-text">Si agregó un diseño extra, retiro, etc.</div>
+                </div>
+
+
+                <!-- Campo editable -->
+                <div class="mb-3">
+                  <label class="form-label">Notas</label>
+                  <textarea name="notas" id="notasCitaEmpleado" class="form-control" rows="3"></textarea>
+                </div>
+
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarCambios">Guardar cambios</button>
+
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+
+    </section>
 
       <!-- CLIENTES -->
       <section id="clientes" style="display:none;">
@@ -303,22 +414,97 @@ function mostrarSeccion(id) {
     }
     </script>
 
-  <script>
-    function mostrarSeccion(id) {
-      const secciones = ['inicio', 'dashboard', 'citas', 'servicios', 'clientes', 'calendario'];
-      secciones.forEach(sec => {
-        const elemento = document.getElementById(sec);
-        if (elemento) elemento.style.display = 'none';
-      });
-      if (id === 'inicio') {
-        document.getElementById('inicio').style.display = 'block';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('calendario').style.display = 'block';
-      } else {
-        const seccionActual = document.getElementById(id);
-        if (seccionActual) seccionActual.style.display = 'block';
-      }
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // --- Abrir modal con datos ---
+    const botones = document.querySelectorAll(".btn-edit");
+
+    botones.forEach(btn => {
+        btn.addEventListener("click", function () {
+
+            let id = this.dataset.id;
+
+            let notaTexto = "";
+            let costoExtra = "";
+
+            if (this.dataset.notas) {
+                try {
+                    let notaObj = JSON.parse(this.dataset.notas);
+
+                    // Texto de notas
+                    notaTexto = notaObj.notas || "";
+
+                    // Costo extra si existe
+                    costoExtra = notaObj.extra || "";
+
+                } catch (e) {
+                    // Por si no es JSON
+                    notaTexto = this.dataset.notas;
+                }
+            }
+
+
+            document.getElementById("cita_id_empleado").value = id;
+            document.getElementById("fechaCitaEmpleado").value = this.dataset.fecha;
+            document.getElementById("horaCitaEmpleado").value = this.dataset.hora;
+            document.getElementById("servicioCitaEmpleado").value = this.dataset.servicio;
+            document.getElementById("notasCitaEmpleado").value = notaTexto;
+            document.getElementById("costoExtra").value = costoExtra;
+
+            const modal = new bootstrap.Modal(document.getElementById("citaEmpleadoModal"));
+            modal.show();
+        });
+    });
+
+
+    document.getElementById("btnGuardarCambios").addEventListener("click", async () => {
+      let id = document.getElementById("cita_id_empleado").value;
+
+      let formData = new FormData();
+      formData.append("_token", "{{ csrf_token() }}");
+      formData.append("notas", document.getElementById("notasCitaEmpleado").value);
+      formData.append("costo_extra", document.getElementById("costoExtra").value);
+
+      try {
+        let respuesta = await fetch(`/empleado/citas/${id}/actualizar`, {
+            method: "POST",
+            body: formData
+        });
+
+        if (respuesta.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Se guardaron los cambios!',
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+
+              window.location.href = "/empleado/panelempleado";
+          });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al guardar cambios',
+                showConfirmButton: true
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al guardar cambios',
+            showConfirmButton: true
+        });
     }
-  </script>
+
+  });
+
+
+
+});
+</script>
+
+
 </body>
 </html>

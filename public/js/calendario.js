@@ -445,6 +445,16 @@ $(function () {
 
 			if (citasDelDia.length > 0) {
 			citasDelDia.forEach((evento, i) => {
+
+				let notaTexto = '';
+
+				try {
+					let notaObj = JSON.parse(evento.notas);
+					notaTexto = notaObj.notas; // solo el texto
+				} catch(e) {
+					notaTexto = evento.notas; // por si no es JSON
+				}
+				
 				contenido += `
 				<div class="card mb-3 shadow-sm border-0" style="border-left: 5px solid #007bff; border-radius: 10px;">
 					<div class="card-body">
@@ -452,7 +462,7 @@ $(function () {
 					<p class="mb-1"><strong>👤 Cliente:</strong> ${evento.cliente}</p>
 					<p class="mb-1"><strong>⏰ Hora:</strong> ${evento.hora}</p>
 					<p class="mb-1"><strong>💅 Servicio:</strong> ${evento.servicio}</p>
-					<p class="mb-0"><strong>📝 Notas:</strong> ${evento.notas}</p>
+					<p class="mb-0"><strong>📝 Notas:</strong> ${notaTexto}</p>
 					</div>
 				</div>
 				`;

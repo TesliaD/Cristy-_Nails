@@ -346,6 +346,7 @@
   transform: translate(-50%, -50%) scale(1);
 }
 
+<<<<<<< Updated upstream
 /* Tabla personalizada con tipografía y color rosado */
 .table-custom thead {
   background-color: #d57474 !important; /* Color rosa */
@@ -466,4 +467,59 @@
 /* Texto centrado en todo */
 .table th, .table td {
   text-align: center;
+=======
+
+
+
+.btn-soft {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-edit {
+    background: #0d6efd22;
+    color: #0d6efd;
+}
+
+.btn-edit:hover {
+    background: #0d6efd44;
+}
+
+.btn-complete {
+    background: #19875422;
+    color: #198754;
+}
+
+.btn-complete:hover {
+    background: #19875444;
+}
+
+
+.swal2-popup.center-alert {
+    position: fixed !important;
+    left: calc(230px + (100vw - 230px) / 2) !important;
+    top: 35% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+}
+
+
+
+
+.bloqueado-wrapper {
+  position: relative;
+  opacity: 0.5;
+}
+
+.bloqueado-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  cursor: not-allowed;
+>>>>>>> Stashed changes
 }

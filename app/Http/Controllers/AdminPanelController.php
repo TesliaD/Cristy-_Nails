@@ -110,4 +110,24 @@ class AdminPanelController extends Controller
         return redirect()->back()->with('success', 'Cliente y usuario eliminados correctamente.');
     }
 
+        public function completarCita($id)
+    {
+        $cita = Cita::findOrFail($id);
+        $cita->estado = 'completada';
+        $cita->save();
+
+        return redirect()->back()->with('success', 'La cita se ha completado correctamente.');
+    }
+
+    public function completar($id)
+    {
+        $cita = Cita::findOrFail($id);
+        $cita->estado = 'completada';
+        $cita->save();
+
+        return response()->json(['success' => true]);
+    }
+
+
+
 }

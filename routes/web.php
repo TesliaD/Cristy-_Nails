@@ -89,8 +89,12 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     //Ruta para ver disponibilidad de clientes
     Route::get('/citas/horas-disponibles', [CitaController::class, 'getHorasDisponibles'])->name('citas.horasDisponibles');
 
+        // Marcar cita como completada
+    Route::post('/citas/{id}/completar', [AdminPanelController::class, 'completarCita'])->name('admin.citas.completar');
 
+    Route::put('/paneladmin/citas/{id}/completar',[AdminPanelController::class, 'completar']);
 
+    
 });
 
 //Panel para Empleados
@@ -100,6 +104,12 @@ Route::middleware('auth')->prefix('empleado')->group(function () {
 
     // Calendario - Jalar Cita
     Route::get('/citasempleado', [EmpleadoController::class, 'citasEmpleado'])->name('empleado.citas');
+
+    // Marcar cita como completada
+    Route::post('/citas/{id}/completar', [EmpleadoController::class, 'completarCita'])->name('empleado.citas.completar');
+
+    // Actualizar cita
+    Route::post('/citas/{id}/actualizar', [EmpleadoController::class, 'actualizar'])->name('empleado.citas.actualizar');
 });
 
 

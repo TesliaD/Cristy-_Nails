@@ -159,6 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       </section>
+
+      
       
       <!-- EMPLEADOS -->
       <section id="empleados" class="mb-5" style="display:none;">
@@ -999,9 +1001,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <form id="formCita">
+
+              
               <div class="modal-header">
                 <h5 class="modal-title" id="modalTitulo">Agregar Cita</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                
               </div>
 
               <div class="modal-body">
@@ -1041,6 +1046,18 @@ document.addEventListener('DOMContentLoaded', () => {
                   </select>
                 </div>
 
+                                <!-- NUEVO: costo extra por servicio adicional -->
+                <div class="mb-3">
+                  <label class="form-label">Costo extra</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="costoExtra" 
+                    name="costo_extra" 
+                    placeholder="Ejemplo: 50">
+                  <div class="form-text">Si agregó un diseño extra, retiro, etc.</div>
+                </div>
+
                 <div class="mb-3">
                   <label class="form-label">Empleado</label>
                   <select name="empleado_id" id="empleadoCita" class="form-select" required>
@@ -1058,8 +1075,12 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
 
               <div class="modal-footer">
+              
                 <button type="button" class="btn btn-danger" id="btnEliminar" style="display:none;">Eliminar</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                <button type="button" class="btn btn-success" id="btnCompletar" style="display:none;">Completar</button>
+
                 <button type="submit" class="btn btn-primary">Guardar</button>
               </div>
             </form>
@@ -1266,6 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const modal = new bootstrap.Modal(document.getElementById('citaModal'));
           const form = document.getElementById('formCita');
           const btnEliminar = document.getElementById('btnEliminar');
+          const btnCompletar = document.getElementById('btnCompletar');
           let cita_id = null;
 
           const fechaInput = document.getElementById('fechaCita');
@@ -1286,6 +1308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   form.reset();
                   document.getElementById('modalTitulo').innerText = "Agregar Cita";
                   btnEliminar.style.display = 'none';
+                  btnCompletar.style.display = 'none';
 
                   fechaInput.value = info.dateStr;
                   horaSelect.innerHTML = '<option value="">Selecciona servicio</option>';
@@ -1300,6 +1323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   cita_id = e.id;
                   document.getElementById('modalTitulo').innerText = "Editar Cita";
                   btnEliminar.style.display = 'inline-block';
+                  btnCompletar.style.display = 'inline-block';
 
                   document.getElementById('cita_id').value = e.id;
                   fechaInput.value = data.fecha;
@@ -1319,7 +1343,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
                   document.getElementById('clienteCita').value = data.cliente_id;
                   document.getElementById('empleadoCita').value = data.empleado_id;
-                  document.getElementById('notasCita').value = data.notas ?? '';
+                  let notaTexto = "";
+                  let costoExtra = "";
+
+                  if (data.notas) {
+                      try {
+                          let notaObj = JSON.parse(data.notas);
+
+                          notaTexto = notaObj.notas || "";
+                          costoExtra = notaObj.extra || "";
+
+                      } catch (e) {
+                          // Por si antes se guardó como texto plano
+                          notaTexto = data.notas;
+                      }
+                  }
+
+                  document.getElementById('notasCita').value = notaTexto;
+
+                  // Si tienes input de costo extra
+                  document.getElementById('costoExtra').value = costoExtra;
 
                   modal.show();
               }
@@ -1387,13 +1430,26 @@ document.addEventListener('DOMContentLoaded', () => {
           form.addEventListener('submit', async function(e) {
               e.preventDefault();
 
+              const notaTexto = document.getElementById('notasCita').value;
+              const costoExtraInput = document.getElementById('costoExtra');
+              const costoExtra = costoExtraInput ? costoExtraInput.value : '';
+
+              let notasFinales = notaTexto;
+
+              if (costoExtra !== '') {
+                  notasFinales = JSON.stringify({
+                      notas: notaTexto,
+                      extra: Number(costoExtra)
+                  });
+              }
+
               const payload = {
                   fecha: fechaInput.value,
                   hora: horaSelect.value,
                   cliente_id: document.getElementById('clienteCita').value,
                   servicio_id: servicioSelect.value,
                   empleado_id: document.getElementById('empleadoCita').value,
-                  notas: document.getElementById('notasCita').value
+                  notas: notasFinales
               };
 
               const url = cita_id ? `/admin/paneladmin/citas/${cita_id}` : `/admin/paneladmin/citas`;
@@ -1413,13 +1469,22 @@ document.addEventListener('DOMContentLoaded', () => {
                   const data = await res.json();
 
                   if (res.status === 422) {
-                      Swal.fire({
-                          icon: "warning",
-                          title: "Validación",
-                          text: Object.values(data.errors).flat().join("\n")
-                      });
-                      return;
-                  }
+                    let mensaje = "Error de validación";
+
+                    if (data.errors) {
+                        mensaje = Object.values(data.errors).flat().join("\n");
+                    } else if (data.message) {
+                        mensaje = data.message;
+                    }
+
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Validación",
+                        text: mensaje
+                    });
+                    return;
+                }
+
 
                   if (data.success) {
                       modal.hide();
@@ -1490,6 +1555,26 @@ document.addEventListener('DOMContentLoaded', () => {
                   });
               });
           });
+
+
+          // BOTON DE COMPLETAR
+          btnCompletar.addEventListener('click', () => {
+
+            if (!cita_id) return;
+
+            fetch(`/admin/paneladmin/citas/${cita_id}/completar`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(() => location.reload());
+        });
+
+
+
+          
 
       });
       </script>
@@ -1870,8 +1955,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
   </script>
-
-
 
       <!--ALERTA DE ÉXITO AL REGRESAR DEL CONTROLADOR-->
       @if(session('success'))

@@ -139,4 +139,31 @@ class EmpleadoController extends Controller
     return view('empleados.panelempleados', compact('citas', 'totalClientes', 'totalCitas', 'totalServicios'));
     }
 
+    public function completarCita($id)
+    {
+        $cita = Cita::findOrFail($id);
+        $cita->estado = 'completada';
+        $cita->save();
+
+        return redirect()->back()->with('success', 'La cita se ha completado correctamente.');
+    }
+
+    public function actualizar(Request $request, $id)
+    {
+        $cita = Cita::findOrFail($id);
+
+        $data = [
+            'notas' => $request->notas,
+            'extra' => (int) $request->costo_extra
+        ];
+
+        $cita->notas = json_encode($data);
+        $cita->save();
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+
 }

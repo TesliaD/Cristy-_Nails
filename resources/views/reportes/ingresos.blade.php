@@ -18,8 +18,27 @@ th {
 }
 </style>
 
-<h3>Ingresos Totales</h3>
-<p>${{ number_format($ingresosTotales, 2) }}</p>
+<h3 style="margin-bottom:5px; font-weight:600;">
+    Ingresos Totales
+</h3>
+<p style="
+    font-size: 26px;
+    font-weight: bold;
+    color: #000;
+    margin: 0;
+">
+    ${{ number_format($ingresosTotales, 2) }}
+</p>
+
+<h4 style="margin-bottom:5px">Ingresos Extras<br>(Agregados antes de finalizar una cita)</h4>
+<p style="
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    margin: 0;
+">
+    ${{ number_format($costoExtraTotal, 2) }}
+</p>
 
 <h3>Ingresos por Empleado</h3>
 @if($ingresosPorEmpleado->count())

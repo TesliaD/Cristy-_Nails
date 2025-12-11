@@ -24,16 +24,13 @@ class ReporteController extends Controller
         // ---------------------------------------------------------------------
         if ($tipo === 'clientes') {
 
-            // Clientes que se atendieron
             $clientesAtendidos = Clientes::whereHas('citas', function ($q) use ($inicio, $fin) {
                 $q->whereBetween('fecha', [$inicio, $fin])
                   ->where('estado', 'completada');
             })->get();
 
-            // Clientes nuevos
             $clientesNuevos = Clientes::whereBetween('created_at', [$inicio, $fin])->get();
 
-            // Total de citas por cliente
             $citasPorCliente = Clientes::withCount(['citas' => function ($q) use ($inicio, $fin) {
                 $q->whereBetween('fecha', [$inicio, $fin]);
             }])->get();
@@ -72,9 +69,18 @@ class ReporteController extends Controller
                 ->with('empleado')
                 ->get();
 
-            $data = compact('inicio', 'fin', 'citasAtendidas', 'citasCanceladas', 'citasPorEstatus', 'citasPorEmpleado', 'citasArealizar');
+            $data = compact(
+                'inicio',
+                'fin',
+                'citasAtendidas',
+                'citasCanceladas',
+                'citasPorEstatus',
+                'citasPorEmpleado',
+                'citasArealizar'
+            );
         }
 
+        // ---------------------------------------------------------------------
         // REPORTE DE SERVICIOS
         // ---------------------------------------------------------------------
         if ($tipo === 'servicios') {
@@ -84,7 +90,6 @@ class ReporteController extends Controller
                 ->with(['servicio', 'empleado'])
                 ->get();
 
-            // Servicios más hechos (igual que antes)
             $serviciosMasHechos = Cita::selectRaw('servicio_id, COUNT(*) as total')
                 ->whereBetween('fecha', [$inicio, $fin])
                 ->where('estado', 'completada')
@@ -93,7 +98,6 @@ class ReporteController extends Controller
                 ->with('servicio')
                 ->get();
 
-            // Servicios menos hechos (incluye los que tienen 0)
             $todosServicios = Servicios::all();
             $serviciosMenosHechos = $todosServicios->map(function($servicio) use ($inicio, $fin) {
                 $servicio->total = Cita::where('servicio_id', $servicio->id)
@@ -103,26 +107,60 @@ class ReporteController extends Controller
                 return $servicio;
             });
 
-            // Filtrar solo los que tienen el mínimo total
             $minTotal = $serviciosMenosHechos->min('total');
             $serviciosMenosHechos = $serviciosMenosHechos->filter(fn($s) => $s->total == $minTotal);
 
-            $data = compact('inicio', 'fin', 'serviciosRealizados', 'serviciosMasHechos', 'serviciosMenosHechos');
+            $data = compact(
+                'inicio',
+                'fin',
+                'serviciosRealizados',
+                'serviciosMasHechos',
+                'serviciosMenosHechos'
+            );
         }
-
 
         // ---------------------------------------------------------------------
         // REPORTE DE INGRESOS
         // ---------------------------------------------------------------------
         if ($tipo === 'ingresos') {
 
-            // Total generado (sumando precios del servicio)
+            // Total generado por servicios (precio desde tabla servicios)
             $ingresosTotales = Cita::whereBetween('fecha', [$inicio, $fin])
                 ->where('estado', 'completada')
                 ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
                 ->sum('servicios.Precio');
 
-            // Por empleado
+            // ==================================================
+            // SUMA DE COSTO EXTRA (SEA JSON O TEXTO PLANO)
+            // ==================================================
+            $costoExtraTotal = 0;
+
+            $notas = Cita::whereBetween('fecha', [$inicio, $fin])
+                ->where('estado', 'completada')
+                ->pluck('notas');
+
+            foreach ($notas as $nota) {
+
+                if (!$nota) continue;
+
+                // 1️⃣ INTENTAR DECODIFICAR JSON
+                $json = json_decode($nota, true);
+
+                if (json_last_error() === JSON_ERROR_NONE && isset($json['extra'])) {
+                    $costoExtraTotal += floatval($json['extra']);
+                    continue;
+                }
+
+                // 2️⃣ SI NO ES JSON → TEXTO PLANO
+                if (preg_match('/extra\s*[:=]?\s*(\d+(?:\.\d+)?)/i', $nota, $match)) {
+                    $costoExtraTotal += floatval($match[1]);
+                }
+            }
+
+
+            $ingresosTotales += $costoExtraTotal;
+
+            // Por empleado (igual que antes)
             $ingresosPorEmpleado = Cita::whereBetween('fecha', [$inicio, $fin])
                 ->where('estado', 'completada')
                 ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
@@ -131,7 +169,7 @@ class ReporteController extends Controller
                 ->with('empleado')
                 ->get();
 
-            // Por servicio
+            // Por servicio (igual que antes)
             $ingresosPorServicio = Cita::whereBetween('fecha', [$inicio, $fin])
                 ->where('estado', 'completada')
                 ->join('servicios', 'citas.servicio_id', '=', 'servicios.id')
@@ -140,7 +178,14 @@ class ReporteController extends Controller
                 ->with('servicio')
                 ->get();
 
-            $data = compact('inicio', 'fin', 'ingresosTotales', 'ingresosPorEmpleado', 'ingresosPorServicio');
+            $data = compact(
+                'inicio',
+                'fin',
+                'ingresosTotales',
+                'costoExtraTotal',
+                'ingresosPorEmpleado',
+                'ingresosPorServicio'
+            );
         }
 
         // ---------------------------------------------------------------------
@@ -149,12 +194,10 @@ class ReporteController extends Controller
         $nombrePDF = "reporte_{$tipo}_" . time() . ".pdf";
         $ruta = "reportes/$nombrePDF";
 
-
         $pdf = Pdf::loadView("reportes.$tipo", $data);
         Storage::disk('public')->put($ruta, $pdf->output());
 
-        // Guardar en BD (tabla reportes)
-        \DB::table('reportes')->insert([
+        DB::table('reportes')->insert([
             'tipo' => $tipo,
             'fecha_inicio' => $inicio,
             'fecha_fin' => $fin,
@@ -170,9 +213,5 @@ class ReporteController extends Controller
             'inicio' => $inicio,
             'fin' => $fin
         ]);
-
-
-
-
     }
 }
