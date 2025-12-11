@@ -1134,7 +1134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="modal-body">
-                <form id="formFechas" action="{{ route('reportes.generar') }}">
+                <form id="formFechas" action="{{ route('reportes.generar') }}" method="POST">
                     @csrf
 
                     <label>Fecha inicial</label>
