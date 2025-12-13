@@ -14,6 +14,11 @@ use App\Http\Controllers\BackupController;
 use function PHPUnit\Framework\callback;
 
 
+//Ruuta inicial
+Route::get('/', function () {
+    return redirect()->route('dashboard');
+});
+
 // -----------------------------------------------------------
 // 🧩 GRUPO DE AUTENTICACIÓN (Login / Registro)
 // -----------------------------------------------------------
