@@ -48,6 +48,12 @@
         </li>
 
         <li class="nav-item mb-2">
+          <a href="{{ route('agendar') }}" class="nav-link text-white fw-bold">
+            <i class="bi bi-calendar-week"></i> Agendar Cita
+          </a>
+        </li>
+
+        <li class="nav-item mb-2">
           <a href="#" class="nav-link text-white fw-bold" onclick="mostrarSeccion('citas')">
             <i class="bi bi-calendar-week"></i> Mis Citas
           </a>

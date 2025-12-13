@@ -4,7 +4,57 @@
 
 @section('content')
 
-<link rel="stylesheet" href="{{ asset('css/registro.css') }}">
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    /* Contenedor principal */
+    .register-card {
+        max-width: 1200px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        background: #fff;
+        margin-top: 40px;
+        margin-bottom: 40px;
+        animation: fadeIn 0.8s forwards;
+    }
+
+    /* Inputs más grandes y elegantes */
+    .form-control {
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
+
+    /* Hover */
+    .form-control:focus {
+        border-color: #d63384;
+        box-shadow: 0 0 5px rgba(214, 51, 132, 0.4);
+    }
+
+    /* Botón principal */
+    .btn-primary {
+        background-color: #d63384;
+        border: none;
+        padding: 12px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #b3296e;
+    }
+
+    /* Animación */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 
 <div class="container d-flex justify-content-center align-items-center">
     <div class="row register-card w-100">
@@ -13,8 +63,8 @@
         <div class="col-md-6 p-5">
 
             <div class="text-center mb-4">
-                <img src="{{ asset('img/main-logo.png') }}" alt="Logo" width="110" class="rounded-circle shadow-sm">
-                <h3 class="mt-3 titulo">Crear cuenta</h3>
+                <img src="{{ asset('img/nailslogo.jpg') }}" alt="Logo" width="110" class="rounded-circle shadow-sm">
+                <h3 class="mt-3">Crear cuenta</h3>
                 <p class="text-muted">Regístrate para continuar</p>
             </div>
 
