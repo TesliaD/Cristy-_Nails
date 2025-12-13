@@ -27,7 +27,7 @@
   <nav class="navbar navbar-expand-lg shadow-sm py-3 sticky-top nav-background">
     <div class="container">
 
-      <a class="navbar-brand" href="/">
+      <a class="navbar-brand" href="{{ route('dashboard') }}">
         <img src="{{ asset('img/main-logo.png') }}" height="50">
       </a>
 
