@@ -1243,9 +1243,8 @@ document.addEventListener('DOMContentLoaded', () => {
         min-height: 700px;
         
       }
-      .fc-event { 
-        cursor: pointer;
-      }
+      
+
       .fc {
         background: white;
         border-radius: 10px;

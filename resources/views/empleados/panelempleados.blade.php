@@ -416,7 +416,7 @@ function mostrarSeccion(id) {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
+    mostrarAlertaCitas();
     // --- Abrir modal con datos ---
     const botones = document.querySelectorAll(".btn-edit");
 
@@ -499,10 +499,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
   });
-
-
-
 });
+
+
+
+
+
 </script>
 
 

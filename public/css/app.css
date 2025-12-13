@@ -25,7 +25,7 @@
     color: var(--gris-texto) !important; 
     font-weight: 500; 
     }
-    .nav-link:hover { color: var(--rosa-oscuro) !important; }
+    .nav-link:hover { color: var(--rosa-oscuro) !important; cursor: pointer;}
 
     .btn-primary {
     background: var(--rosa-oscuro);

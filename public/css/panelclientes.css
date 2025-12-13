@@ -99,6 +99,7 @@ h1, h2, h3, h4, h5, h6 {
   color: #000 !important;
   background-color: var(--color-rosa-hover) !important;
   transform: translateX(5px);
+  cursor: pointer;
 }
 
 .sidebar .nav-link.active,
